@@ -1,0 +1,5 @@
+%layout 'sylspace';
+
+<% $self->stash( color => 'beige', avatarid => 'aquamarine-blue-150', homeurl => '/instructor' ); %>
+
+<%= content %>

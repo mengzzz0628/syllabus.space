@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use lib 'lib';
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+use Perl6::Slurp;
+use MIME::Base64;
+use Digest::MD5 qw(md5 md5_hex md5_base64);
+
+plugin 'Mojolyst' => {controllers => 'SylSpace::Controller'};
+plugin 'RenderFile';
+
+## could use either the snippet or /var/sylspace/secrets.txt
+## my $midf= (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id";
+## app->secrets([ md5_base64($midf.$0), 'moniker', 'aha']);
+
+use Perl6::Slurp;
+app->secrets( ((slurp('/var/sylspace/secrets.txt'))[0]) );  ## the first one encodes, the others are usable; maybe rotate by day
+
+our $domain= ".localhost:3000";
+($domain !~ /localhost/) and app->sessions->cookie_domain($domain);
+
+app->start();
+
+# Rotate passphrases
