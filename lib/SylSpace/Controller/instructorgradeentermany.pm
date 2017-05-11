@@ -39,7 +39,7 @@ __DATA__
 %title 'enter grades';
 %layout 'instructor';
 
-<% use SylSpace::Model::Controller qw(mkdatatable) %> <%== mkdatatable('gradebrowser') %>
+<% use SylSpace::Model::Controller qw(mkdatatable); %> <%== mkdatatable('gradebrowser') %>
 
 <main>
 

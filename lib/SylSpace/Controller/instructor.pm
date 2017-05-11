@@ -4,7 +4,7 @@ use Mojolicious::Lite;  ## implied strict, warnings, utf8, 5.10
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo cbuttons msgreadnotread bioiscomplete cioiscomplete lasttweet);
+use SylSpace::Model::Model qw(sudo cbuttons msgreadnotread bioiscomplete cioiscomplete lasttweet _suundo);
 use SylSpace::Model::Controller qw(global_redirect standard msghash2string global_redirect);
 
 ################################################################
@@ -12,6 +12,8 @@ use SylSpace::Model::Controller qw(global_redirect standard msghash2string globa
 my $ihm= sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
+
+  _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
 
   sudo( $subdomain, $c->session->{uemail} );
 
@@ -52,7 +54,6 @@ __DATA__
 
 <main>
 
-  <style> span.epoch { display:none; } </style>
 
   <%== $msgstring %>
 

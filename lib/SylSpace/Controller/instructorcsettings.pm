@@ -39,7 +39,7 @@ __DATA__
     <%== $udrawform %>
 
     <div class="form-group">
-         <button class="btn btn-lg" type="submit" value="submit">Submit These Course Settings</button>
+         <button class="btn btn-default btn-lg" type="submit" value="submit">Submit These Course Settings</button>
     </div>
 
   </form>
@@ -62,18 +62,18 @@ __DATA__
     if (defined($_[0])) {
       foreach(@{$_[0]}) {
 	$rs.= "<tr> ".
-	  "<td> <input class=\"urlin\" id=\"url$count\" name=\"url$count\" value=\"$_->[0]\" readonly size=\"64\" maxwidth=\"128\" /> </td>".
-	  "<td> <input class=\"titlein\" id=\"titlein$count\" name=\"titlein$count\" value=\"$_->[1]\" size=\"12\" maxwidth=\"12\" /></td>".
-	  "<td> <input class=\"textin\" id=\"textin$count\" name=\"textin$count\" value=\"$_->[2]\" size=\"48\" maxwidth=\"48\" /></td>".
+	  "<td> <input class=\"urlin\" id=\"url$count\" name=\"url$count\" value=\"$_->[0]\" readonly size=\"64\" maxsize=\"128\" /> </td>".
+	  "<td> <input class=\"titlein\" id=\"titlein$count\" name=\"titlein$count\" value=\"$_->[1]\" size=\"12\" maxsize=\"12\" /></td>".
+	  "<td> <input class=\"textin\" id=\"textin$count\" name=\"textin$count\" value=\"$_->[2]\" size=\"48\" maxsize=\"48\" /></td>".
 	  "</tr>";
 	++$count;
       }
     }
 
     $rs.= "<tr> ".
-      "<td> <input class=\"urlin\" id=\"url$count\" name=\"url$count\" placeholder=\"e.g., http://google.com\" size=\"64\" maxwidth=\"128\" /> </td>".
-      "<td> <input class=\"titlein\" id=\"titlein$count\" name=\"titlein$count\" placeholder=\"e.g., google\" size=\"12\" maxwidth=\"12\" /></td>".
-      "<td> <input class=\"textin\" id=\"textin$count\" name=\"textin$count\" placeholder=\"e.g., learn more\" size=\"48\" maxwidth=\"48\" /></td>".
+      "<td> <input class=\"urlin\" id=\"url$count\" name=\"url$count\" placeholder=\"e.g., http://google.com\" size=\"64\" maxsize=\"128\" /> </td>".
+      "<td> <input class=\"titlein\" id=\"titlein$count\" name=\"titlein$count\" placeholder=\"e.g., google\" size=\"12\" maxsize=\"12\" /></td>".
+      "<td> <input class=\"textin\" id=\"textin$count\" name=\"textin$count\" placeholder=\"e.g., learn more\" size=\"48\" maxsize=\"48\" /></td>".
       "</tr>";
     return $rs;
   }
@@ -86,7 +86,7 @@ __DATA__
     </table>
 
      <div class="form-group">
-        <button class="btn btn-lg" type="submit" value="submit">Submit Buttons</button>
+        <button class="btn btn-default btn-lg" type="submit" value="submit">Submit Buttons</button>
      </div>
 
   </form>

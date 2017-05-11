@@ -9,7 +9,8 @@ use SylSpace::Model::Controller qw(domain);
 get '/login' => sub {
   my $c = shift;
 
-  (domain($c) =~ /localhost/) or die "this is a controlled function";
+  (time()>=1502385651) and die "sorry, by now you should be in real use.  this is a controlled function, after all";
+  # (domain($c) =~ /localhost/) or die "this is a controlled function";
 
   $c->session->{uemail}= $c->req->query_params->param('email');
   $c->session->{expiration}= time()+3600*24*365;

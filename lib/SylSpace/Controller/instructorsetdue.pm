@@ -24,7 +24,7 @@ get '/instructor/setdue' => sub {
 
   tweet( $subdomain, $c->session->{uemail}, " published ". $params->param('f'). ", due $whendue (GMT ".gmtime($whendue).")" );
 
-  my $msg= "set due date to ".($params->param('duedate'))." ".($params->param('duetime'))." -> ".$whendue;
+  my $msg= "set due to $whendue [".($params->param('duedate'))." ".($params->param('duetime'))." server time]";
   $c->flash(message => $msg)->redirect_to($c->req->headers->referrer);
 };
 

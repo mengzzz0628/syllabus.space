@@ -18,7 +18,7 @@ get '/instructor/filecenter' => sub {
 
   sudo( $subdomain, $c->session->{uemail} );
 
-  $c->stash( filelist => ifilelistall($subdomain, [ 'equizrun', 'view', 'download', 'edit' ], $c->session->{uemail}, "X" ),
+  $c->stash( filelist => ifilelistall($subdomain, $c->session->{uemail}, "X" ),
 	   tzi => tzi( $c->session->{uemail} )  ); ## X means not hw and not equiz
 };
 
@@ -34,14 +34,22 @@ __DATA__
 %title 'file center';
 %layout 'instructor';
 
-<main>
+<script src="/js/dropzone.js"></script>
 
-  <style> span.epoch { display:none; } </style>
+<main>
 
   <% use SylSpace::Model::Controller qw( ifilehash2table fileuploadform);
 
-  <%== ifilehash2table($filelist, 'file', $tzi) %>
+  <%== ifilehash2table($filelist, [ 'view', 'download', 'edit' ], 'file', $tzi) %>
 
   <%== fileuploadform() %>
+
+  <h2> Big Drop Zone </h2>
+
+  <form action="uploadfile" method="POST" class="dropzone"  id="my-awesome-dropzone" enctype="multipart/form-data">
+
+  <img src="/images/mickey.png" />
+
+  </form>
 
 </main>

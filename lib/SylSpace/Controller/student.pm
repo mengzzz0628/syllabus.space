@@ -47,7 +47,6 @@ __DATA__
 %>
 
 <main>
-  <style> span.epoch { display:none; } </style>
 
   <%== $msgstring %>
 

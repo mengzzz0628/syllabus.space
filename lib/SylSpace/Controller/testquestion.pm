@@ -53,10 +53,18 @@ get '/testquestion' => sub {
   use File::Temp qw/ tempfile /;
   my ($FOUT, $FNAME) = tempfile(); print $FOUT $ecode; close($FOUT);
 
+  _confirmnotdangerous( $FNAME, "quizname FNAME" );
+
   my $eresult= `$executable solo < $FNAME`;
 
   $c->stash( template => 'testquestion', ecode => $ecode, eresult => $eresult);
 };
+
+sub _confirmnotdangerous {
+  my ( $string, $warning )= @_;
+  ($string =~ /\;\&\|\>\<\?\`\$\(\)\{\}\[\]\!\#\'/) and die "too dangerous: $warning fails!";  ## we allow '*'
+  return $string;
+}
 
 1;
 

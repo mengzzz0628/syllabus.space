@@ -6,6 +6,8 @@ use strict;
 
 use SylSpace::Model::Controller qw(domain);
 
+
+
 ################################################################
 
 my $authroot= sub {
@@ -15,7 +17,7 @@ my $authroot= sub {
 
   $c->stash( email => $c->session->{uemail} );
 
-  $c->render( template => 'authindex' );
+  $c->render( template => 'authindex');
 };
 
 get '/auth/index' =>  $authroot;
@@ -24,7 +26,6 @@ get '/auth/' =>  $authroot;
 get '/auth/' =>  $authroot;
 
 1;
-
 
 ################################################################
 
@@ -37,21 +38,33 @@ __DATA__
 
 <main>
 
-<p>Here goes dani's code, requesting login.  at the end, it goes back to the referrer (if local) or to <a href="/goclass">/auth/goclass</a>.
+<p>
 
-<p>In the meantime:
+<%  use SylSpace::Model::Controller qw(domain btnblock btn); %>
+
+  <%
+  use SylSpace::Model::Model qw(_listallusers);
+  my $s;
+  my $l= _listallusers();
+  foreach (@$l) {
+    $s .="<li> <a href=\"/login?email=$_\">Make yourself $_</a> </li>\n";
+  }
+  %>
+
+  <h2>Test Site</h2>
+
+  <p>This is a simple testsite, shared by all, public to anyone, and ephemeral (regularly destroyed).  Do not enter anything confidential here.</p>
 
 <ul>
-<li> <a href="/login?email=ivo.welch@gmail.com">Make yourself ivo.welch@gmail.com (who happens to be the su for the mfe class).</a> </li>
-<li> <a href="/login?email=arthur.welch@gmail.com">Make yourself arthur.welch@gmail.com (who happens to be a student in the mfe class).</a> </li>
-<li> <a href="/login?email=x.lily.qiu@gmail.com">Make yourself x.lily.qiu.</a> </li>
-<li> <a href="/login?email=noone@gmail.com">Try making yourself noone@gmail.com, who does not exist</a> </li>
+<%== $s %>
 <li> <a href="/logout">Log out</a> </li>
 </ul>
 
+<hr />
+
 <p>right now, you are <tt><%= $email||"no session email" %></tt>.</p>
 
-
+<!--
 <form method="POST" action="/auth/localverify">
   <div class="row">
 
@@ -77,9 +90,22 @@ __DATA__
     </div>
 
   </div>
-</form>
+  <p> PS: The password could be RSA-encrypted before it is passed to the server. </p>
 
-<p> PS: The password could be RSA-encrypted before it is passed to the server. </p>
+</form>
+-->
+
+<hr />
+
+<!--
+<p>Here will go more sophisticated code, requesting login.  At the end, this code should go back to the referrer (if local) or to <a href="/goclass">/auth/goclass</a>.
+
+<p> <%== btn('/auth/dani', "Go To Dani</h2>") %>
+
+-->
+
+<p> <%== btn("/auth/goclass", "choose class") %>
+
 
 </main>
 

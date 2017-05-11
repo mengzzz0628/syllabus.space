@@ -54,13 +54,13 @@ __DATA__
   }
   $rs .= "</tbody>\n";
 
-  my $studentselector="<select name=\"uemail\" class=\"form-control\">";
-  $studentselector .= qq("<option value=""></option>");
+  my $studentselector="<select name=\"uemail\" class=\"form-control\">\n";
+  $studentselector .= qq(<option value=""></option>);
   foreach (@{$all->{uemail}}) { $studentselector .= qq(<option value="$_">$_</option>); }
   $studentselector .= "</select>\n";
 
-  my $hwselector="<select name=\"task\" class=\"form-control\">";
-  $hwselector .= qq("<option value=""></option>");
+  my $hwselector="<select name=\"task\" class=\"form-control\">\n";
+  $hwselector .= qq(<option value=""></option>);
   foreach (@{$all->{hw}}) { $hwselector .= qq(<option value="$_">$_</option>); }
   $hwselector .= "</select>\n";
 %>
@@ -72,12 +72,12 @@ __DATA__
 
   <p style="font-size:x-small">Click on the column name to enter many student grades for this one task.  If it is a new task, you must first add it.  To enter just one grade for one student, use the following form.</p>
 
-<hr />
+  <hr />
 
-<form method="GET" action="/instructor/gradeenter1">
+  <form method="GET" action="/instructor/gradeenter1">
   <div class="row">
 
-    <div class="col-xs-4">
+    <div class="col-md-3">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-user"></i></span>
         <!-- input type="text" class="form-control" placeholder="student email" name="uemail" -->
@@ -85,44 +85,45 @@ __DATA__
       </div>
     </div>
 
-    <div class="col-xs-2">
+    <div class="col-md-2">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-file"></i></span>
             <%== $hwselector %>
       </div>
     </div>
 
-    <div class="col-xs-2">
+    <div class="col-md-2">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-thermometer-half"></i></span>
         <input type="text" class="form-control" placeholder="grade" name="grade" />
       </div>
     </div>
 
-    <div class="col-xs-1">
+    <div class="col-md-1">
       <div class="input-group">
          <button class="btn btn-default" type="submit" value="submit">Submit 1 New Grade</button>
       </div>
     </div>
 
   </div>
-  <span style="font-size:x-small">For entering many student grades, please click on the column header name instead.</span></form>
+  <span style="font-size:x-small">For entering many student grades, please click on the column header name instead.</span>
+  </form>
 
 <hr />
 
 <form action="/instructor/gradetaskadd">
   <div class="row">
 
-    <div class="col-xs-2">
+    <div class="col-md-2">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-file"></i></span>
          <input type="text" class="form-control" placeholder="task name" name="taskn" />
       </div>
     </div>
 
-    <div class="col-xs-1">
+    <div class="col-md-1">
        <div class="input-group">
-          <button class="btn" type="submit" value="submit">Add 1 New Task Category</button>
+          <button class="btn btn-default" type="submit" value="submit">Add 1 New Task Category</button>
        </div>
     </div>
   </div>
@@ -132,14 +133,16 @@ __DATA__
 
 <hr />
 
-    <form action="studentlist"><button class="btn" value="add students"> add student </button></form>
+  <form action="studentlist">
+  <button class="btn btn-default" value="add students"> Add 1 New Student </button>
+  </form>
 
   <hr />
 
 
-   <div class="row top-buffer text-center">
-     <%== btn('/instructor/gradedownload?f=csv&sf=l', 'Download Long CSV') %>
-     <%== btn('/instructor/gradedownload?f=csv&sf=w', 'Download Wide CSV') %>
+   <div class="row">
+  <div class="col-md-2"><%== btn('/instructor/gradedownload?f=csv&sf=l', 'Download Long CSV') %> </div>
+  <div class="col-md-2"><%== btn('/instructor/gradedownload?f=csv&sf=w', 'Download Wide CSV') %> </div>
   </div>
 
   <p style="font-size:x-small">The long view also contains repeated entries, changes, time stamps, etc.</p>

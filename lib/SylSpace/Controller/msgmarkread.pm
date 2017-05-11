@@ -17,8 +17,9 @@ get '/msgmarkread' => sub {
   my $uemail= $c->session->{uemail};
 
   msgmarkread($subdomain, $uemail, $msgid);
-  my $subject= $c->req->body_params->param('subject');
-  my $priority= $c->req->body_params->param('priority');
+  my $subject= $c->req->body_params->param('subject')||"no subject";
+  my $priority= $c->req->body_params->param('priority')||"no priority";
+
   my $msg= "marked message $msgid as read: '$subject', priority $priority";
 
   $c->flash(message => $msg)->redirect_to($c->req->headers->referrer);

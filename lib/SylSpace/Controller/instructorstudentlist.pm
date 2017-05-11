@@ -33,7 +33,7 @@ __DATA__
 
 <main>
 
-  <% use SylSpace::Model::Controller qw(mkdatatable) %> <%== mkdatatable('namebrowser') %>
+  <% use SylSpace::Model::Controller qw(mkdatatable); %> <%== mkdatatable('namebrowser') %>
 
   <table class="table" id="namebrowser">
     <thead>
@@ -68,8 +68,7 @@ __DATA__
   </div>
    </form>
 
-  <span style="font-size:x-small">For entering many student grades, please click on the column header name instead.</span></form>
-
+  <span style="font-size:x-small">For entering many student grades, please click on the column header name instead.</span>
 
 </main>
 

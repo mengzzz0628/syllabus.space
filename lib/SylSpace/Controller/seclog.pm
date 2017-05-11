@@ -16,13 +16,15 @@ get '/seclog' => sub {
   (userisenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/goclass');
   my $seclog= seclogged($subdomain);
 
+  $c->stash(toprightexit => '<li><a href="/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a></li>');
+
   if (!isinstructor($subdomain, $c->session->{uemail})) {
     my @seclog=split(/\n/, $seclog);
     @seclog = grep { $_ =~ $c->session->{uemail} } @seclog;
     $seclog= join("\n", @seclog);
-    $c->stash( color => 'white', avatarid => 'aquamarine-blue-150', homeurl => '/student' );
+    $c->stash( color => 'white', homeurl => '/student' );
   } else {
-    $c->stash( color => 'orange', avatarid => 'aquamarine-blue-150', homeurl => '/instructor' );
+    $c->stash( color => 'beige', homeurl => '/instructor' );
   }
 
   $c->stash( seclog => $seclog );
@@ -40,8 +42,6 @@ __DATA__
 %layout 'sylspace';
 
 <main>
-
-<h1>Security Log</h1>
 
 <%
     use SylSpace::Model::Controller qw(displaylog);

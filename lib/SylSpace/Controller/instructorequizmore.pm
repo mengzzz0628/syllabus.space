@@ -59,8 +59,6 @@ __DATA__
   }
 %> <%== upl($studentuploaded) %>
 
-  <style> span.epoch { display:none; } </style>
-
 <table class="table" id="eqabrowser">
 <thead> <tr> <th> # </th> <th> Student </th> <th> Score </th> <th> Date </th> </tr> </thead>
 <tbody>

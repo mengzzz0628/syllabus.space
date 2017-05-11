@@ -4,14 +4,22 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
+use SylSpace::Model::Model qw(tweeted isinstructor);
 use SylSpace::Model::Controller qw(global_redirect standard);
-use SylSpace::Model::Model qw(tweeted);
 
 ################################################################
 
 get '/rss' => sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
+
+  $c->stash(toprightexit => '<li><a href="/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a></li>');
+
+  if (isinstructor($subdomain, $c->session->{uemail})) {
+    $c->stash( color => 'beige', homeurl => '/student' );
+  } else {
+    $c->stash( color => 'white', homeurl => '/student' );
+  }
 
   ## enrollment not required
   $c->stash( tweets => tweeted($subdomain) );
@@ -26,11 +34,9 @@ __DATA__
 @@ rss.html.ep
 
 %title 'course activity';
-%layout 'auth';
+%layout 'sylspace';
 
 <main>
-
-<h1>Tweeted Messages</h1>
 
   <%
     use SylSpace::Model::Controller qw(displaylog);

@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(readschema bioread);
+use SylSpace::Model::Model qw(readschema bioread userexists);
 use SylSpace::Model::Controller qw(global_redirect standard drawform);
 
 ################################################################
@@ -12,6 +12,8 @@ use SylSpace::Model::Controller qw(global_redirect standard drawform);
 get '/auth/usettings' => sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
+
+  userexists($c->session->{uemail}) or die "internal error: you were never created";
 
   $c->stash( udrawform=> drawform( readschema('u'), bioread($c->session->{uemail}) ) );
 };
@@ -49,6 +51,13 @@ __DATA__
   <div class="form-group">
      <button class="btn btn-lg" type="submit" value="submit">Submit These Settings</button>
   </div>
+
+  <script>
+      var clientDate = new Date(); //Get date on current client machine
+      var clientDateTimeOffset = (clientDate.getTimezoneOffset() * -1); //account for the offset             
+      var convertToHours = clientDateTimeOffset/60; //Convert it to hours
+      $("#tzi").val(convertToHours); //Update the input control
+  </script>
 
   </form>
 

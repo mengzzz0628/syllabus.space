@@ -17,6 +17,8 @@ get '/instructor/cptemplate' => sub {
 
   my $templatename= $c->req->query_params->param('templatename');
 
+  (($templatename eq /corpfinintro/) && ($subdomain !~ /fin/)) and die "only fin classes are allowed to use the corpfinintro template";
+
   my $nc= cptemplate( $subdomain, $templatename );
 
   return $c->flash( message => "copied $nc equiz files from template $templatename")->redirect_to( 'equizcenter' );

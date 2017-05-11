@@ -35,7 +35,7 @@ get '/student/faq' => sub {
 ## use Mojolicious::Plugin::ContentManagement::Type::Markdown;
 ## ($allfaq) or $allfaq = $markdown->translate(slurp("/faq.md"));
 
-  $c->stash( allfaq => $body, isfaq => $isfaq );
+  $c->stash( allfaq => $body, isfaq => $isfaq, template => 'faq' );
 };
 
 1;
@@ -55,7 +55,7 @@ __DATA__
 
   <dt>What is <i>not</i> intuitive using syllabus.space?  Have an idea to make it easier and better?  Found a dead link?</dt>
 
-  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-syllabus-space">let me know</a>.  I cannot guarantee that I will follow it, but I will consider it.</dd>
+  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-syllabus-space">let me know</a>.  I cannot guarantee that I will follow your recommendation(s), but I will consider it.</dd>
 
   <dt>Why won't my file upload?</dt>
 
@@ -63,9 +63,13 @@ __DATA__
 
 </dl>
 
+<hr />
+
 <h3> Site FAQ </h3>
 
   <%== $allfaq %>
+
+<hr />
 
 <h3> Instructor-added Student FAQ </h3>
 

@@ -18,8 +18,10 @@ get '/instructor/hwcenter' => sub {
 
   sudo( $subdomain, $c->session->{uemail} );
 
-  $c->stash( filetable => ifilelistall($subdomain, [ 'view', 'download', 'edit' ], $c->session->{uemail}, "hw*"),
-	   tzi => tzi( $c->session->{uemail} )  );
+  my $tzi = tzi( $c->session->{uemail} );
+
+  $c->stash( filetable => ifilelistall($subdomain, $c->session->{uemail}, "hw*"),
+	     tzi => $tzi  );
 };
 
 
@@ -38,11 +40,9 @@ __DATA__
 
 <main>
 
-  <style> span.epoch { display:none; } </style>
-
   <% use SylSpace::Model::Controller qw( ifilehash2table fileuploadform); %>
 
-  <%== ifilehash2table($filetable, 'hw', $tzi) %>
+  <%== ifilehash2table($filetable,  [ 'view', 'download', 'edit' ], 'hw', $tzi) %>
 
   <%== fileuploadform() %>
 

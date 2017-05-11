@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo usermorph);
+use SylSpace::Model::Model qw(sudo usermorph ismorphed);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -12,6 +12,8 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 get '/instructor/morph' => sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
+
+  ismorphed($subdomain, $c->session->{uemail}) and return $c->flash( message => "you were already morphed" )->redirect_to('/student');
 
   sudo( $subdomain, $c->session->{uemail} );
 

@@ -19,7 +19,10 @@ post '/auth/localverify' => sub {
   $c->session->{uemailhint}= $uemail;
 
   my $exists= `./requestauthentication`;
-  ($exists eq "ok") or die "cannot find requestauthentication".($exists||"--")."\n";
+  ($exists eq "we exist") or die "cannot find executable requestauthentication".($exists||"--")." in ".`pwd`."\n";
+
+  _confirmnotdangerous($uemail, "email $uemail");
+  _confirmnotdangerous($pw, "pw $pw");
 
   my $ask= `requestauthentication $uemail $pw`;
   ($ask eq $uemail) or die "sorry, but you provided a non-working user password combination!\n";
@@ -30,3 +33,9 @@ post '/auth/localverify' => sub {
 };
 
 1;
+
+sub _confirmnotdangerous {
+  my ( $string, $warning )= @_;
+  ($string =~ /\;\&\|\>\<\?\`\$\(\)\{\}\[\]\!\#\'/) and die "$warning fails!";  ## we allow '*'
+  return $string;
+}

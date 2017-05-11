@@ -4,7 +4,7 @@ use Mojolicious::Lite;  ## implied strict, warnings, utf8, 5.10
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(userisenrolled isinstructor);
+use SylSpace::Model::Model qw(userisenrolled isinstructor _suundo);
 use SylSpace::Model::Controller qw(global_redirect standard domain);
 
 ################################################################
@@ -18,11 +18,14 @@ my $torealhome = sub {
 
   ($subdomain eq "auth") and return $c->redirect_to('/auth/index');
 
-  userisenrolled( $subdomain, $c->session->{uemail} )
+  (userisenrolled( $subdomain, $c->session->{uemail} ))
     or return $c->flash(message => 'we do not know who you are, so you need to authenticate')->redirect_to('http://auth'.domain($c).'/index');
 
-  (isinstructor( $subdomain, $c->session->{uemail} )) and return $c->redirect_to('/instructor/');
-  return $c->redirect_to('/student/');
+  _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
+
+  my $ii= isinstructor( $subdomain, $c->session->{uemail} );
+  my $desturl= ($ii) ? '/instructor' : '/student';
+  return $c->flash(message => $c->session->{uemail}." logs into $desturl for $ii")->redirect_to($desturl);
 };
 
 

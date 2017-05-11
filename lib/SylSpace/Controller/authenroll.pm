@@ -16,6 +16,8 @@ get '/auth/enroll' => sub {
   my $coursename= $c->req->query_params->param('c');
   my $secret= coursesecret($coursename);
 
+  (defined($secret)) or $secret="";
+
   $c->stash( asecret => $secret, coursename => $coursename );
 };
 
@@ -39,7 +41,10 @@ __DATA__
   sub enrollform {
     my ($secret,$coursename)= @_;
 
-    my $q= defined($secret) ? qq( <input class="form-control foo" id="secret" name="secret" placeholder="usually instructor provided" />) : qq( <input class="form-control foo" id="secret" name="secret" placeholder="not required - instructor requests none" readonly />);
+    my $q= '<input class="form-control foo" id="secret" name="secret"'
+      .(($secret ne "") ?
+	'placeholder="usually instructor provided"' :
+	'placeholder="not required - instructor requests none" readonly').' />';
 
     return qq(
 	<form  class="form-horizontal" method="POST"  action="/auth/enrollpost">
@@ -60,7 +65,7 @@ __DATA__
   }
    %>
 
-  <%== enrollform( defined($asecret), $coursename ) %>
+  <%== enrollform( $asecret, $coursename ) %>
 
 </main>
 

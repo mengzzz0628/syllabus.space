@@ -68,7 +68,7 @@ sub filehash2string {
 
     $filestring .= "<tr>"
       . "<td> ". btn("/student/view?f=$fname", "$pencil $fname") . "</td>"
-      . "<td style=\"text-align:left\"> due $duein (<span class=\"epoch\">$duetime</span>)<br />due GMT ". localtime($_->[1])."<br />now GMT ".localtime()."</td>"
+      . "<td style=\"text-align:left\"> due $duein (<span class=\"epoch0\">$duetime</span>)<br />due GMT ". localtime($_->[1])."<br />now GMT ".localtime()."</td>"
       . "<td> $uploadform </td>"
       . '<td> '.$sownfilelist{$fname}.' </td>' ."</tr>";
   }
