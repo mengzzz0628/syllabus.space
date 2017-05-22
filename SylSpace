@@ -1,28 +1,109 @@
 #!/usr/bin/env perl
 use lib 'lib';
-use strict;
-use warnings;
-
-use Mojolicious::Lite;
-use Perl6::Slurp;
-use MIME::Base64;
-use Digest::MD5 qw(md5 md5_hex md5_base64);
+use Mojolicious::Lite; ## strict, warnings, utf8 and Perl 5.10
 
 plugin 'Mojolyst' => {controllers => 'SylSpace::Controller'};
 plugin 'RenderFile';
 
+################################################################################################################################
+
+{
+  (my $pgmname= $0) =~ s{.*/}{};
+  (-l "$pgmname.conf") or die "\nFATAL ERROR: you cannot have the authentication secrets configuration file $pgmname.conf in the github'ed  directory.\n".
+    "it must be a symbolic link to somewhere safe!\n";
+  print "[Authentication secrets resolve to ".readlink("$pgmname.conf")."]\n";
+
+  plugin 'Config';
+
+  my $credentials = app->plugin('Config')->{oauth};
+
+  if (my $google = $credentials->{google}) {
+    my ($key, $secret) = @$google;
+
+    plugin 'Web::Auth' => (
+			   module      => 'Google',
+			   key         => $key,
+			   secret      => $secret,
+			   scope       => 'email',
+			   on_finished => \&SylSpace::Controller::AuthAuthenticator::google,
+			  );
+  }
+
+  if (my $github = $credentials->{github}) {
+    my ($key, $secret) = @$github;
+
+    plugin 'Web::Auth' => (
+			   module      => 'Github',
+			   key         => $key,
+			   secret      => $secret,
+			   on_finished => \&SylSpace::Controller::AuthAuthenticator::github,
+			  );
+  }
+
+  if (my $facebook = $credentials->{facebook}) {
+    my ($key, $secret) = @$facebook;
+
+    plugin 'Web::Auth' => (
+			   module      => 'Facebook',
+			   key         => $key,
+			   secret      => $secret,
+			   scope       => 'email',
+			   on_finished => \&SylSpace::Controller::AuthAuthenticator::facebook
+			  );
+  }
+}
+
+################################################################################################################################
+## http://user.course.syllabus.space -> syllabus.space
+## http://syllabus.space -> syllabus.space
+*Mojo::URL::domain = sub {
+  my $self= shift;
+  my $fulldomain= $self->to_abs->host;
+  ($fulldomain =~ /localhost/) and return "localhost:3000";
+  $fulldomain =~ s{^http.*[^/]*/}{};
+
+  my @f= split(/\./, $fulldomain);
+  (@f) or return;  ## should never happen, so this is an error return
+  return $f[$#f-1].'.'.$f[$#f];  ## the last two: TLD and Domain
+};
+
+
+## http://user.course.syllabus.space -> user.course
+## http://syllabus.space -> undef
+*Mojo::URL::subdomain = sub {
+  my $self= shift;
+  my $fulldomain= $self->to_abs->host;
+  $fulldomain =~ s{^http.*[^/]*/}{};
+
+  my @f= split(/\./, $fulldomain);
+  (@f) or return '';  ## never
+  (pop(@f) ne "localhost") and pop(@f);  ## hehe --- pop again
+  ($#f>=0) or return '';
+  return join('.', @f);
+};
+
+
+################################################################################################################################
+# use MIME::Base64;
+# use Digest::MD5 qw(md5 md5_hex md5_base64);
 ## could use either the snippet or /var/sylspace/secrets.txt
 ## my $midf= (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id";
 ## app->secrets([ md5_base64($midf.$0), 'moniker', 'aha']);
 
-my $pwsecret=slurp('/var/sylspace/secrets.txt');
-
 use Perl6::Slurp;
-app->secrets( [ $pwsecret ] );  ## the first one encodes, the others are usable; maybe rotate by day
+my @pwsecret=slurp('/var/sylspace/secrets.txt');
+app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
 
-our $domain= ".localhost:3000";
-($domain !~ /localhost/) and app->sessions->cookie_domain($domain);
+#use Data::Dumper;
+#die Dumper \%ENV;
+
+$ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'} =~ /^[0-9]+\.0\.0\./)?1:0;
+
+if ($ENV{'ONLOCALHOST'}) {
+  warn "localhost mode only --- logging out does not work correctly\n";
+} else {
+  our $domain=".syllabus.space";
+  app->sessions->cookie_domain($domain);
+}
 
 app->start();
-
-# Rotate passphrases
