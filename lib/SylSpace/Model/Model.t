@@ -36,64 +36,64 @@ note '
 ';
 my @c=qw (mfe.welch mba.welch mba.daniel 2017.mba430.schwartz.ucla);
 
-like(dies { _websitemake($c[0], 'ivo.welch-not-possible-gmail.com') }, qr/email /, 'good fail on bad i email' );
+like(dies { _websitemake($c[0], 'alice.welch-not-possible-gmail.com') }, qr/email /, 'good fail on bad i email' );
 
-foreach (@c) {  ok( _websitemake($_, 'ivo.welch@gmail.com'), "created $_ site" ); }
-ok( !eval { _websitemake($c[0], 'ivo.welch@gmail.com') }, 'cannot create mfe a second time' );
+foreach (@c) {  ok( _websitemake($_, 'alice.welch@gmail.com'), "created $_ site" ); }
+ok( !eval { _websitemake($c[0], 'alice.welch@gmail.com') }, 'cannot create mfe a second time' );
 
-ok( scalar @{courselistenrolled('ivo.welch@gmail.com')} == scalar @c, "need enrollment info on $#c+1 existing courses");
-ok( isenrolled($c[0], 'ivo.welch@gmail.com'), "ivo.welch\@gmail.com is nicely enrolled in $c[0]");
-ok( !isenrolled($c[0], 'arthur.welch@gmail.com'), "arthur is not enrolled in $c[0]");
+ok( scalar @{courselistenrolled('alice.welch@gmail.com')} == scalar @c, "need enrollment info on $#c+1 existing courses");
+ok( isenrolled($c[0], 'alice.welch@gmail.com'), "alice.welch\@gmail.com is nicely enrolled in $c[0]");
+ok( !isenrolled($c[0], 'alice@gmail.com'), "alice is not enrolled in $c[0]");
 
 note '
 ################ auth: user bios
 ';
 
-my %bioivo = ( uniname => 'ucla', regid => 'na', firstname => 'ivo', lastname => 'welch', birthyear => 1963,
-	       email2 => 'ivo.welch@anderson.ucla.edu', zip => 90095, country => 'US', cellphone => '(312) 212-3100',
-	       email => 'ivo.welch@gmail.com', tzi => tziserver(), optional => '' );
-ok( biosave('ivo.welch@gmail.com', \%bioivo), 'written biodata for ivo' );
+my %bioalice = ( uniname => 'ucla', regid => 'na', firstname => 'alice', lastname => 'welch', birthyear => 1963,
+	       email2 => 'alice.welch@anderson.ucla.edu', zip => 90095, country => 'US', cellphone => '(312) 212-3100',
+	       email => 'alice.welch@gmail.com', tzi => tziserver(), optional => '' );
+ok( biosave('alice.welch@gmail.com', \%bioalice), 'written biodata for alice' );
 
-ok( usernew('x.lily.qiu@gmail.com'), 'new lily' );
-my %biolily = ( uniname => 'na', regid => 'na', firstname => 'lily', lastname => 'qiu', birthyear => 1975,
-		email2 => 'x.lily.qiu@gmail.com', zip => 90049, country => 'US', cellphone => '(312) 212-3200',
-		email => 'x.lily.qiu@gmail.com', tzi => tziserver(), optional => '' );
-ok( biosave('x.lily.qiu@gmail.com', \%biolily), 'written biodata for lily' );
+ok( usernew('bob@gmail.com'), 'new bob' );
+my %biobob = ( uniname => 'na', regid => 'na', firstname => 'bob', lastname => 'qiu', birthyear => 1975,
+		email2 => 'bob@gmail.com', zip => 90049, country => 'US', cellphone => '(312) 212-3200',
+		email => 'bob@gmail.com', tzi => tziserver(), optional => '' );
+ok( biosave('bob@gmail.com', \%biobob), 'written biodata for bob' );
 
 
-ok( usernew('arthur.welch@gmail.com'), 'new arthur' );
-my %bioarthur = ( uniname => 'portola', regid => 'na', firstname => 'arthur', lastname => 'welch', birthyear => 2005,
-		  email => 'arthur.welch@gmail.com', zip => 90049, country => 'US', cellphone => '(312) 212-3300',
+ok( usernew('charlie@gmail.com'), 'new charlie' );
+my %biocharlie = ( uniname => 'ucla', regid => 'na', firstname => 'charlie', lastname => 'welch', birthyear => 2005,
+		  email => 'charlie@gmail.com', zip => 90049, country => 'US', cellphone => '(312) 212-3300',
 		  email2 => 'gdtwentyseven@gmail.com', tzi => tziserver(), optional => '' );
 
 ok( usernew('noone@gmail.com'), 'new noone user' );
 
 
-#my $s= Dumper testmodhash(\%bioarthur, 'uniname', '');
+#my $s= Dumper testmodhash(\%biocharlie, 'uniname', '');
 
 sub testmodhash { my ( $h, $k, $v )=@_; my %nh= %$h; $nh{$k}=$v; return \%nh; }
 
-like(dies { biosave('arthur.welch@gmail.com', testmodhash(\%bioarthur, 'uniname', '')) }, qr/required/, 'fail on bad field content for uniname' );
-like(dies { biosave('arthur.welch@gmail.com', testmodhash(\%bioarthur, 'uniname', '&^SD')) }, qr/regex/, 'fail on regex for uniname' );
-like(dies { biosave('arthur.welch@gmail.com', testmodhash(\%bioarthur, 'uniname', 'ucla' x 50)) }, qr/long/, 'fail on length' );
+like(dies { biosave('charlie@gmail.com', testmodhash(\%biocharlie, 'uniname', '')) }, qr/required/, 'fail on bad field content for uniname' );
+like(dies { biosave('charlie@gmail.com', testmodhash(\%biocharlie, 'uniname', '&^SD')) }, qr/regex/, 'fail on regex for uniname' );
+like(dies { biosave('charlie@gmail.com', testmodhash(\%biocharlie, 'uniname', 'ucla' x 50)) }, qr/long/, 'fail on length' );
 
-like(dies { biosave('arthur.welch@gmail.com', testmodhash(\%bioarthur, 'notvalid', 'any')) }, qr/allowed/, 'fail on field that should not be here' );
+like(dies { biosave('charlie@gmail.com', testmodhash(\%biocharlie, 'notvalid', 'any')) }, qr/allowed/, 'fail on field that should not be here' );
 #delete $biosampledata{'notvalid'};
 
-ok( biosave('arthur.welch@gmail.com', \%bioarthur), 'written biodata for arthur' );
+ok( biosave('charlie@gmail.com', \%biocharlie), 'written biodata for charlie' );
 
 ok(dies { usernew('../..@gmail.com') }, 'bad email new user' );
 
-ok( my $ibio=bioread('ivo.welch@gmail.com'), 'reread biodata for ivo' );
-ok( biosave('ivo.welch@gmail.com', $ibio), 'rewrote it' );
+ok( my $ibio=bioread('alice.welch@gmail.com'), 'reread biodata for alice' );
+ok( biosave('alice.welch@gmail.com', $ibio), 'rewrote it' );
 
 note '
 ################ enroll users in course
 ';
 
-ok( isinstructor($c[0],'ivo.welch@gmail.com'), 'ivo.welch\@ is an instructor for mfe' );
-ok( userenroll($c[0], 'x.lily.qiu@gmail.com'), 'enrolled lily' );
-ok( userenroll($c[0], 'arthur.welch@gmail.com'), 'enrolled arthur' );
+ok( isinstructor($c[0],'alice.welch@gmail.com'), 'alice.welch\@ is an instructor for mfe' );
+ok( userenroll($c[0], 'bob@gmail.com'), 'enrolled bob' );
+ok( userenroll($c[0], 'charlie@gmail.com'), 'enrolled charlie' );
 like(dies { userenroll($c[0], 'noone22@gmail.com') }, qr/no such user/, 'cannot enroll non-existing user nooone' );
 
 
@@ -107,7 +107,7 @@ my %ciosample = ( uniname => 'ucla', unicode => 'mfe237', coursesecret => 'judy'
 
 like(dies { ciosave($c[0], \%ciosample) }, qr/insufficient privileges/, 'student cannot write class info' );
 
-sudo($c[0], 'ivo.welch@gmail.com');  ## become the instructor
+sudo($c[0], 'alice.welch@gmail.com');  ## become the instructor
 
 my $w= testmodhash(\%ciosample, 'coursesecret', '&^SD');
 
@@ -139,28 +139,28 @@ ok( msgsave($c[0], { subject => 'third msg', body => 'tres nada nada nada', prio
 ok( msgsave($c[0], { subject => 'fourth msg', body => 'ze meiyou meiyou meiyou', priority => 3 }, 1236), 'posting 1236');
 ok( msgsave($c[0], { subject => 'to be killed', body => 'please die', priority => 3 }, 999), 'posting 999');
 
-ok( msgmarkasread($c[0],'ivo.welch@gmail.com', 1235), 'marking 1235 as read by ivo');
+ok( msgmarkasread($c[0],'alice.welch@gmail.com', 1235), 'marking 1235 as read by alice');
 
-my $msglistnotread= _msglistnotread($c[0],'ivo.welch@gmail.com');
+my $msglistnotread= _msglistnotread($c[0],'alice.welch@gmail.com');
 ok( scalar @{$msglistnotread} == 4, 'correct n=4 messages unread');
 ok( msgdelete($c[0], 999), 'destroying 999');
-$msglistnotread= _msglistnotread($c[0],'ivo.welch@gmail.com');
+$msglistnotread= _msglistnotread($c[0],'alice.welch@gmail.com');
 ok( scalar @{$msglistnotread} == 3, 'correct n=3 messages unread');
 ok( join(" ",@$msglistnotread) eq join(" ", (1233, 1234, 1236)), 'returned correct list of unread' );
 like( (msgread( $c[0], 1235 ))->[0]->{body}, qr/nada nada nada/, 'read 1235 again' );
 
-like( (msgshownotread( $c[0], 'ivo.welch@gmail.com' ))->[0]->{body}, qr/the first message contains nothing/, 'reading message ok' );
+like( (msgshownotread( $c[0], 'alice.welch@gmail.com' ))->[0]->{body}, qr/the first message contains nothing/, 'reading message ok' );
 
 note '
 ################ file storage and retrieval system
 ';
 
-ok( filewrite($c[0], 'ivo.welch@gmail.com', 'hw1.txt', "please do the first homework\n"), 'writing hw1.txt');
-ok( filewrite($c[0], 'ivo.welch@gmail.com', 'hw2.txt', "please do the second homework.  it is longer.\n"), 'writing hw2.txt');
+ok( filewrite($c[0], 'alice.welch@gmail.com', 'hw1.txt', "please do the first homework\n"), 'writing hw1.txt');
+ok( filewrite($c[0], 'alice.welch@gmail.com', 'hw2.txt', "please do the second homework.  it is longer.\n"), 'writing hw2.txt');
 my $e2n= "2medium.equiz"; ok( -e $e2n, "have test for 2medium.equiz for use in Model subdir" );
-ok( filewrite($c[0], 'ivo.welch@gmail.com', $e2n, scalar slurp($e2n)), 'writing $e2n' );
-ok( filewrite($c[0], 'ivo.welch@gmail.com', 'syllabus.txt', "<h2>please read this syllabus</h2>\n"), 'writing syllabus.txt' );
-ok( filewrite($c[0], 'ivo.welch@gmail.com', 'other.txt', "please do this syllabus\n"), 'writing other.txt' );
+ok( filewrite($c[0], 'alice.welch@gmail.com', $e2n, scalar slurp($e2n)), 'writing $e2n' );
+ok( filewrite($c[0], 'alice.welch@gmail.com', 'syllabus.txt', "<h2>please read this syllabus</h2>\n"), 'writing syllabus.txt' );
+ok( filewrite($c[0], 'alice.welch@gmail.com', 'other.txt', "please do this syllabus\n"), 'writing other.txt' );
 
 ####
 like( dies { filesetdue($c[0], 'hw0.txt', time()+100); }, qr/ does not exist/, 'cannot publish non-existing file' );
@@ -172,10 +172,10 @@ ok( filesetdue($c[0], 'other.txt', time()-10000), 'unpublished other.txt' );
 ok( filesetdue($c[0], 'other.txt', time()-10000), 'harmless unpublished again' );
 ok( filesetdue($c[0], 'hw2.txt', time()-100), "unpublished hw2 by setting expiry to be behind us" );
 
-my $npub= arrlen(ifilelistall($c[0], 'ivo.welch@gmail.com'));
+my $npub= arrlen(ifilelistall($c[0], 'alice.welch@gmail.com'));
 ok( $npub == 5, "instructor has 5 files" );
 
-my $publicstruct=sfilelistall($c[0], 'ivo.welch@gmail.com');
+my $publicstruct=sfilelistall($c[0], 'alice.welch@gmail.com');
 $npub= arrlen($publicstruct);
 ok( $npub == 2, "student should see 2 published files (hw1, syllabus) not $npub" );
 
@@ -197,41 +197,41 @@ ok( filesetdue($c[0], 'hw1.txt', time()+1000), "publish 'hw1.txt' by setdue ");
 
 _suundo();
 
-ok( !defined(sownfilelist( $c[0], 'arthur.welch@gmail.com' )), "you have not yet uploaded hw1" );
-like(dies { sownfileread( $c[0], 'arthur.welch@gmail.com', 'hw1.txt' ) }, qr/uploaded/, "arthur cannot read a student submission he has not yet uploaded" );
-like(dies { filewrite($c[0], 'arthur.welch@gmail.com', 'hwneanswer.txt', "I have done hwne text\n", 'hwne.txt') },
-     qr/not collecting/, 'arthur cannot answer nonexisting hw hwne.txt');
+ok( !defined(sownfilelist( $c[0], 'charlie@gmail.com' )), "you have not yet uploaded hw1" );
+like(dies { sownfileread( $c[0], 'charlie@gmail.com', 'hw1.txt' ) }, qr/uploaded/, "charlie cannot read a student submission he has not yet uploaded" );
+like(dies { filewrite($c[0], 'charlie@gmail.com', 'hwneanswer.txt', "I have done hwne text\n", 'hwne.txt') },
+     qr/not collecting/, 'charlie cannot answer nonexisting hw hwne.txt');
 
-ok( filewrite($c[0], 'arthur.welch@gmail.com', 'hw1answer.txt', "I have done hw1 text\n", 'hw1.txt'), 'arthur answered hw1.txt');
-my $ownfiles= join(" ", @{sownfilelist( $c[0], 'arthur.welch@gmail.com' )});
+ok( filewrite($c[0], 'charlie@gmail.com', 'hw1answer.txt', "I have done hw1 text\n", 'hw1.txt'), 'charlie answered hw1.txt');
+my $ownfiles= join(" ", @{sownfilelist( $c[0], 'charlie@gmail.com' )});
 ok( $ownfiles =~ /hw1/, "you have now uploaded hw1" );
 ok( $ownfiles !~ /hw3/, "you had not uploaded hw3" );
 
-sudo($c[0], 'ivo.welch@gmail.com');  ## become the instructor
+sudo($c[0], 'alice.welch@gmail.com');  ## become the instructor
 
-ok( collectstudentanswers($c[0], 'hw1.txt') =~ /zip/, "collected properly submitted hw1 answer for arthur" );
+ok( collectstudentanswers($c[0], 'hw1.txt') =~ /zip/, "collected properly submitted hw1 answer for charlie" );
 
 note '
 ################ grade center
 ';
 
-ok( dies { gradeadd($c[0], 'arthur.welch@gmail.com', 'hw1', 'fail' ) }, "no hw1 yet registered for new grades");
+ok( dies { gradeadd($c[0], 'charlie@gmail.com', 'hw1', 'fail' ) }, "no hw1 yet registered for new grades");
 ok( gradetaskadd($c[0], qw(hw1 hw2 hw3 midterm)), "hw1, hw2 hw3 midterm all allowed now" );
 
-ok( gradesave($c[0], 'arthur.welch@gmail.com', 'hw2', 'c-' ), "grade hw2 for arthur");
-ok( gradesave($c[0], 'arthur.welch@gmail.com', 'hw3', 'pass' ), "grade hw1 for arthur");
-ok( gradesave($c[0], 'arthur.welch@gmail.com', 'hw1', 'pass' ), "grade hw1 for arthur changed");
+ok( gradesave($c[0], 'charlie@gmail.com', 'hw2', 'c-' ), "grade hw2 for charlie");
+ok( gradesave($c[0], 'charlie@gmail.com', 'hw3', 'pass' ), "grade hw1 for charlie");
+ok( gradesave($c[0], 'charlie@gmail.com', 'hw1', 'pass' ), "grade hw1 for charlie changed");
 
-ok( gradesave($c[0], 'x.lily.qiu@gmail.com', 'hw1', 'pass' ), "grade hw1 for lily fail");
-ok( gradesave($c[0], 'x.lily.qiu@gmail.com', 'hw2', 'a-' ), "grade hw2 for lily a-");
-ok( gradesave($c[0], 'x.lily.qiu@gmail.com', 'midterm', 'pass' ), "grade midterm for lily");
+ok( gradesave($c[0], 'bob@gmail.com', 'hw1', 'pass' ), "grade hw1 for bob fail");
+ok( gradesave($c[0], 'bob@gmail.com', 'hw2', 'a-' ), "grade hw2 for bob a-");
+ok( gradesave($c[0], 'bob@gmail.com', 'midterm', 'pass' ), "grade midterm for bob");
 
 ok( dies { gradesave($c[0], 'noone12312@gmail.com', 'midterm', 'pass' ) }, "grade midterm for none12312");
-ok( dies { gradesave('mfe2', 'arthur.welch@gmail.com', 'test5', 'midterm' ) }, "grade midterm for wrong course");
+ok( dies { gradesave('mfe2', 'charlie@gmail.com', 'test5', 'midterm' ) }, "grade midterm for wrong course");
 
 ok( gradetaskadd($c[0], qw(hw5)), "hw5 is now allowed now" );
-ok( gradesave($c[0], 'ivo.welch@gmail.com', "hw5", " 1/3 "), "added grade ivo for hw5");
-ok( gradesave($c[0], 'arthur.welch@gmail.com', "hw5", " 2/3 "), "added grade arthur for hw5");
+ok( gradesave($c[0], 'alice.welch@gmail.com', "hw5", " 1/3 "), "added grade alice for hw5");
+ok( gradesave($c[0], 'charlie@gmail.com', "hw5", " 2/3 "), "added grade charlie for hw5");
 
 my $gah;
 my @students;
@@ -240,16 +240,16 @@ $gah=gradesashash( $c[0] );  ## instructor call
 @students= @{$gah->{uemail}};
 ok( $#students==2, "you have three students, $#students: ".join("|", @students) );
 
-ok( $gah->{grade}->{'x.lily.qiu@gmail.com'}->{midterm} eq 'pass', "Sorry, but lily should have passed the midterm, not ".$gah->{grade}->{'x.lily.qiu@gmail.com'}->{midterm});
-ok( !defined($gah->{grade}->{'x.lily.qiu@gmail.com'}->{eq1}), "Good. lily has no eq1 grade" );
+ok( $gah->{grade}->{'bob@gmail.com'}->{midterm} eq 'pass', "Sorry, but bob should have passed the midterm, not ".$gah->{grade}->{'bob@gmail.com'}->{midterm});
+ok( !defined($gah->{grade}->{'bob@gmail.com'}->{eq1}), "Good. bob has no eq1 grade" );
 
-$gah=gradesashash( $c[0], 'arthur.welch@gmail.com' );
+$gah=gradesashash( $c[0], 'charlie@gmail.com' );
 @students= $gah->{uemail};
-ok( $#students==0, "Sorry, but arthur should have been only one student.  you have ".join("|", @students) );
-ok( $gah->{grade}->{'arthur.welch@gmail.com'}->{hw2} eq 'c-', "good.  arthur got a c-" );
-ok( !defined($gah->{grade}->{'arthur.welch@gmail.com'}->{eqz22}), "good.  arthur has no grade" );
+ok( $#students==0, "Sorry, but charlie should have been only one student.  you have ".join("|", @students) );
+ok( $gah->{grade}->{'charlie@gmail.com'}->{hw2} eq 'c-', "good.  charlie got a c-" );
+ok( !defined($gah->{grade}->{'charlie@gmail.com'}->{eqz22}), "good.  charlie has no grade" );
 
-ok( !defined($gah->{grade}->{'x.lily.qiu@gmail.com'}->{midterm}), "Good.  we did not leak lily's grade info to arthur" );
+ok( !defined($gah->{grade}->{'bob@gmail.com'}->{midterm}), "Good.  we did not leak bob's grade info to charlie" );
 
 note '
 ################ backup
@@ -262,7 +262,7 @@ done_testing();
 
 print "\n################ website structure now\n"._websiteshow($c[0])."\n";
 
-# my $g= gradesashash( $c[0], 'ivo.welch@gmail.com' ); print "glist for instructor: ".(Dumper $g);
+# my $g= gradesashash( $c[0], 'alice.welch@gmail.com' ); print "glist for instructor: ".(Dumper $g);
 
 sub tziserver {
   my $off_h=1;
