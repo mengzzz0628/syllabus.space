@@ -8,7 +8,9 @@ our @EXPORT_OK =qw(  standard global_redirect global_redirectmsg domain
 		     timedelta epochof epochtwo timezones
 		     btn btnsubmit btnblock btnxs
 		     msghash2string ifilehash2table
-		     drawform drawmore fileuploadform displaylog mkdatatable);
+		     drawform drawmore fileuploadform displaylog mkdatatable
+		     obscure unobscure
+);
 
 use strict;
 use warnings;
@@ -51,7 +53,6 @@ use Data::Dumper;
 my $global_redirecturl;
 my $global_message;
 
-
 ## standard() should start every webpage.  it makes sure that we have
 ## a session uemail and expiration, and redirects nonsensible
 ## subdomains (course names) to /auth
@@ -59,22 +60,41 @@ my $global_message;
 sub standard {
   my $c= shift;
 
-  if (!($c->session->{uemail})) {
-    $global_redirecturl= '/auth'; $global_message= 'you have no (session) email yet.  please identify yourself';
-    return;
+  my $domain= $c->req->url->domain;  ## mfe.welch.syllabus.space:3000
+  my $subdomain= $c->req->url->subdomain; ## mfe.welch
+  my $cururl= $c->req->url;  ## /auth/dosome
+  $cururl =~ s{\?.*}{}; ## strip any parameters
+
+  sub retredirect { $global_redirecturl= $_[0]; $global_message= $_[1] || ""; return; }
+
+  my $reloginurl="http://auth.$domain/auth/index";
+
+  if ($subdomain eq 'auth') {
+    ## already in http://auth.$domain/...  --> never redirect, always allowed
+    my @authallowedurls= qw(/auth/index /auth /logout /auth/logout /auth/facebook
+			/auth/localverify /auth/userenrollsave /auth/userenrollsave
+			/auth/biosave /auth/settimeout /auth/dani);
+    foreach my $au (@authallowedurls) {
+      ($cururl =~ m{^$au}) and return 'auth';
+    }
   }
 
-  if (time() > $c->session->{expiration}) {
-    $global_redirecturl= '/auth'; $global_message= 'sorry, '.($c->{session}->{uemail}).', but your session has expired.  you have to reauthenticate';
-    return;
+  defined($c->session->{uemail}) or return retredirect($reloginurl, "no identity yet");
+
+  if ($subdomain eq 'auth') {
+    ($cururl eq '/auth/goclass') and return 'auth';  ## also now ok; will not redirect
+    return retredirect($reloginurl, "unknown url. start over");  ## no other urls on aux are ok
   }
 
-  my $subdomain= _subdomain($c);
+  ## anything else requesting an auth page is redirected to the aux website
+  ($cururl =~ m{^/auth/goclass}) and return retredirect("http://auth.$domain/auth/goclass", "/auth requests channel back ");
+  ($cururl =~ m{^/auth/}) and return retredirect($reloginurl, "/auth requests channel back ");
 
-  if (!($subdomain)) {
-    $global_redirecturl= '/auth'; $global_message= "no subdomain for '".$c->req->url->to_abs->host."' in /index --- redirected to '/auth'"; return;
-  }
+  ($subdomain =~ /\w/) or return retredirect($reloginurl, "the base domain is not defined");
+  ($subdomain =~ /^www\./) and return retredirect($reloginurl, "the www domain (on $subdomain) is not defined");
 
+
+  (time() > $c->session->{expiration}) and return retredirect($reloginurl, "your session has expired.");
   return $subdomain;
 }
 
@@ -97,33 +117,45 @@ sub global_redirect {
 
 ################################################################
 
+## http://a.b.c.d/e/f?g=h&i=j
+
+## $self->req->url
+##   ->to_abs:   http://a.b.c.d:1/e/f?g=h&i=j#k
+##   ->fragment: k
+##   ->host: a.b.c.d
+##   ->port: 1
+##   ->host_port: a.b.c.d:1
+##   ->scheme: http
+##   ->url->parse($)->host: a.b.c.d:1
+##   ->url->parse($)->path: /e/f
+##   ->path_query: /e/f?g=h&i=j ?#k
+
+## not used userinfo for n@a.b.c.d
+##   ->to_string: omits userinfo
+
 sub _subdomain( $c ) {
-  my @f= split(/\./, $c->req->url->to_abs->host);
-  (@f) or return;  ## never
-  (pop(@f) ne "localhost") and pop(@f);  ## hehe --- pop again
-  ($#f>=0) or return;
-  return join('.', @f);
+  return $c->req->url->subdomain;
 }
 
 sub domain( $c ) {
-  return domainfromurl($c->req->url->to_abs->host);
-}
-
-sub domainfromurl( $url ) {
-  ($url =~ /localhost/) and return "localhost:3000";  ## this catches too many
-
-  my @f= split(/\./, $url);
-  (@f) or return;  ## should never happen, so this is an error return
-  return $f[$#f-1].'.'.$f[$#f];
+  return $c->req->url->domain;
 }
 
 
 ################################################################
-## routines related to time
+
+=pod
+
+=head2 Time related Functions
+
+=cut
+
 ################################################################
 
 ## a nice English version of how much time is left
 sub timedelta {
+  ($_[0]) or die "weird call from ".((caller(1))[3]);
+
   my $x= ($_[1]||time()) - ($_[0]);
   sub tdt {
     my $ax= abs($_[0]);
@@ -209,9 +241,14 @@ sub _epochfour( $epoch, $tzi ) {
 sub epochtwo( $epoch ) { qq(<span class="epoch0">$epoch</span> ).timedelta($epoch); }
 
 
-
 ################################################################
-## button related drawing
+
+=pod
+
+=head2 Button-Related Drawing
+
+=cut
+
 ################################################################
 
 sub btn( $url, $text, $btntypes="btn-default", $extra="" ) {
@@ -254,9 +291,14 @@ sub btnblock($url, $text, $belowtext="", $btntypes="btn-default", $textlength=un
 
 
 ################################################################
-## others, mostly used a few times in similar fashion
-################################################################
 
+=pod
+
+=head2 Functions used by 2-3 URLs
+
+=cut
+
+################################################################
 
 ## use this if you want to make a table sortable
 sub mkdatatable {
@@ -266,6 +308,29 @@ sub mkdatatable {
     } );
   </script>'; }
 
+
+################
+## used by all file-related centers (hw, equiz, file)
+
+sub fileuploadform {
+return '
+   <form action="/upload" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
+     <label for="idupload">Upload A New File: </label>
+     <input type="file" name="uploadfile" id="idupload" style="display:inline"  >
+   </form>
+  <ul style="margin-left:5em;font-size:smaller">
+  <li> any file starting with <tt>hw</tt> is considered to be a <a href="/instructor/hwcenter">homework</a>,</li>
+  <li> any file ending with <tt>.equiz</tt> is considered to be an <a href="/instructor/equizcenter">equiz</a>,</li>
+  <li> and any other file (e.g., <tt>syllabus.html</tt>) is considered just a <a href="/instructor/filecenter">file</a>.</li>
+  </ul>
+
+   <script>
+      document.getElementById("idupload").onchange = function() {
+         document.getElementById("uploadform").submit();
+      }
+   </script>
+ ';
+}
 
 
 ################
@@ -311,7 +376,7 @@ EOM
 
 
 ################
-## used by course and bio settings, this draws the html form
+## used by course (cio) and bio settings, this draws the html form
 
 sub drawform {
   my ($readschema, $ciobio)= @_;
@@ -348,6 +413,7 @@ sub drawform {
 
 
 ################
+## this draws the "more" screens for homeworks, equizzes, and files
 
 sub drawmore($centertype, $actionchoices, $detail, $tzi) {
   my $fname= $detail->{filename};
@@ -355,7 +421,7 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi) {
   my $achoices= actionchoices( $actionchoices, $fname );
 
   my $changedtime= _epochfour( $detail->{mtime}||0, $tzi );
-  my $delbutton= btn("delete?f=$fname", 'delete', 'btn-xs btn-danger');
+  my $delbutton= btn("filedelete?f=$fname", 'delete', 'btn-xs btn-danger');
   my $backbutton= btn($centertype."center", "back to ${centertype}center", 'btn-xs btn-default');
 
   my $dueyyyymmdd="";  my $duehhmm="23:59";
@@ -376,7 +442,7 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi) {
 	<tr> <th> action </th> <td> $achoices </td> </tr>
 	<tr> <th> visible until </th> <td> $duetimefour
 			<p>
-			<form method="get" action="setdue?f=$fname" class="form-inline">
+			<form method="get" action="filesetdue?f=$fname" class="form-inline">
 			<input type="hidden" name="f" value="$fname" />
 			User Time: <input type="date" id="duedate" name="duedate" value="$dueyyyymmdd" onblur="submit();" />
 			<input type="time" id="duetime" name="duetime" value="$duehhmm" />
@@ -437,10 +503,9 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
 EOT
 }
 
-
 sub actionchoices( $actionchoices, $fname ) {
   my $selector= {
-		 equizrun => btn("equizrun?f=$fname", 'run', 'btn-xs btn-default'),
+		 equizrun => btn("/renderequiz?f=$fname", 'run', 'btn-xs btn-default'),
 		 view => btn("view?f=$fname", 'view', 'btn-xs btn-default'),
 		 download => btn("download?f=$fname", 'download', 'btn-xs btn-default'),
 		 edit => btn("edit?f=$fname", 'edit', 'btn-xs btn-default') };
@@ -450,28 +515,6 @@ sub actionchoices( $actionchoices, $fname ) {
 }
 
 
-################
-## used by all file-related centers (hw, equiz, file)
-
-sub fileuploadform {
-return '
-   <form action="/upload" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
-     <label for="idupload">Upload A New File: </label>
-     <input type="file" name="uploadfile" id="idupload" style="display:inline"  >
-   </form>
-  <ul style="margin-left:5em;font-size:smaller">
-  <li> any file starting with <tt>hw</tt> is considered to be a <a href="/instructor/hwcenter">homework</a>,</li>
-  <li> any file ending with <tt>.equiz</tt> is considered to be an <a href="/instructor/equizcenter">equiz</a>,</li>
-  <li> and any other file (e.g., <tt>syllabus.html</tt>) is considered just a <a href="/instructor/filecenter">file</a>.</li>
-  </ul>
-
-   <script>
-      document.getElementById("idupload").onchange = function() {
-         document.getElementById("uploadform").submit();
-      }
-   </script>
- ';
-}
 
 ################
 ## used for both tweeting and security logs, displays a nice
@@ -481,13 +524,13 @@ sub displaylog( $logptr ) {
 
   my $s="";
   foreach (split(/\n/, $logptr)) {
-    my ($epoch, $gmt, $who, $what)=split(/\t/,$_);
-    $s.= "<tr> <td>".epochtwo($epoch)."</td> <td> $gmt </td> <td>$who</td> <td>$what</td> </tr>";
+    my ($ip, $epoch, $gmt, $who, $what)=split(/\t/,$_);
+    $s.= "<tr> <td>$ip</td> <td>".epochtwo($epoch)."</td> <td> $gmt </td> <td>$who</td> <td>$what</td> </tr>";
   };
 
   return mkdatatable('seclogbrowser').<<LOGT;
    <table class="table" id="seclogbrowser">
-      <thead> <tr> <th> Epoch </th> <th> GMT </th> <th> Who </th> <th> What </th> </tr> </thead>
+      <thead> <tr> <th>IP</th> <th> Epoch </th> <th> GMT </th> <th> Who </th> <th> What </th> </tr> </thead>
       <tbody>
        $s
      </tbody>
@@ -496,5 +539,26 @@ LOGT
 }
 
 ################################################################
+
+use Crypt::CBC;
+use Crypt::DES;
+
+my $simplesecret= (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id";
+
+sub obscure {
+  my $message= shift;
+  my $cipherhandle = Crypt::CBC->new( -key => $simplesecret, -ciper => 'Blowfish', -salt => '12312523' );
+  my $secretmessage = $cipherhandle->encrypt($message);
+  $secretmessage= unpack("H*", $secretmessage);
+  return $secretmessage;
+}
+
+sub unobscure {
+  my $secretmessage= shift;
+  my $cipherhandle = Crypt::CBC->new( -key => $simplesecret, -ciper => 'Blowfish', -salt => '12312523' );
+  $secretmessage= pack("H*", $secretmessage);
+  $secretmessage= $cipherhandle->decrypt($secretmessage);
+  return $secretmessage;
+}
 
 1;

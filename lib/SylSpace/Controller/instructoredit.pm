@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructoredit;
+package SylSpace::Controller::InstructorEdit;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;

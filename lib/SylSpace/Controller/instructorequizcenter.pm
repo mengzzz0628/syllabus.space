@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorequizcenter;
+package SylSpace::Controller::InstructorEquizcenter;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -36,12 +36,12 @@ __DATA__
 
 @@ instructorequizcenter.html.ep
 
+<% use SylSpace::Model::Controller qw( ifilehash2table fileuploadform); %>
+
 %title 'equiz center';
 %layout 'instructor';
 
 <main>
-
-  <% use SylSpace::Model::Controller qw( ifilehash2table fileuploadform); %>
 
   <%== ifilehash2table($filelist, [ 'equizrun', 'view', 'download', 'edit' ], 'equiz', $tzi) %>
 

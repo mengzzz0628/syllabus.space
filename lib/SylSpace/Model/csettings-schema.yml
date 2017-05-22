@@ -4,7 +4,7 @@
     required: 0
     public: 0
     placeholder: you choose
-    maxlength: 63
+    maxsize: 63
     readonly: 0
 -
   coursesecret:
@@ -56,4 +56,4 @@
   hellomsg:
     public: 1
     placeholder: e.g., please come to the first class session to get the course secret
-    maxlength: 160
+    maxsize: 160

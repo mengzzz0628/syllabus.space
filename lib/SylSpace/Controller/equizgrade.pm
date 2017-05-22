@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::equizgrade;
+package SylSpace::Controller::Equizgrade;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo userisenrolled equizgrade equizanswerrender);
-use SylSpace::Model::Controller qw(global_redirect standard);
+use SylSpace::Model::Model qw(isenrolled equizgrade equizanswerrender);
+use SylSpace::Model::Controller qw(standard global_redirect);
 
 ################################################################
 
@@ -13,7 +13,7 @@ post '/equizgrade' => sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
 
-  (userisenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
 
   my $result= equizgrade($subdomain, $c->session->{uemail}, $c->req->body_params->to_hash);
 

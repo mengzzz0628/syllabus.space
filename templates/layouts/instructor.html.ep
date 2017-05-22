@@ -1,5 +1,7 @@
 %layout 'sylspace';
 
-<% $self->stash( color => 'beige', avatarid => 'aquamarine-blue-150', homeurl => '/instructor' ); %>
+<% $self->stash( color => 'beige', homeurl => '/instructor',
+     toprightexit => '<li><a href="/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a></li>'
+ ); %>
 
 <%= content %>

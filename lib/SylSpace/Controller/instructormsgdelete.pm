@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructormsgdelete;
+package SylSpace::Controller::InstructorMsgdelete;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -17,7 +17,7 @@ get '/instructor/msgdelete' => sub {
   my $msgid= $c->req->query_params('msgid');
   my $success= msgdelete($subdomain, $msgid );
 
-  tweet($subdomain, 'instructor', "completely deleted message $msgid");
+  tweet($c->tx->remote_address, $subdomain, 'instructor', "completely deleted message $msgid");
   $c->flash( message => "completely deleted message $msgid" )->redirect_to("/instructor/msgcenter");
 };
 

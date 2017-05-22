@@ -6,33 +6,33 @@
     placeholder: you choose
     regex:
     readonly: 0
-    maxlength: 63
+    maxsize: 63
 -
   email:
     required: 1
     readonly: 1
     placeholder: from authentication system!
     htmltype: email
-    maxlength: 64
+    maxsize: 64
 -
   firstname:
     required: 1
     public: 1
-    maxlength: 32
+    maxsize: 32
     placeholder: e.g., John (alphanumeric, space, dash, period)
     regex: ^[a-zA-Z0-9 \-\.]+$
 -
   lastname:
     required: 1
     public: 1
-    maxlength: 32
+    maxsize: 32
     placeholder: e.g., Smith (alphanumeric, space, dash, period)
     regex: ^[a-zA-Z0-9 \-\.]+$
 -
   uniname:
     required: 1
     public: 1
-    maxlength: 32
+    maxsize: 32
     placeholder: e.g., UCLA (alphanumeric, space, dash, period)
     regex: ^[a-zA-Z0-9 \-\.]+$
 -
@@ -40,38 +40,38 @@
     required: 1
     public: 0
     placeholder: registration identification (max 20 chars)
-    maxlength: 20
+    maxsize: 20
 -
   birthyear:
     required: 1
     public: 0
     htmltype: number
     placeholder: e.g., 1980 (max 4 chars)
-    maxlength: 4
+    maxsize: 4
 -
   zip:
     required: 1
     placeholder: e.g., U-90095-1481 (max 16 chars)
-    maxlength: 16
+    maxsize: 16
 -
   country:
     required: 1
     public: 1
     placeholder: e.g., US -- 2 letters only (max 16 chars)
-    maxlength: 16
+    maxsize: 16
 -
   cellphone:
     required: 1
     public: 0
     placeholder: for SMS two-factor authentication
     htmltype: tel
-    maxlength: 32
+    maxsize: 32
 -
   email2:
     required: 1
     placeholder: valid gmail, hotmail, university, etc. (max 64 chars)
     htmltype: email
-    maxlength: 64
+    maxsize: 64
 -
   tzi:
     required: 1
@@ -82,4 +82,4 @@
   optional:
     required: 0
     placeholder: any message.
-    maxlength: 64
+    maxsize: 64

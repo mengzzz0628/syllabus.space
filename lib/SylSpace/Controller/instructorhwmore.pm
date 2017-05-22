@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorhwmore;
+package SylSpace::Controller::InstructorHwmore;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -32,18 +32,23 @@ __DATA__
 
 @@ instructorhwmore.html.ep
 
+<% use SylSpace::Model::Controller qw(drawmore btn); %>
+
 %title 'more homework information';
 %layout 'instructor';
-
-<%
-  use SylSpace::Model::Controller qw(drawmore btn);
-%>
 
 <main>
 
   <%== drawmore('hw', [ 'view', 'download', 'edit' ], $detail, $tzi); %>
 
   <hr />
+
+  <%== upl($studentuploaded) %>
+
+
+<%== btn('/instructor/collectanswers?f='.$fname, "collect all student answers", 'btn-lg') %>
+
+</main>
 
 <%
   sub upl {
@@ -56,10 +61,4 @@ __DATA__
     }
     return "<h2> $c Student Responses </h2>\n\n<ol> $rs </ol>\n";
   }
-%> <%== upl($studentuploaded) %>
-
-
-<%== btn('/instructor/collectanswers?f='.$fname, "collect all student answers", 'btn-lg') %>
-
-</main>
-
+%>

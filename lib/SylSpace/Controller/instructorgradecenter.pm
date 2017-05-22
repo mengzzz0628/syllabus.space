@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorgradecenter;
+package SylSpace::Controller::InstructorGradecenter;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -30,65 +30,38 @@ __DATA__
 
 @@ instructorgradecenter.html.ep
 
+<% use SylSpace::Model::Controller qw(btn mkdatatable); %>
+
 %title 'grade center';
 %layout 'instructor';
 
 <main>
 
-  <%
-    use SylSpace::Model::Controller qw(btn mkdatatable);
-  %> <%== mkdatatable('gradebrowser') %>
-
-<%
-  my $rs= "";
-  $rs.= "<thead> <tr> <th>Student</th>";
-  foreach (@{$all->{hw}}) { $rs.= "<th> <a href=\"gradeentermany?taskn=$_\">$_</a> </th>"; }
-  $rs.= "</tr> </thead>\n<tbody>\n";
-
-  foreach my $st (@{$all->{uemail}}) {
-    $rs.= "<tr> <th> $st </th> \n";
-    foreach my $hw (@{$all->{hw}}) {
-      $rs.= "<td style=\"text-align:center\">".($all->{grade}->{$st}->{$hw}||"-")."</td>";
-    }
-    $rs.= "</tr>\n";
-  }
-  $rs .= "</tbody>\n";
-
-  my $studentselector="<select name=\"uemail\" class=\"form-control\">\n";
-  $studentselector .= qq(<option value=""></option>);
-  foreach (@{$all->{uemail}}) { $studentselector .= qq(<option value="$_">$_</option>); }
-  $studentselector .= "</select>\n";
-
-  my $hwselector="<select name=\"task\" class=\"form-control\">\n";
-  $hwselector .= qq(<option value=""></option>);
-  foreach (@{$all->{hw}}) { $hwselector .= qq(<option value="$_">$_</option>); }
-  $hwselector .= "</select>\n";
-%>
-
+ <%== mkdatatable('gradebrowser') %>
 
   <table class="table" id="gradebrowser">
-     <%== $rs %>
+     <%== showgrades($all) %>
   </table>
 
   <p style="font-size:x-small">Click on the column name to enter many student grades for this one task.  If it is a new task, you must first add it.  To enter just one grade for one student, use the following form.</p>
 
   <hr />
 
-  <form method="GET" action="/instructor/gradeenter1">
+  <form method="GET" action="/instructor/gradesave1">
   <div class="row">
 
     <div class="col-md-3">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-user"></i></span>
         <!-- input type="text" class="form-control" placeholder="student email" name="uemail" -->
-        <%== $studentselector %>
+        <%== studentselector($all) %>
       </div>
     </div>
 
     <div class="col-md-2">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-file"></i></span>
-            <%== $hwselector %>
+            <%== hwselector($all) %>
       </div>
     </div>
 
@@ -148,4 +121,43 @@ __DATA__
   <p style="font-size:x-small">The long view also contains repeated entries, changes, time stamps, etc.</p>
 
 </main>
+
+
+
+<%
+  sub showgrades {
+    my $all = shift;
+    my $rs= "<thead> <tr> <th>Student</th>";
+    foreach (@{$all->{hw}}) { $rs.= "<th> <a href=\"gradesave?taskn=$_\">$_</a> </th>"; }
+    $rs.= "</tr> </thead>\n<tbody>\n";
+
+    foreach my $st (@{$all->{uemail}}) {
+      $rs.= "<tr> <th> $st </th> \n";
+      foreach my $hw (@{$all->{hw}}) {
+	$rs.= "<td style=\"text-align:center\">".($all->{grade}->{$st}->{$hw}||"-")."</td>";
+      }
+    $rs.= "</tr>\n";
+    }
+    $rs .= "</tbody>\n";
+    return $rs;
+  }
+
+  sub studentselector {
+    my $all = shift;
+    my $studentselector="<select name=\"uemail\" class=\"form-control\">\n";
+    $studentselector .= qq(<option value=""></option>);
+    foreach (@{$all->{uemail}}) { $studentselector .= qq(<option value="$_">$_</option>); }
+    $studentselector .= "</select>\n";
+    return $studentselector;
+  }
+
+  sub hwselector {
+    my $all = shift;
+    my $hwselector="<select name=\"task\" class=\"form-control\">\n";
+    $hwselector .= qq(<option value=""></option>);
+    foreach (@{$all->{hw}}) { $hwselector .= qq(<option value="$_">$_</option>); }
+    $hwselector .= "</select>\n";
+    return $hwselector;
+  }
+%>
 

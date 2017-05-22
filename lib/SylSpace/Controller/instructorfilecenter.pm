@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorfilecenter;
+package SylSpace::Controller::InstructorFilecenter;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -31,6 +31,8 @@ __DATA__
 
 @@ instructorfilecenter.html.ep
 
+<% use SylSpace::Model::Controller qw( ifilehash2table fileuploadform); %>
+
 %title 'file center';
 %layout 'instructor';
 
@@ -38,13 +40,13 @@ __DATA__
 
 <main>
 
-  <% use SylSpace::Model::Controller qw( ifilehash2table fileuploadform);
-
   <%== ifilehash2table($filelist, [ 'view', 'download', 'edit' ], 'file', $tzi) %>
 
   <%== fileuploadform() %>
 
-  <h2> Big Drop Zone </h2>
+  <hr />
+
+  <h2> Big Drop Zone Test </h2>
 
   <form action="uploadfile" method="POST" class="dropzone"  id="my-awesome-dropzone" enctype="multipart/form-data">
 

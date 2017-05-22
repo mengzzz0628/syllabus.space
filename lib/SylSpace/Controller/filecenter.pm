@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::filecenter;
+package SylSpace::Controller::Filecenter;
 use Mojolicious::Lite;  ## implied strict, warnings, utf8, 5.10
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(utype);
+use SylSpace::Model::Model qw(isinstructor);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -15,10 +15,6 @@ get '/filecenter' => sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
 
-  my $whoami= utype($subdomain, $c->session->{uemail});
-
-  (defined($whoami)) or die "what are you??";
-  ($whoami eq 'i') and return $c->redirect_to('/instructor/filecenter');
-  ($whoami eq 's') and return $c->redirect_to('/student/filecenter');
-  die "confused with '$whoami'!";
+  (isinstructor($subdomain, $c->session->{uemail})) and return $c->redirect_to('/instructor/filecenter');
+  return $c->redirect_to('/student/filecenter');
 };

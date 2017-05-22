@@ -66,7 +66,7 @@ if ($equizfilename =~ /solo/) {
   my %h = ( gradename => 'na', name => 'na', ntime => time(), callbackurl => '/testquestion', shuffle => 0, HTMLQALL => 'na' );
   $qz->{h}= \%h;
 
-  print RenderEquiz::renderequiz($qz, 1);
+  print RenderEquiz::renderequiz($qz, 'stdin', 'solo');
   exit 0;
 }
 

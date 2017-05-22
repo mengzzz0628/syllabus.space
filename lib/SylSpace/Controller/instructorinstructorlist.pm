@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorinstructorlist;
+package SylSpace::Controller::InstructorInstructorlist;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -31,19 +31,13 @@ __DATA__
 
 <main>
 
-  <div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  Warning: This page allows you to give full control to anyone to administer the website.</div>
+  <div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  Warning: This page allows you to give full control to anyone to administer the website.  They can even remove you as the instructor.</div>
 
   <table class="table" style="width: auto !important; margin:2em; font-size:large;" id="insbrowser">
-  <thead> <tr> <th> Instructors </th> </tr> </thead>
-  <tbody>
-  <%
-  my $rs="";
-  foreach (@{$instructors}) {
-    $rs .= "<tr> <td> $_ </td> <td> <a href=\"instructordel?deliemail=$_\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></a> </td> </tr>\n";
-  }
-%> <%== $rs %>
-
-  </tbody>
+    <thead> <tr> <th> Instructors </th> </tr> </thead>
+    <tbody>
+      <%== ilist($instructors) %>
+    </tbody>
   </table>
 
 <form action="/instructor/instructoradd" method="POST">
@@ -64,6 +58,16 @@ __DATA__
   </div>
 </form>
 
-
 </main>
 
+
+  <%
+    sub ilist {
+      my $instructors= shift;
+      my $rs="";
+      foreach (@{$instructors}) {
+	$rs .= "<tr> <td> $_ </td> <td> <a href=\"instructordel?deliemail=$_\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></a> </td> </tr>\n";
+      }
+      return $rs;
+    }
+  %>

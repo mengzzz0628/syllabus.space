@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 use strict;
 use common::sense;
 use utf8;
@@ -37,6 +37,15 @@ use Mojolicious::Lite;
 use Mojolicious::Plugin::RenderFile;
 use Mojolicious::Plugin::Mojolyst;
 
+## these are used in the authentication module
+use Mojo::JWT;
+use Mojolicious::Plugin::Web::Auth;
+use Email::Sender::Simple;
+use Email::Simple::Creator;
+use Email::Sender::Transport::SMTP::TLS;
+
+use Mojolicious::Plugin::Web::Auth;
+
 =pod
 
 =head1 Title
@@ -56,7 +65,7 @@ use Mojolicious::Plugin::Mojolyst;
 (-e "templates/equiz/starters") or die "internal error: you don't seem to have any starter templates";
 (-e "Model/Model.pm") or die "internal error: you don't seem to have the Model";
 (-e "Model/eqbackend/eqbackend.pl") or die "internal error: you don't seem to have the eqbackend";
-(-e "Controller/instructor.pm") or die "internal error: you don't seem to have the frontend";
+(-e "Controller/InstructorIndex.pm") or die "internal error: you don't seem to have the frontend (Controller/instructorindex.pm";
 
 my $var="/var/sylspace";
 
@@ -78,6 +87,13 @@ if (!(-e $varu)) {
   chmod(0777, $varu) or die "chmod: failed on opening $varu to the public: $!\n";
 }
 
+if (!(-e "$var/sites")) {
+  mkdir("$var/sites") or die "cannot make $var/sites\n";
+  chmod(0777, "$var/sites") or die "chmod: failed on opening $varu to the public: $!\n";
+  say STDERR "made sites";
+}
+
+
 if (!(-e "$var/templates")) {
   mkdir("$var/templates") or die "cannot make $var/templates\n";
   system("cp -a templates/equiz/* $var/templates/");
@@ -88,7 +104,7 @@ if (!(-e "$var/secrets.txt")) {
   open(my $FO, ">", "$var/secrets.txt"); for (my $i=0; $i<30; ++$i) { print $FO mkrandomstring(32)."\n"; } close($FO);
 }
 
-say STDERR "now create a samplewebsite, such as Model/mksite.pl";
+say STDERR "now create a samplewebsite, e.g., (1) mksite.pl mfe.ucla instructor\@gmail.com or (2) run Model.t";
 
 
 sub mkrandomword {

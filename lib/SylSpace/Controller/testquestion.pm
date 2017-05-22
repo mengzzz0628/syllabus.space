@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::testquestion;
+package SylSpace::Controller::Testquestion;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -92,7 +92,7 @@ __DATA__
 <main>
 
 <form method="GET" action="/testquestion" />
-  <button class="btn" type="submit" value="submit">Completely Start Over</button>
+  <button class="btn btn-default" type="submit" value="submit">Completely Start Over</button>
 </form>
 
 
@@ -100,12 +100,22 @@ __DATA__
 
 <form method="GET" action="/testquestion" />
 
-  <b>bug: please make textarea autoexpansive, as tried in eqbackend.css</b><br />
-  
-  <textarea name="ecode" rows="15" cols="60"><%= $ecode %></textarea>
+  <b>bug: why is the textarea not auto-growth, as tried in eqbackend.css</b><br />
+
+  <!-- script $('#ecode').css('overflow', 'hidden').autogrow() /script -->
+
+  <script>
+    $("textarea").keyup(function(e) {
+       while($(this).outerHeight() < this.scrollHeight + parseFloat($(this).css("borderTopWidth")) + parseFloat($(this).css("borderBottomWidth"))) {
+          $(this).height($(this).height()+1);
+       };
+   });
+ </script>
+
+  <textarea name="ecode" rows="15" id="ecode" cols="60"><%= $ecode %></textarea>
 
 <br />
-  <button class="btn" type="submit" value="submit">Test Now</button>
+  <button class="btn btn-default" type="submit" value="submit">Test Now</button>
 </form>
 
 <h1>Evaluated</h1>

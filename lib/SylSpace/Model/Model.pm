@@ -8,26 +8,26 @@ our @EXPORT_OK=qw(
  sudo tzi
 
  isinstructor ismorphed
- instructorlist instructoradd instructordel utype
+ instructorlist instructoradd instructordel
 
- websitebackup courselistenrolled courselistnotenrolled
- usernew userenroll userisenrolled usermorph userunmorph coursesecret userexists
+ sitebackup courselistenrolled courselistnotenrolled
+ usernew userenroll isenrolled instructor2student student2instructor coursesecret userexists
 
- readschema bioread biowrite bioiscomplete cioread ciowrite cioiscomplete
+ readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
 
- csetbuttons cbuttons hassyllabus
+ ciobuttonsave ciobuttons hassyllabus
  studentlist studentdetailedlist
 
- msgpost msgdelete msgread msgmarkread msglistread msgreadnotread
+ msgsave msgdelete msgread msgmarkasread msglistread msgshownotread
 
  ifilelistall ifilelist1
  sfilelistall sfileread sownfilelist sownfileread
- filelistsfiles filesetdue filestudentcollect filewrite fileread fullfilename filedelete
+ filelistsfiles filesetdue collectstudentanswers filewrite fileread fullfilename filedelete
  cptemplate rmtemplates
 
- gradetaskadd gradeenter gradesashash gradesasraw gradesfortask2table
+ gradetaskadd gradesave gradesashash gradesasraw gradesfortask2table
 
- tweet seclog tweeted seclogged lasttweet
+ tweet showtweets showlasttweet seclog showseclog superseclog
 
  renderequiz equizgrade equizanswerrender
 );
@@ -36,7 +36,7 @@ our @EXPORT_DEBUG= qw(_msglistnotread _suundo _websitemake _websiteshow _webcour
 
 @EXPORT_OK = ( @EXPORT_OK, @EXPORT_DEBUG );
 
-
+################
 use strict;
 use common::sense;
 use utf8;
@@ -48,13 +48,12 @@ use feature ':5.20';
 use feature 'signatures';
 no warnings qw(experimental::signatures);
 
-################################################################
+################
 
 my $var="/var/sylspace";  ## this should be hardcoded and unchanging
 (-e "$var") or die "$0: please create the $var directory for the site first.  then run mksite.pl, Model.t, or Test.t\n";
 
-
-################################################################
+################
 
 =pod
 
@@ -110,7 +109,13 @@ use Archive::Zip;
 
 
 ################################################################
-## Website related functions
+
+=pod
+
+=head2 website-related, course, and user-related functionality
+
+=cut
+
 ################################################################
 
 sub _websitemake($subdomain, $instructoremail) {
@@ -180,7 +185,7 @@ sub _listallusers() {
 
 
 ## create a zip file of the site, place it in the user directory, and return the filename
-sub websitebackup( $subdomain ) {
+sub sitebackup( $subdomain ) {
   $subdomain= _confirmsudoset( $subdomain );
 
   (-d "$var/sites/$subdomain") or die "bad course";
@@ -223,7 +228,7 @@ sub _courselist( $uemail, $enrolltype ) {
 }
 
 sub coursesecret( $subdomain ) { 
-  ($subdomain) or die "you need a secret for a course, not for nothing";
+  (defined($subdomain)) or die "you need a secret for a course, not for nothing";
   return bsd_glob("$var/sites/$subdomain/secret=*");
 }
 
@@ -266,7 +271,7 @@ sub userenroll( $subdomain, $uemail, $iswebsitecreator=0 ) {
   return _checkemail($uemail, $subdomain);
 }
 
-sub userisenrolled( $subdomain, $uemail ) {
+sub isenrolled( $subdomain, $uemail ) {
   ($subdomain =~ /^[\w][\w\-\.]*[\w]/) or die "bad subdomain name $subdomain";
   ($subdomain eq "auth") and return 0;
   (-e "$var/sites/$subdomain") or die "no such course $subdomain.\n";
@@ -281,7 +286,7 @@ sub bioread( $uemail ) {
   return _saferead("$var/users/$uemail/bio.yml");
 }
 
-sub biowrite( $uemail, $biodataptr ) {
+sub biosave( $uemail, $biodataptr ) {
   $uemail=_checkemail($uemail);
   _checkvalidagainstschema( $biodataptr, 'u' );
   ($biodataptr->{email} eq $uemail) or die "you better have the same primary email in biowrite, not $uemail and $biodataptr->{email}";
@@ -315,7 +320,7 @@ sub cioread( $subdomain ) {
   return _saferead("$var/sites/$subdomain/cinfo.yml");
 }
 
-sub ciowrite( $subdomain, $ciodataptr ) {
+sub ciosave( $subdomain, $ciodataptr ) {
   $subdomain= _confirmsudoset( $subdomain );
   _checkvalidagainstschema( $ciodataptr, 'c' );
 
@@ -329,12 +334,12 @@ sub cioiscomplete( $subdomain ) {
   return ((-s "$var/sites/$subdomain/cinfo.yml")>10);  ## ok, not a full check, I admit.
 }
 
-sub csetbuttons( $subdomain, $list ) {
+sub ciobuttonsave( $subdomain, $list ) {
   $subdomain= _confirmsudoset( $subdomain );
   return _safewrite($list, "$var/sites/$subdomain/buttons.yml" );
 }
 
-sub cbuttons( $subdomain ) {
+sub ciobuttons( $subdomain ) {
   $subdomain= _checkcname($subdomain);
   return _saferead( "$var/sites/$subdomain/buttons.yml" )|| ();
 }
@@ -370,17 +375,23 @@ sub studentlist( $subdomain ) {
 
 
 
-################################################################################################################################
-## the sudo (instructor) validation system
 ################################################################
 
-sub usermorph( $subdomain, $uemail) {
+=pod
+
+=head2 SODO (Instructor)-related functionality
+
+=cut
+
+################################################################
+
+sub instructor2student( $subdomain, $uemail) {
   $subdomain= _confirmsudoset( $subdomain );  ## ok, we are the instructor!
   $uemail= _checkemail($uemail, $subdomain);
   return touch("$var/sites/$subdomain/$uemail/morphed=1");
 }
 
-sub userunmorph( $subdomain, $uemail) {
+sub student2instructor( $subdomain, $uemail) {
   $uemail= _checkemail($uemail, $subdomain);
   # (ismorphed($subdomain,$uemail)) or die "you cannot unmorph $uemail in $subdomain";
   (-e "$var/sites/$subdomain/$uemail/morphed=1") and unlink("$var/sites/$subdomain/$uemail/morphed=1");
@@ -406,8 +417,7 @@ sub sudo( $subdomain, $uemail ) {
   return $subdomain;
 }
 
-sub utype( $subdomain, $uemail ) { return (isinstructor($subdomain, $uemail)) ? 'i' : 's'; }
-
+# sub utype( $subdomain, $uemail ) { return (isinstructor($subdomain, $uemail)) ? 'i' : 's'; }
 
 ## a local helper,  works only after an sudo() has been called, because email has been checked; also does _checkcname
 sub _confirmsudoset( $subdomain ) {
@@ -454,8 +464,14 @@ sub instructordel( $subdomain, $uemail, $newiemail ) {
 }
 
 
-################################################################################################################################
-## biographical and course information must be validated and entered
+################################################################
+
+=pod
+
+=head2 Bio and Course Info : Input and Validation
+
+=cut
+
 ################################################################
 
 #### the main routine to make sure that our inputs validate
@@ -467,7 +483,7 @@ sub readschema( $metaschemafletter ) {
   (!(-e $fname)) and $fname="Model/$fname";
   (!(-e $fname)) and $fname="SylSpace/$fname";
   my $metaptr= _saferead($fname);  ## needs to be external, so that form controller and viewer know it, too
-  (defined($metaptr)) or die "schema for '$metaschemafletter' is not readable from `pwd`!\n";
+  (defined($metaptr)) or die "schema '$metaschemafletter' ($fname) is not readable from ".`pwd`."!\n";
   return $metaptr;
 }
 
@@ -533,11 +549,16 @@ sub _checkvalidagainstschema( $dataptr, $metaschemafletter, $verbose =0 ) {
 
 
 ################################################################
-## the messaging system (from instructors to notify students
-## msg = $text, $subject, $urgency ... msgid
+
+=pod
+
+=head2 Messaging System (from instructors to notify students)
+
+=cut
+
 ################################################################
 
-sub msgpost( $subdomain, $msgin, $optmsgid =undef ) {
+sub msgsave( $subdomain, $msgin, $optmsgid =undef ) {
   $subdomain= _confirmsudoset( $subdomain );
   (defined($msgin)) or die "no message was provided";
   $msgin->{time}= time();
@@ -587,7 +608,7 @@ sub msgread( $subdomain, @msgid ) {
 }
 
 ## iterate messages
-sub msgmarkread( $subdomain, $uemail, $msgid ) {
+sub msgmarkasread( $subdomain, $uemail, $msgid ) {
   $subdomain= _checkcname( $subdomain );
   $uemail= _checkemail($uemail,$subdomain);
   $msgid =~ s/^msgid=//;
@@ -617,13 +638,20 @@ sub _msglistnotread( $subdomain, $uemail ) {
 }
 
 ## iterate all unread messages and put it into a full structure
-sub msgreadnotread( $subdomain, $uemail ) {
+sub msgshownotread( $subdomain, $uemail ) {
   return msgread( $subdomain, _msglistnotread( $subdomain, $uemail ) ); } ## ->[0] dereferences
 
 
 
+
 ################################################################
-## the grade interface, allowing setting and reading grades
+
+=pod
+
+=head2 Grading interface, allowing setting and reading grades
+
+=cut
+
 ################################################################
 
 ## can be done repeatedly without harm
@@ -699,7 +727,7 @@ sub gradesashash( $subdomain, $uemail=undef ) {
 ## to repeat ourselves; if the grade has not changed, keep the old entry.  note that we may
 ## have multiple grades on the same homework in the file.  the reader has to be smart enough
 ## to know that it is the last one that counts;
-sub gradeenter( $subdomain, $semail, $hwname, $newgrade ) {
+sub gradesave( $subdomain, $semail, $hwname, $newgrade ) {
   $subdomain= _confirmsudoset( $subdomain );
 
   my (@semail, @hwname, @newgrade);
@@ -717,13 +745,17 @@ sub gradeenter( $subdomain, $semail, $hwname, $newgrade ) {
   }
 
   my %recorded;
-  foreach (slurp("$var/sites/$subdomain/grades")) {
-    (my $key= $_) =~ s/(.*)\t/$1/;  # everything up to the last field, which is the time stamp;
-    $recorded{$key}=1;
+  if (-e "$var/sites/$subdomain/grades") {
+    foreach (slurp("$var/sites/$subdomain/grades")) {
+      my @k= split(/\t/, $_); pop(@k);
+      $recorded{join("\t", @k)}=1;
+    }
   }
 
   my %hw;
-  foreach (slurp("$var/sites/$subdomain/tasklist")) { chomp; $hw{$_}=1; }
+  if (-e "$var/sites/$subdomain/tasklist") {
+    foreach (slurp("$var/sites/$subdomain/tasklist")) { chomp; $hw{$_}=1; }
+  }
 
   my @todo;
   while ($#semail >= 0) {
@@ -756,10 +788,17 @@ sub gradesfortask2table($subdomain, $task) {
   return \@r;
 }
 
-################################################################################################################################
-## the file interface.  instructors can store and read all files.
-## students can only read published instructor files, plus own
-## files that they have uploaded.
+################################################################
+
+=pod
+
+=head2 File interface. 
+
+instructors can store and read all files.  students can only read
+published instructor files, plus own files that they have uploaded.
+
+=cut
+
 ################################################################
 
 ### could be split into instructor and studentwrites
@@ -897,7 +936,7 @@ sub filelistsfiles( $subdomain, $inresponseto="*" ) {
 
 
 ## instructor can collect all student homework submissions
-sub filestudentcollect( $subdomain, $filename ) {
+sub collectstudentanswers( $subdomain, $filename ) {
   $subdomain= _confirmsudoset( $subdomain );
   $filename= _checkfilename($filename);
 
@@ -958,109 +997,16 @@ sub rmtemplates( $subdomain ) {
 
 
 
-
-################################################################################################################################
-## Utility Routines
-################################################################################################################################
-
-## safewrite will first write a temporary file with the new content,
-## then rename any old file to a backup first (including useless
-## symlinks), and finally rename the two files appropriately.  if the
-## file ends with yml, the content is written and read through
-## yaml::tiny.  otherwise, it is just a plain file
-
-sub _safewrite( $contentinfo, $filename ) {
-  $filename= _checkfilepath($filename);
-
-  (defined($contentinfo)) or die "need contentinfo to write!\n";
-
-  if ($filename =~ /\.yml$/) {
-    my $yamlofinfo= YAML::Tiny->new($contentinfo);
-    $yamlofinfo->write($filename.".new") or die "cannot write replacement: $! --- aborted update/write\n";
-  } else {
-    open(my $FOUT, ">", $filename.".new") or die "cannot write replacement: $! --- aborted update/date\n"; print $FOUT $contentinfo; close($FOUT);
-  }
-  if (-e $filename) {
-    if ($filename =~ /\.equiz$/) {
-      (my $newfilename= $filename) =~ s{(.*)/(.*)}{$1/old-$2};
-      rename($filename, $newfilename) or die "cannot rename existing file $filename to $newfilename: $!";
-    } else {
-      rename($filename, $filename.".old") or die "cannot rename existing file $filename to $filename.old: $!";
-    }
-  }
-  return rename($filename.".new", $filename); ## this better work
-}
-
-sub _saferead( $filename ) {
-  ## problem: the below will change Model/filename to model/filename, which
-  ## works under osx, but not under linux;
-
-  $filename= ($filename =~ m{^Model/[bc]settings-schema\.yml}) ? $filename : _checkfilepath($filename);  ## do not uppercase
-
-  ## the .yml extension is hardcoded
-  if ($filename =~ /\.ya?ml$/) {
-    (-e $filename) or return;
-    return (YAML::Tiny->read($filename))->[0];
-  }
-
-  ## we will try to see if any of the following work, in order
-  foreach my $ext ("", ".html", ".htm", ".pdf", ".txt", ".text", ".csv", ".doc") {
-    (-e "$filename$ext") and return slurp("$filename$ext");
-  }
-
-  return (-e $filename);  ## not found
-}
-
-
-sub _glob2last( $globstring ) {
-  return map { (my $foo = $_) =~ s{.*/}{}; $foo; } bsd_glob($globstring);
-}
-
-sub _glob2lastnoyaml( $globstring ) {
-  return map { (my $foo = $_) =~ s{.*/}{}; $foo =~ s{\.ya?ml$}{}; $foo; } bsd_glob($globstring);
-}
-
-sub _checkfilename( $filename ) {
-  defined($filename) or die "please provide a filename";
-  ($filename eq "") and die "please provide a filename";
-  ($filename =~ /^[\w\-\ ][\@\w\.\-\ ]*$/) or die "filename $filename contains bad characters; use only words, dashes, dots";
-  return lc($filename);
-}
-
-sub _checkfilepath( $filepath ) {
-  $filepath =~ s{/+}{/};
-  ($filepath =~ m{[^\w]\.\.}) and die "filepath $filepath can have double dots only after a word character\n";
-  return lc($filepath);
-}
-
-################################################################
-## validation of names and sites
 ################################################################
 
-sub _checkemail( $uemail, $subdomain=undef ) {
-  (defined($uemail)) or die "I have no idea who you are!\n";
-  (length($uemail)<128) or die "email $uemail too long\n";
-  (Email::Valid->address($uemail)) or die "email address '$uemail' could not possibly be valid\n";
-  ($uemail =~ m{/}) and die "email $uemail cannot have slash in it!\n";
-  ($uemail =~ m{\.\.}) and die "email $uemail cannot have consecutive dots!\n";
-  $uemail= lc($uemail);
+=pod
 
-  if ((defined($subdomain))&&($subdomain ne "auth")) {
-    $subdomain= _checkcname($subdomain);
-    (-e "$var/sites/$subdomain/$uemail") or die "user $uemail is not enrolled in course $subdomain\n";
-  }
-  return $uemail;
-}
+=head2 Deadline interface.
 
-sub _checkcname( $subdomain ) {
-  ($subdomain =~ /^[\w][\w\.\-]*[\w]$/) or die "bad website name '$subdomain'!\n";
-  (-e "$var/sites/$subdomain") or ($subdomain eq "auth") or die "subdomain $subdomain is unknown.\n";
-  return lc($subdomain);
-}
+deadlines are (empty) filenames in the filesystem
 
+=cut
 
-################################################################
-## the deadline interface.  here, they are (empty) filenames in the filesystem
 ################################################################
 
 sub filesetdue( $subdomain, $filename, $when ) {
@@ -1112,28 +1058,36 @@ sub _cleandeadlines( $subdomain, $basename="*" ) {
 }
 
 
+
+
 ################################################################
-sub _confirmnotdangerous( $string, $warning ) {
-  ($string =~ /\;\&\|\>\<\?\`\$\(\)\{\}\[\]\!\#\'/) and die "too dangerous: $warning fails!";  ## we allow '*'
-  return $string;
-}
 
+=pod
 
-################################################################################################################################
-## logging and tweeting
+=head2 Logging and Tweeting interface.
 
-sub _logany( $subdomain, $who, $msg, $file ) {
-  (($who =~ /instructor/)||($who =~ /\@/)) or die "who needs to identify user";
-  $who =~ s/\@.*\b//;
+=cut
+
+################################################################
+
+sub _logany( $ip, $subdomain, $who, $msg, $file, $destdir=undef ) {
+  (defined($who)) or die "please give a user name.  you gave undef at ".((caller(1))[3]);
+  (($who =~ /instructor/)||($who =~ /\@/)) or die "who needs to identify user?  not ".($who||"nowho");
+  # let's keep the full email address  $who =~ s/\@.*\b//;
   $msg =~ s{\t}{ }g;  $msg=~ s/[\n\r]//g;
-  open(my $FLOG, ">>", "$var/sites/$subdomain/$file"); print $FLOG time()."\t".gmtime()."\t".$who."\t$msg\n"; close($FLOG);
+  (defined($destdir)) or $destdir="$var/sites/$subdomain";
+  open(my $FLOG, ">>", "$destdir/$file"); print $FLOG $ip."\t".time()."\t".gmtime()."\t".$who."\t$msg\n"; close($FLOG);
 }
 
-sub seclog( $subdomain, $who, $msg ) {
-  _logany($subdomain, $who, $msg, "security.log");
+sub superseclog( $ip, $who, $msg ) {
+  _logany( $ip, 'auth', $who, $msg, 'auth.log', "$var/" );
 }
 
-sub tweet( $subdomain, $who, $msg ) {
+sub seclog( $ip, $subdomain, $who, $msg ) {
+  _logany($ip, $subdomain, $who, $msg, 'security.log');
+}
+
+sub tweet( $ip, $subdomain, $who, $msg ) {
   sub randstring {
     my @chars = ("a".."z", "0".."9");
     $_=""; foreach my $i (1..8) { $_ .= $chars[rand @chars]; } return $_;
@@ -1142,31 +1096,37 @@ sub tweet( $subdomain, $who, $msg ) {
   my $tweetfile= bsd_glob("$var/sites/$subdomain/tweet.*")||("$var/sites/$subdomain/tweet.log");
   (-e $tweetfile) or touch($tweetfile);
   $tweetfile =~ s{.*/}{};
-  _logany($subdomain, $who, $msg, $tweetfile);
+  _logany($ip, $subdomain, $who, $msg, $tweetfile);
   open(my $FLT, ">", "$var/sites/$subdomain/lasttweet"); print $FLT "GMT ".gmtime()." $who $msg"; close($FLT);
 }
 
-sub lasttweet( $subdomain ) {
+sub showlasttweet( $subdomain ) {
   (-e "$var/sites/$subdomain/lasttweet") or return "";
   return "<div class=\"ltweet\">Last Tweet: ".slurp("$var/sites/$subdomain/lasttweet")."</div>";
 }
 
 
-sub tweeted( $subdomain ) {
+sub showtweets( $subdomain ) {
   (my $tweetfile=bsd_glob("$var/sites/$subdomain/tweet.*")) or return "\t\t\tno tweet log just yet\n";
   return scalar slurp($tweetfile);
 }
 
-sub seclogged( $subdomain ) {
+sub showseclog( $subdomain ) {
   my $seclogfile= "$var/sites/$subdomain/security.log";
   (-e $seclogfile) or return time()."\t".gmtime()."\tsystem\tno security log just yet\n";
   return scalar slurp($seclogfile);
 }
 
 
-################################################################################################################################
-## the equiz program is external.  This provides the appropriate interface.
-################
+################################################################
+
+=pod
+
+=head2 Equiz Backend Interface
+
+=cut
+
+################################################################
 
 sub renderequiz( $subdomain, $email, $equizname, $callbackurl ) {
   (defined($equizname)) or die "need a filename for equizmore.\n";
@@ -1180,6 +1140,8 @@ sub renderequiz( $subdomain, $email, $equizname, $callbackurl ) {
   } ->();
 
   my $secret= md5_base64( (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id" );
+  ## must be same secret as in equizgrade()
+  ## instead of this secret, we could use a line from /var/sylgrade/secrets.txt
 
   my $fullcommandline= "$executable $fullequizname ask $secret $callbackurl $email";
   _confirmnotdangerous($fullcommandline, "executable to render equiz");
@@ -1200,6 +1162,9 @@ sub equizgrade( $subdomain, $uemail, $posttextashash ) {
 
     use Digest::MD5 qw(md5_base64);
     my $secret= md5_base64( (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id" );
+    ## must be same secret as in renderequiz()
+    ## instead of this secret, we could use a line from /var/sylgrade/secrets.txt
+
     my $cipherhandle = Crypt::CBC->new( -key => $secret, -cipher => 'Blowfish', -salt => '14151617' );
 
     my $step1 = decode_entities($_[0]);
@@ -1279,7 +1244,7 @@ sub _storegradeequiz( $subdomain, $semail, $gradename, $eqlongname, $time, $grad
   my $psudo= $amsudo;
   $amsudo=1;
   gradetaskadd( $subdomain, $gradename );
-  my $rv=gradeenter( $subdomain, $semail, $gradename, $grade );
+  my $rv=gradesave( $subdomain, $semail, $gradename, $grade );
   $amsudo=$psudo;
   return $rv;
 }
@@ -1328,5 +1293,126 @@ sub equizanswerrender( $decodedarray ) {
   return $rv;
 }
 
+
+################################################################
+
+=pod
+
+=head2 Utility Routines: 
+
+* safe writing into the filesystem (with backup and yaml understanding)
+
+* globbing
+
+* checking filenames and filepaths
+
+* checking email / enrollment
+
+=cut
+
+################################################################
+
+## safewrite will first write a temporary file with the new content,
+## then rename any old file to a backup first (including useless
+## symlinks), and finally rename the two files appropriately.  if the
+## file ends with yml, the content is written and read through
+## yaml::tiny.  otherwise, it is just a plain file
+
+sub _safewrite( $contentinfo, $filename ) {
+  $filename= _checkfilepath($filename);
+
+  (defined($contentinfo)) or die "need contentinfo to write!\n";
+
+  if ($filename =~ /\.yml$/) {
+    my $yamlofinfo= YAML::Tiny->new($contentinfo);
+    $yamlofinfo->write($filename.".new") or die "cannot write replacement: $! --- aborted update/write\n";
+  } else {
+    open(my $FOUT, ">", $filename.".new") or die "cannot write replacement: $! --- aborted update/date\n"; print $FOUT $contentinfo; close($FOUT);
+  }
+  if (-e $filename) {
+    if ($filename =~ /\.equiz$/) {
+      (my $newfilename= $filename) =~ s{(.*)/(.*)}{$1/old-$2};
+      rename($filename, $newfilename) or die "cannot rename existing file $filename to $newfilename: $!";
+    } else {
+      rename($filename, $filename.".old") or die "cannot rename existing file $filename to $filename.old: $!";
+    }
+  }
+  return rename($filename.".new", $filename); ## this better work
+}
+
+sub _saferead( $filename ) {
+  ## problem: the below will change Model/filename to model/filename, which
+  ## works under osx, but not under linux;
+
+  $filename= ($filename =~ m{^Model/[ubc]settings-schema\.yml}) ? $filename : _checkfilepath($filename);  ## do not uppercase
+
+  ## the .yml extension is hardcoded
+  if ($filename =~ /\.ya?ml$/) {
+    (-e $filename) or return;
+    return (YAML::Tiny->read($filename))->[0];
+  }
+
+  ## we will try to see if any of the following work, in order
+  foreach my $ext ("", ".html", ".htm", ".pdf", ".txt", ".text", ".csv", ".doc") {
+    (-e "$filename$ext") and return slurp("$filename$ext");
+  }
+
+  return (-e $filename);  ## not found
+}
+
+
+sub _glob2last( $globstring ) {
+  return map { (my $foo = $_) =~ s{.*/}{}; $foo; } bsd_glob($globstring);
+}
+
+sub _glob2lastnoyaml( $globstring ) {
+  return map { (my $foo = $_) =~ s{.*/}{}; $foo =~ s{\.ya?ml$}{}; $foo; } bsd_glob($globstring);
+}
+
+sub _checkfilename( $filename ) {
+  defined($filename) or die "please provide a filename";
+  ($filename eq "") and die "please provide a filename";
+  ($filename =~ /^[\w\-\ ][\@\w\.\-\ ]*$/) or die "filename $filename contains bad characters; use only words, dashes, dots";
+  return lc($filename);
+}
+
+sub _checkfilepath( $filepath ) {
+  $filepath =~ s{/+}{/};
+  ($filepath =~ m{[^\w]\.\.}) and die "filepath $filepath can have double dots only after a word character\n";
+  return lc($filepath);
+}
+
+
+##
+## validation of names and sites
+##
+
+sub _checkemail( $uemail, $subdomain=undef ) {
+  (defined($uemail)) or die "I have no idea who you are!\n";
+  (length($uemail)<128) or die "email $uemail too long\n";
+  (Email::Valid->address($uemail)) or die "email address '$uemail' could not possibly be valid\n";
+  ($uemail =~ m{/}) and die "email $uemail cannot have slash in it!\n";
+  ($uemail =~ m{\.\.}) and die "email $uemail cannot have consecutive dots!\n";
+  $uemail= lc($uemail);
+
+  if ((defined($subdomain))&&($subdomain ne "auth")) {
+    $subdomain= _checkcname($subdomain);
+    (-e "$var/sites/$subdomain/$uemail") or die "user $uemail is not enrolled in course $subdomain\n";
+  }
+  return $uemail;
+}
+
+sub _checkcname( $subdomain ) {
+  ($subdomain =~ /^[\w][\w\.\-]*[\w]$/) or die "bad website name '$subdomain'!\n";
+  (-e "$var/sites/$subdomain") or ($subdomain eq "auth") or die "subdomain $subdomain is unknown.\n";
+  return lc($subdomain);
+}
+
+
+## stuff we may pass into a system or backquote call
+sub _confirmnotdangerous( $string, $warning ) {
+  ($string =~ /\;\&\|\>\<\?\`\$\(\)\{\}\[\]\!\#\'/) and die "too dangerous: $warning fails!";  ## we allow '*'
+  return $string;
+}
 
 1;

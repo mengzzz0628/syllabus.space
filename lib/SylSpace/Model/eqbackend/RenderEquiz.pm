@@ -50,6 +50,8 @@ sub renderequiz {
   my $time= time();
 
   ## if we are in a non standard mode, we need not encrypt
+  (defined($mode)) or die "internal backend error: you have no mode. invoked with $equizfilename".join(" ", @ARGV)."\n";
+
   if ($mode eq "ask") {
     $cipherhandle = Crypt::CBC->new( -key => $secret, -cipher => 'Blowfish', -salt => '14151617' );
   } else {

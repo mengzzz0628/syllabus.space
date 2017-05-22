@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package SylSpace::Controller::logout;
+package SylSpace::Controller::Logout;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -16,8 +16,6 @@ my $logout = sub {
   $c->flash(message => "$logoutemail logged out")->redirect_to('http://auth.'.domain($c).'/auth/index');
 };
 
-get '/noone' => $logout;
 get '/logout' => $logout;
-get '/auth/logout' => $logout;
 
 1;

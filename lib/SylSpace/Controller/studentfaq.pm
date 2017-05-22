@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::studentfaq;
+package SylSpace::Controller::StudentFaq;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo fileread);
+use SylSpace::Model::Model qw(fileread);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################

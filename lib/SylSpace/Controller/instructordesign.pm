@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructordesign;
+package SylSpace::Controller::InstructorDesign;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -26,7 +26,7 @@ __DATA__
 
 @@ instructordesign.html.ep
 
-%title 'instructor/design';
+%title 'Design an Equiz';
 %layout 'instructor';
 
 <main>

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorfilemore;
+package SylSpace::Controller::InstructorFilemore;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -30,12 +30,10 @@ __DATA__
 
 @@ instructorfilemore.html.ep
 
+<% use SylSpace::Model::Controller qw(drawmore); %>
+
 %title 'more file information';
 %layout 'instructor';
-
-<%
-  use SylSpace::Model::Controller qw(drawmore);
-%>
 
 <main>
 

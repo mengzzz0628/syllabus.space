@@ -1,5 +1,7 @@
 %layout 'sylspace';
 
-<% $self->stash( color => 'orange', avatarid => 'aquamarine-blue-150', homeurl => '/auth' ); %>
+<% $self->stash( color => 'orange', homeurl => '/auth',
+  toprightexit => '<li><a href="/logout"> <i class="fa fa-sign-out"></i> LOG OFF </a></li>'
+); %>
 
 <%= content %>

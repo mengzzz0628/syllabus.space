@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::instructorequizmore;
+package SylSpace::Controller::InstructorEquizmore;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
@@ -33,12 +33,12 @@ __DATA__
 
 @@ instructorequizmore.html.ep
 
+<% use SylSpace::Model::Controller qw(drawmore epochtwo mkdatatable); %>
+
 %title 'more equiz information';
 %layout 'instructor';
 
-<%
-  use SylSpace::Model::Controller qw(drawmore epochtwo mkdatatable);
-%>  <%== mkdatatable('eqabrowser') %>
+  <%== mkdatatable('eqabrowser') %>
 
 <main>
 
@@ -46,8 +46,19 @@ __DATA__
 
   <hr />
 
+ <%== studentresponses($studentuploaded) %>
+
+<table class="table" id="eqabrowser">
+<thead> <tr> <th> # </th> <th> Student </th> <th> Score </th> <th> Date </th> </tr> </thead>
+<tbody>
+  <%== mktbl($grds4tsk) %>
+</tbody>
+</table>
+
+</main>
+
 <%
-  sub upl {
+  sub studentresponses {
     my $rs=""; my $c=0;
     my @fl= @{$_[0]};
     foreach (@fl) {
@@ -57,11 +68,8 @@ __DATA__
     }
     return "<h2> Student Responses </h2>\n\n<ol> $rs </ol>\n";
   }
-%> <%== upl($studentuploaded) %>
+%>
 
-<table class="table" id="eqabrowser">
-<thead> <tr> <th> # </th> <th> Student </th> <th> Score </th> <th> Date </th> </tr> </thead>
-<tbody>
     <%
     sub mktbl {
       my $rs=""; my $i=0;
@@ -70,9 +78,4 @@ __DATA__
       }
       return $rs;
     }
-    %> <%== mktbl($grds4tsk) %>
-</tbody>
-</table>
-
-</main>
-
+    %>

@@ -14,7 +14,7 @@ foreach my $url (@ARGV) {
 
   (my $fname= $url) =~ s{\/}{}g;
   my $fnamepm = "$fname.pm";
-  my $layout= ($fname =~ /instructor/) ? 'instructor' : ($fname =~ /instructor/) ? 'student' : 'guest';
+  my $layout= ($fname =~ /instructor/) ? 'instructor' : ($fname =~ /instructor/) ? 'student' : 'auth';
 
   open(my $FOUT, ">", $fnamepm);
 
@@ -26,7 +26,7 @@ use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
 use SylSpace::Model::Model qw(sudo);
-use SylSpace::Model::Utils qw(global_redirect standard);
+use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
 

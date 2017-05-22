@@ -1,18 +1,25 @@
 
 * reasonable production error messages
+   exception.development.html.ep = mojo/debug.html.ep (with mojo/menubar.html.ep) exception.html.ep 
+
 * audit for all sudo in all controller and all model functions
 
-* https rather than http
+* https rather than http (joel berger, mojolicious hypnotoad)
+
+* bioiscomplete, cioiscomplete
+
 * SMS confirmation on new computers --- instructors, special sites (e.g., book.ivo-welch.info/instructor)
-* bulk registration of students, with limits to authentication on a particular computer
 
-* permanent testsite, instructor read-only  readonly.testsite.syllabus.space
+* bulk registration of students, with limits to authentication on a particular computer?
 
-* maybe prevent original instructor from being unqualified
-* more automatic tests
+* users can limit authentication to specific method only (e.g., via email only, via google only, via facebook only, via local only)
 
-* when students upload files, they need to be immediately visible after /uploadsave
+* add permanent testsite, instructor read-only  readonly.testsite.syllabus.space
 
-* priority on msgs
+* maybe prevent original instructor from being removed by TA
 
-* exception.development.html.ep = mojo/debug.html.ep (with mojo/menubar.html.ep) exception.html.ep 
+* add more automatic tests, esp with respect to web
+
+* implement priority on msgs
+
+* carton?  docker?

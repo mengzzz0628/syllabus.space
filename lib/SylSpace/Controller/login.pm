@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package SylSpace::Controller::login;
+package SylSpace::Controller::Login;
 use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
