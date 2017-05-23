@@ -33,7 +33,7 @@ __DATA__
 
 @@ instructorequizmore.html.ep
 
-<% use SylSpace::Model::Controller qw(drawmore epochtwo mkdatatable); %>
+<% use SylSpace::Model::Controller qw(drawmore epochtwo mkdatatable browser); %>
 
 %title 'more equiz information';
 %layout 'instructor';
@@ -42,7 +42,7 @@ __DATA__
 
 <main>
 
-  <%== drawmore('equiz', [ 'equizrun', 'view', 'download', 'edit' ], $detail, $tzi); %>
+  <%== drawmore('equiz', [ 'equizrun', 'view', 'download', 'edit' ], $detail, $tzi, browser($self)); %>
 
   <hr />
 

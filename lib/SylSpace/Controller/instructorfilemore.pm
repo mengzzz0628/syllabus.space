@@ -30,14 +30,14 @@ __DATA__
 
 @@ instructorfilemore.html.ep
 
-<% use SylSpace::Model::Controller qw(drawmore); %>
+<% use SylSpace::Model::Controller qw(drawmore browser); %>
 
 %title 'more file information';
 %layout 'instructor';
 
 <main>
 
-  <%== drawmore('file', [ 'view', 'download', 'edit' ], $detail, $tzi); %>
+  <%== drawmore('file', [ 'view', 'download', 'edit' ], $detail, $tzi, browser($self)); %>
 
 </main>
 

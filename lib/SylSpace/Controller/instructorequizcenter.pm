@@ -58,9 +58,10 @@ __DATA__
   <div class="col-xs-2"> <a href="/instructor/cptemplate?templatename=starters" class="btn btn-default btn-block">starters</a></div>
   <div class="col-xs-2 col-md-offset-0"> <a href="/instructor/cptemplate?templatename=tutorials" class="btn btn-default btn-block">tutorials</a></div>
   <div class="col-xs-2 col-md-offset-0">
-  <%== ($subdomain !~ /fin/) ? '' :
+  <!-- %== ($subdomain !~ /fin/) ? '' :
     ($subdomain =~ /test/) ? '<a href="" class="btn btn-disabled btn-block">corpfinintro disabled</a>' :
-                             '<a href="/instructor/cptemplate?templatename=corpfinintro" class="btn btn-default btn-block">corpfinintro</a>' %>
+                             '<a href="/instructor/cptemplate?templatename=corpfinintro" class="btn btn-default btn-block">corpfinintro</a>' % -->
+  <a href="/instructor/cptemplate?templatename=corpfinintro" class="btn btn-default btn-block">corpfinintro</a>'
 </div>
 </div> <!--row-->
 </div> <!--formgroup-->

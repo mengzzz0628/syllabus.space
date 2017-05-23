@@ -4,6 +4,7 @@ use Mojolicious::Lite; ## strict, warnings, utf8 and Perl 5.10
 
 plugin 'Mojolyst' => {controllers => 'SylSpace::Controller'};
 plugin 'RenderFile';
+plugin 'browser_detect';
 
 ################################################################################################################################
 
@@ -94,10 +95,15 @@ use Perl6::Slurp;
 my @pwsecret=slurp('/var/sylspace/secrets.txt');
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
 
-#use Data::Dumper;
-#die Dumper \%ENV;
+use Data::Dumper;
 
-$ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'} =~ /^[0-9]+\.0\.0\./)?1:0;
+if (defined($ENV{'HYPNOTOAD_EXE'})) {
+  $ENV{'ONLOCALHOST'}=0;
+  app->config(hypnotoad => {listen => ['http://syllabus.space:80']});
+} else {
+  (defined($ENV{'MOJO_REUSE'})) or die "do not know which Mserver is being used\n";
+  ($ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'}) =~ /^[0-9]+\.0\.0\./)?1:0;
+}
 
 if ($ENV{'ONLOCALHOST'}) {
   warn "localhost mode only --- logging out does not work correctly\n";

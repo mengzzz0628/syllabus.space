@@ -17,7 +17,8 @@ get '/instructor/cptemplate' => sub {
 
   my $templatename= $c->req->query_params->param('templatename');
 
-  (($templatename eq /corpfinintro/) && ($subdomain !~ /fin/)) and die "only fin classes are allowed to use the corpfinintro template";
+  ## && ($subdomain !~ /fin/)
+  ## (($templatename eq /corpfinintro/)) and die "only fin classes are allowed to use the corpfinintro template";
 
   my $nc= cptemplate( $subdomain, $templatename );
 

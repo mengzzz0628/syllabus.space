@@ -36,6 +36,7 @@ use YAML::Tiny;
 use Mojolicious::Lite;
 use Mojolicious::Plugin::RenderFile;
 use Mojolicious::Plugin::Mojolyst;
+use Mojolicious::Plugin::browser_detect;
 
 ## these are used in the authentication module
 use Mojo::JWT;

@@ -32,14 +32,14 @@ __DATA__
 
 @@ instructorhwmore.html.ep
 
-<% use SylSpace::Model::Controller qw(drawmore btn); %>
+<% use SylSpace::Model::Controller qw(drawmore btn browser); %>
 
 %title 'more homework information';
 %layout 'instructor';
 
 <main>
 
-  <%== drawmore('hw', [ 'view', 'download', 'edit' ], $detail, $tzi); %>
+  <%== drawmore('hw', [ 'view', 'download', 'edit' ], $detail, $tzi, browser($self) ); %>
 
   <hr />
 

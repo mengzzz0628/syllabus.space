@@ -9,6 +9,7 @@ our @EXPORT_OK =qw(  standard global_redirect global_redirectmsg domain
 		     btn btnsubmit btnblock btnxs
 		     msghash2string ifilehash2table
 		     drawform drawmore fileuploadform displaylog mkdatatable
+		     browser
 		     obscure unobscure
 );
 
@@ -24,6 +25,7 @@ use feature 'signatures';
 no warnings qw(experimental::signatures);
 
 use Data::Dumper;
+use Devel::StackTrace;
 
 ################################################################
 
@@ -152,9 +154,24 @@ sub domain( $c ) {
 
 ################################################################
 
+sub StackTracePrint {
+  my $trace = Devel::StackTrace->new;
+  # from bottom (least recent) of stack to top.
+  print "\n";
+  while ( my $frame = $trace->next_frame ) {
+    ($frame->subroutine =~ /SylSpace::Model::Controller::StackTracePrint/) and next;
+    ($frame->subroutine =~ /^Devel/) and next;
+    ($frame->subroutine =~ /^Stack::Mojo/) and last;
+    ($frame->subroutine =~ /^Mojo/) and last;
+    print "\t--> ", $frame->as_string, "\n";
+  }
+  print "\n";
+}
+
 ## a nice English version of how much time is left
 sub timedelta {
-  ($_[0]) or die "weird call from ".((caller(1))[3]);
+  ($_[0]) or StackTracePrint();
+  ($_[0]) or die "weird call without time to timedelta from ".((caller(1))[3]);
 
   my $x= ($_[1]||time()) - ($_[0]);
   sub tdt {
@@ -238,7 +255,9 @@ sub _epochfour( $epoch, $tzi ) {
 }
 
 
-sub epochtwo( $epoch ) { qq(<span class="epoch0">$epoch</span> ).timedelta($epoch); }
+sub epochtwo( $epoch ) {
+  qq(<span class="epoch0">$epoch</span> ).timedelta($epoch);
+}
 
 
 ################################################################
@@ -415,7 +434,7 @@ sub drawform {
 ################
 ## this draws the "more" screens for homeworks, equizzes, and files
 
-sub drawmore($centertype, $actionchoices, $detail, $tzi) {
+sub drawmore($centertype, $actionchoices, $detail, $tzi, $browser="") {
   my $fname= $detail->{filename};
 
   my $achoices= actionchoices( $actionchoices, $fname );
@@ -432,6 +451,8 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi) {
   }
   my $duetimefour= _epochfour( $detail->{duetime}||0, $tzi );
 
+  $browser = ($browser eq 'safari') ? qq(<br />safari's date selector is broken.  please complain to apple and use chrome<br />until then, use mm/dd/yyyy) : '';
+
   my $v= <<EOT;
   <table class="table">
     <thead> <tr> <th> variable </th> <th> value </th> </tr> </thead>
@@ -447,6 +468,7 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi) {
 			User Time: <input type="date" id="duedate" name="duedate" value="$dueyyyymmdd" onblur="submit();" />
 			<input type="time" id="duetime" name="duetime" value="$duehhmm" />
 			<input type="submit" id="submit" value="change or tab out to set" class="btn btn-xs btn-default" />
+                   $browser
 			</form>
 	   </td> </tr>
 	<tr> <th> delete </th> <td> $delbutton </td> </tr>
@@ -467,14 +489,12 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
     ++$counter;
     my $fq= "f=$_->{filename}";
 
-    my $thisduedate= epochtwo($_->{duetime});
-    my $thismdfddate= epochtwo($_->{mtime});
-
-    my $publish=($_->{duetime}) ? qq(<a href="${type}more?$fq"> $thisduedate </a>) :
+    my $publish=($_->{duetime}) ? qq(<a href="${type}more?$fq"> ).epochtwo($_->{duetime}).'</a>' :
       qq(<a href="${type}more?$fq"  class="btn btn-primary btn-xs">Publish</a>);
 
     my $achoices= actionchoices( $actionchoices, $_->{filename} );
 
+    my $thismdfddate= epochtwo($_->{mtime}||1);
     $filestring .= qq(
     <tr class="published">
 	<td class="c">$counter</td>
@@ -560,5 +580,15 @@ sub unobscure {
   $secretmessage= $cipherhandle->decrypt($secretmessage);
   return $secretmessage;
 }
+
+################################################################
+sub browser {
+  my $self= shift;
+  return $self->browser->{browser};
+  # use HTTP::BrowserDetect;
+  # my $ua = HTTP::BrowserDetect->new($user_agent_string);
+  # my $browser= ($ua->browser_string);
+}
+
 
 1;
