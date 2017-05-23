@@ -21,3 +21,10 @@
 * add more automatic tests, esp with respect to web
 
 * carton?  docker?
+
+* unenroll from a course
+
+* in MkTestSite, copy the corpfin template and make the files all public; also, add a syllabus, etc.,  maybe make ivowel an instructor, too.
+
+
+

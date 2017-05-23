@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(seclog);
+use SylSpace::Model::Model qw(superseclog);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -105,6 +105,8 @@ __DATA__
   </p>
 % } else {
   <h2>Email was sent</h2>
+    % }
+
   <p>
   Please check your mailbox for a confirmation email with link.  If you do not receive an email from us within 5-10 minutes, check for any spam filters along the way.  Whitelist 'syllabus.space@gmail.com'.
 

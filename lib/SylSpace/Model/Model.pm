@@ -10,7 +10,7 @@ our @EXPORT_OK=qw(
  isinstructor ismorphed
  instructorlist instructoradd instructordel
 
- sitebackup courselistenrolled courselistnotenrolled
+ sitebackup isvalidsitebackupfile courselistenrolled courselistnotenrolled
  usernew userenroll isenrolled instructor2student student2instructor coursesecret userexists
 
  readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
@@ -97,6 +97,7 @@ my $var="/var/sylspace";  ## this should be hardcoded and unchanging
 
 ################################################################
 
+use File::Temp;
 use File::Path;
 use File::Touch;
 use File::Copy;
@@ -190,6 +191,7 @@ sub sitebackup( $subdomain ) {
 
   (-d "$var/sites/$subdomain") or die "bad course";
   (-r "$var/sites/$subdomain") or die "unreadable course";
+  ((-d "$var/tmp") && (-w "$var/tmp")) or die "tmp was not created";
 
   ($subdomain =~ /test/) and die "sorry, no websitebackup for testsite allowed";
 
@@ -198,10 +200,15 @@ sub sitebackup( $subdomain ) {
   my $ls=`ls -Rlt $var/sites/$subdomain/`;
   $zip->addString($ls , '_MANIFEST_' );
   $zip->addTreeMatching( "$var/sites/$subdomain", "backup", '(?<!\.zip)$' );
-  my $ofname="$var/sites/$subdomain/instructor/files/$subdomain-".time().".zip";
+
+  my $ofname="$var/tmp/$subdomain-".time().".zip";
   $zip->writeToFileNamed($ofname);
 
   return $ofname;
+}
+
+sub isvalidsitebackupfile( $fnm ) {
+  ($fnm =~ m{^$var/tmp/[\w\-\.]+\.zip}) or die "internal error: '$fnm' is not a good site backup file\n";
 }
 
 ################################################################

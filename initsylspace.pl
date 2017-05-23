@@ -36,7 +36,7 @@ use YAML::Tiny;
 use Mojolicious::Lite;
 use Mojolicious::Plugin::RenderFile;
 use Mojolicious::Plugin::Mojolyst;
-use Mojolicious::Plugin::browser_detect;
+use Mojolicious::Plugin::BrowserDetect;
 
 ## these are used in the authentication module
 use Mojo::JWT;
@@ -86,14 +86,20 @@ my $varu="$var/users";
 if (!(-e $varu)) {
   mkdir($varu) or die "cannot make $varu\n";
   chmod(0777, $varu) or die "chmod: failed on opening $varu to the public: $!\n";
+  say STDERR "made $var";
 }
 
 if (!(-e "$var/sites")) {
   mkdir("$var/sites") or die "cannot make $var/sites\n";
-  chmod(0777, "$var/sites") or die "chmod: failed on opening $varu to the public: $!\n";
-  say STDERR "made sites";
+  chmod(0777, "$var/sites") or die "chmod: failed on opening $varu/sites to the public: $!\n";
+  say STDERR "made $var/sites";
 }
 
+if (!(-e "$var/tmp")) {
+  mkdir("$var/tmp") or die "cannot make $var/tmp\n";
+  chmod(0777, "$var/tmp") or die "chmod: failed on opening $varu/tmp to the public: $!\n";
+  say STDERR "made $var/tmp";
+}
 
 if (!(-e "$var/templates")) {
   mkdir("$var/templates") or die "cannot make $var/templates\n";
@@ -105,7 +111,8 @@ if (!(-e "$var/secrets.txt")) {
   open(my $FO, ">", "$var/secrets.txt"); for (my $i=0; $i<30; ++$i) { print $FO mkrandomstring(32)."\n"; } close($FO);
 }
 
-say STDERR "now create a samplewebsite, e.g., (1) mksite.pl mfe.ucla instructor\@gmail.com or (2) run Model.t";
+
+say STDERR "now create a samplewebsite, e.g., (1) mksite.pl mfe.ucla instructor\@gmail.com or (2) run Model/Model.t or (3) run Model/MkTestSite.t";
 
 
 sub mkrandomword {
