@@ -20,6 +20,4 @@
 
 * add more automatic tests, esp with respect to web
 
-* implement priority on msgs
-
 * carton?  docker?

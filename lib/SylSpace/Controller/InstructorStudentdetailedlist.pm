@@ -48,7 +48,7 @@ __DATA__
 
     <h3> Adding Students </h3>
 
-    <p> Please note that when you add students, they will be added to the entire system (all courses).  Use sparingly please. </p>
+    <p> Please note that when you add students, they will be added to the entire system (all courses).  If an added user does not control the email you are entering, then you have created a useless orphan that will hang around forever.  Please use sparingly.  For the most part, your students should add themselves. </p>
 
     <form method="GET" action="/instructor/userenroll">
     <div class="row">
@@ -67,8 +67,6 @@ __DATA__
     </div>
   </div>
    </form>
-
-  <span style="font-size:x-small">For entering many student grades, please click on the column header name instead.</span>
 
 </main>
 

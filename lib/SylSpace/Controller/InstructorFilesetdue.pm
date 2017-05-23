@@ -19,7 +19,9 @@ get '/instructor/filesetdue' => sub {
 
   my $params= $c->req->query_params;
 
-  my $whendue= epochof( $params->param('duedate'), $params->param('duetime'), tzi($c->session->{uemail}) );
+  my $whendue= ($params->param('dueepoch')) ||
+    epochof( $params->param('duedate'), $params->param('duetime'), tzi($c->session->{uemail}) );
+
   my $r= filesetdue( $subdomain, $params->param('f'), $whendue );
 
   tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, ' published '. $params->param('f'). ", due $whendue (GMT ".gmtime($whendue).')' );

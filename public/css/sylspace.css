@@ -92,3 +92,13 @@ div.flash { background-color:yellow; font: italic bold 30px/40px Georgia, serif;
 div.ltweet {
     padding: 2em;  color:green; font-family:monospace;
 }
+
+.prioritylow {
+    font-size:small;
+}
+
+.priorityhigh {
+    font-size:large;
+    border: 2px solid red;
+}
+

@@ -18,7 +18,7 @@ my $shm= sub {
   (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
 
   $c->stash(
-	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkread"),
+	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkasread"),
 	    btnptr => ciobuttons( $subdomain )||undef,
 	    ismorphed => ismorphed( $subdomain,$c->session->{uemail} ),
 	    lasttweet => showlasttweet( $subdomain )||"",

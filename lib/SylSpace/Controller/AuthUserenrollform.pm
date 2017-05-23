@@ -64,7 +64,7 @@ __DATA__
 
           <div class="form-group">
              <label class="col-sm-2 control-label col-sm-2" for="submit"></label>
-	     <button class="btn btn-lg" type="submit" value="submit">Enroll Now</button>
+	     <button class="btn btn-lg btn-default" type="submit" value="submit">Enroll Now</button>
 	  </div>
 	</form>
        );

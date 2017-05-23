@@ -6,6 +6,8 @@ plugin 'Mojolyst' => {controllers => 'SylSpace::Controller'};
 plugin 'RenderFile';
 plugin 'browser_detect';
 
+use Data::Dumper;
+
 ################################################################################################################################
 
 {
@@ -60,6 +62,8 @@ plugin 'browser_detect';
 *Mojo::URL::domain = sub {
   my $self= shift;
   my $fulldomain= $self->to_abs->host;
+  (defined($fulldomain)) or die "internal error trying to decode domain, ".Dumper $self->to_abs;
+
   ($fulldomain =~ /localhost/) and return "localhost:3000";
   $fulldomain =~ s{^http.*[^/]*/}{};
 
@@ -94,8 +98,6 @@ plugin 'browser_detect';
 use Perl6::Slurp;
 my @pwsecret=slurp('/var/sylspace/secrets.txt');
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
-
-use Data::Dumper;
 
 if (defined($ENV{'HYPNOTOAD_EXE'})) {
   $ENV{'ONLOCALHOST'}=0;

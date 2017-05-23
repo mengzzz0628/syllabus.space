@@ -22,7 +22,7 @@ my $ihm= sub {
   (cioiscomplete($subdomain)) or $c->flash( message => 'You first need to complete the course settings!' )->redirect_to('/instructor/csettings');
 
   $c->stash(
-	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkread"),
+	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkasread"),
 	    btnptr => ciobuttons( $subdomain ),
 	    lasttweet => showlasttweet( $subdomain ),
 	    template => 'instructor',

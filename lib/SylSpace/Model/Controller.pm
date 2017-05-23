@@ -379,9 +379,11 @@ sub msghash2string( $msgptr, $msgurlback, $listofread=undef, $tzformat=undef ) {
 EOS
     }
 
+    my $priorityclass= ($_->{priority} > 5) ? " priorityhigh" : ($_->{priority} < 5) ? " prioritylow" : "";
+
     my $epoch= (defined($tzformat)) ? _epochfour($_->{time}, $tzformat) : epochtwo($_->{time});
     $msgstring .= <<EOM;
-  <dl class="dl-horizontal" id="$_->{msgid}">
+  <dl class="dl-horizontal $priorityclass" id="$_->{msgid}">
     <dt>msgid</dt> <dd class="msgid-msgid ">$_->{msgid} $donotshowmarkreadagain</dd>
     <dt>date</dt> <dd class="msgid-date">$epoch</dd>
     <dt>subject</dt> <dd class="msgid-subject" > $_->{subject}</dd>
@@ -443,15 +445,18 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi, $browser="") {
   my $delbutton= btn("filedelete?f=$fname", 'delete', 'btn-xs btn-danger');
   my $backbutton= btn($centertype."center", "back to ${centertype}center", 'btn-xs btn-default');
 
+  use POSIX qw(strftime);
   my $dueyyyymmdd="";  my $duehhmm="23:59";
   if ($detail->{duetime}) {
-    use POSIX qw(strftime);
     $dueyyyymmdd=  strftime('%Y-%m-%d', localtime($detail->{duetime}));
     $duehhmm=  strftime('%H:%M', localtime($detail->{duetime}));
   }
   my $duetimefour= _epochfour( $detail->{duetime}||0, $tzi );
 
   $browser = ($browser eq 'safari') ? qq(<br />safari's date selector is broken.  please complain to apple and use chrome<br />until then, use mm/dd/yyyy) : '';
+
+  my $sixmobutton= "<p style=\"padding:1em\"> or <span style=\"padding:2ex\">".btn("filesetdue?f=$fname&amp;dueepoch=".(time()+24*3600*180), "publish for 6 Months", 'btn-default')."</span>".
+     " or <span style=\"padding:2ex\">".btn("filesetdue?f=$fname&amp;dueepoch=".(time()-2), "unpublish", 'btn-default')."</span></p>";
 
   my $v= <<EOT;
   <table class="table">
@@ -470,6 +475,7 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi, $browser="") {
 			<input type="submit" id="submit" value="change or tab out to set" class="btn btn-xs btn-default" />
                    $browser
 			</form>
+		$sixmobutton
 	   </td> </tr>
 	<tr> <th> delete </th> <td> $delbutton </td> </tr>
 	<tr> <td colspan="2"> $backbutton </td> </tr>
@@ -489,8 +495,10 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
     ++$counter;
     my $fq= "f=$_->{filename}";
 
-    my $publish=($_->{duetime}) ? qq(<a href="${type}more?$fq"> ).epochtwo($_->{duetime}).'</a>' :
-      qq(<a href="${type}more?$fq"  class="btn btn-primary btn-xs">Publish</a>);
+    my $publish=($_->{duetime}) ?
+      qq(<a href="${type}more?$fq"> ).epochtwo($_->{duetime}).'</a> '. btn("filesetdue?$fq&amp;dueepoch=".(time()-2), "unpub", 'btn-info btn-xs')
+      :
+      btn("filesetdue?$fq&amp;dueepoch=".(time()+24*3600*180), "publish", 'btn-primary btn-xs');
 
     my $achoices= actionchoices( $actionchoices, $_->{filename} );
 

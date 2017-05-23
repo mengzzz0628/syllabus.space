@@ -16,7 +16,7 @@ get '/msgmarkasread' => sub {
   my $msgid= $c->req->query_params->param('msgid');
   my $uemail= $c->session->{uemail};
 
-  msgmarkread($subdomain, $uemail, $msgid);
+  msgmarkasread($subdomain, $uemail, $msgid);
   my $subject= $c->req->body_params->param('subject')||"no subject";
   my $priority= $c->req->body_params->param('priority')||"no priority";
 
