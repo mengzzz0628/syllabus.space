@@ -17,7 +17,7 @@ post '/equizgrade' => sub {
 
   my $result= equizgrade($subdomain, $c->session->{uemail}, $c->req->body_params->to_hash);
 
-  $c->stash( a => equizanswerrender($result) );
+  $c->stash( eqanswer => equizanswerrender($result) );
 };
 
 1;
@@ -35,7 +35,7 @@ __DATA__
 
 <h1>Equiz Results</h1>
 
-<%== $a %>
+<%== $eqanswer %>
 
 </main>
 

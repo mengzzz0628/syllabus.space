@@ -18,3 +18,5 @@ get '/login' => sub {
 
   $c->flash(message => "we have made you ".$c->session->{uemail}." and redirected to '$redir")->redirect_to($redir);
 };
+
+1;

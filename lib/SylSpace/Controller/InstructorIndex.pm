@@ -23,8 +23,8 @@ my $ihm= sub {
 
   $c->stash(
 	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkasread"),
-	    btnptr => ciobuttons( $subdomain ),
-	    lasttweet => showlasttweet( $subdomain ),
+	    btnptr => ciobuttons( $subdomain )||undef,
+	    lasttweet => showlasttweet( $subdomain )||"no tweet yet",
 	    template => 'instructor',
 	   );
 };
@@ -92,6 +92,8 @@ __DATA__
 
 <% sub btnstring {
   my $btnptr= shift;
+  (defined($btnptr)) or return "";
+
   my $btnstring="";
   if (defined($btnptr)) {
     $btnstring= '<div class="row top-buffer text-center">';

@@ -22,9 +22,9 @@ get '/showseclog' => sub {
     my @seclog=split(/\n/, $seclog);
     @seclog = grep { $_ =~ $c->session->{uemail} } @seclog;
     $seclog= join("\n", @seclog);
-    $c->stash( color => 'white', homeurl => '/student' );
+    $c->stash( color => $ENV{sitescolor}, homeurl => '/student' );
   } else {
-    $c->stash( color => 'beige', homeurl => '/instructor' );
+    $c->stash( color => $ENV{siteicolor}, homeurl => '/instructor' );
   }
 
   $c->stash( seclog => $seclog );

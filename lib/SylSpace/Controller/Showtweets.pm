@@ -16,13 +16,13 @@ get '/showtweets' => sub {
   $c->stash(toprightexit => '<li><a href="/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a></li>');
 
   if (isinstructor($subdomain, $c->session->{uemail})) {
-    $c->stash( color => 'beige', homeurl => '/student' );
+    $c->stash( color => $ENV{siteicolor}, homeurl => '/instructor' );
   } else {
-    $c->stash( color => 'white', homeurl => '/student' );
+    $c->stash( color => $ENV{sitescolor}, homeurl => '/student' );
   }
 
   ## enrollment not required
-  $c->stash( tweets => showtweets($subdomain) );
+  $c->stash( tweets => showtweets($subdomain)||undef );
 };
 
 1;
@@ -40,7 +40,7 @@ __DATA__
 
 <main>
 
-  <%== displaylog($tweets) %>
+  <%== defined($tweets) ? displaylog($tweets) : "(no tweets yet)" %>
 
 </main>
 

@@ -13,8 +13,6 @@ get '/uploadform' => sub {
   my $c = shift;
   (my $subdomain = standard( $c )) or return global_redirect($c);
 
-  ## sudo( $subdomain, $c->session->{uemail} );
-
   $c->stash( );
 };
 

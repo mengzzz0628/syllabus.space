@@ -11,8 +11,12 @@ use Data::Dumper;
 
 $ENV{'sitename'}= "syllabus.space";  ## could be deduced from $ENV{HOSTNAME} =~ s/-/\./;
 $ENV{'sitepath'}= $FindBin::Bin;
+$ENV{'siteicolor'}='#ffc8b3'; $ENV{'sitescolor'}='white'; $ENV{'siteacolor'}='AntiqueWhite';
+
 ## the full executable is in $ENV{MOJO_EXE} or in $ENV{'sitepath'}/$0;
 
+################################################################################################################################
+## unfortunately, you have to be connected to the correct diretory; I think Mojolyst does not work otherwise
 ################################################################################################################################
 
 {

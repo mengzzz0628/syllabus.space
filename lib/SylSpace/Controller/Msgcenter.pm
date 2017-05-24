@@ -18,3 +18,5 @@ get '/msgcenter' => sub {
   (isinstructor($subdomain, $c->session->{uemail})) and return $c->redirect_to('/instructor/msgcenter');
   return $c->redirect_to('/student/msgcenter');
 };
+
+1;

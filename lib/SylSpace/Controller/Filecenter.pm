@@ -18,3 +18,5 @@ get '/filecenter' => sub {
   (isinstructor($subdomain, $c->session->{uemail})) and return $c->redirect_to('/instructor/filecenter');
   return $c->redirect_to('/student/filecenter');
 };
+
+1;

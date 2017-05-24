@@ -1144,7 +1144,7 @@ sub showlasttweet( $subdomain ) {
 
 
 sub showtweets( $subdomain ) {
-  (my $tweetfile=bsd_glob("$var/sites/$subdomain/tweet.*")) or return "\t\t\tno tweet log just yet\n";
+  (my $tweetfile=bsd_glob("$var/sites/$subdomain/tweet.*")) or return undef;
   return scalar slurp($tweetfile);
 }
 

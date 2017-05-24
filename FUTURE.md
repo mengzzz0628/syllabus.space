@@ -1,7 +1,7 @@
 
 MORE IMPORTANT
 
-get hypnotoad running via service
+* token must expire on email, and/or be used only once
 
 BUG* students list their own upload, but not see it (needs Student/Viewown)
 

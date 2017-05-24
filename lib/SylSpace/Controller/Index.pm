@@ -40,14 +40,10 @@ __DATA__
 
 @@ exception.production.html.ep
 
+$self->stash( color => 'orange' );
+
 %title 'please go back';
 %layout 'auth';
-
-<!DOCTYPE html>
-  <html>
-    <head><title>Server Error: Please Go Back</title></head>
-
-    <body>
 
   <main>
     <h1>Exception</h1>
@@ -66,5 +62,3 @@ __DATA__
 
   </main>
 
-  </body>
-</html>

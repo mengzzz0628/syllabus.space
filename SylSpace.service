@@ -9,7 +9,7 @@ Restart=always
 SyslogIdentifier=SylSpace
 PIDFile=/home/ivo/bitsyllabus/syllabus.space/hypnotoad.pid
 ExecStart=/home/ivo/bitsyllabus/syllabus.space/serve-hypnotoad.sh
-ExecStop= # /usr/local/bin/hypnotoad -s /path/to/app/script/my-app
+ExecStop=/home/ivo/bitsyllabus/syllabus.space/stop-hypnotoad.sh
 ExecReload=/home/ivo/bitsyllabus/syllabus.space/serve-hypnotoad.sh # /usr/local/bin/hypnotoad /path/to/app/script/my-app
 
 [Install]

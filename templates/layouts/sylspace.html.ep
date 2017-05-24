@@ -29,7 +29,7 @@
   </head>
 
 
-  <body style="background-color:<%= $color %>">
+  <body style="background-color:<%= stash("color") || 'lightblue' %>">
 
     <div class="container-fluid" id="headbardraw">
 
@@ -41,8 +41,7 @@
 	  </div> <!-- navbar-header -->
 	  <div id="w0-collapse" class="collapse navbar-collapse">
 	    <ul id="w1" class="navbar-nav navbar-right nav">
-              <%== $toprightexit %>
-
+              <%== stash('toprightexit') || '<li><a href="/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a></li>' %>
               <!-- (($self->req->url->subdomain() =~ m{\bauth\b}) ?
 	          '<a href="/logout"> <i class="fa fa-sign-out"></i> LOG OFF </a>' :
 	          '<a href="http://auth.'.$self->req->url->domain().'/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a>')
@@ -54,7 +53,7 @@
 
       <header>
 
-	<div class="jumbotron" style="background-color:MediumAquaMarine">
+	<div class="jumbotron" style="background-color:Lightgray">
 
           <%== ($self->session->{flash}->{message}) ?
 	  '<div class="alert alert-success" role="alert">'.($self->session->{flash}->{message}).'</div>' :
