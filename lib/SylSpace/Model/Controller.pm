@@ -62,7 +62,7 @@ my $global_message;
 sub standard {
   my $c= shift;
 
-  my $domain= $c->req->url->domain;  ## mfe.welch.syllabus.space:3000
+  my $domain= $c->req->url->domain;  ## mfe.welch.$ENV{'sitename'}:3000
   my $subdomain= $c->req->url->subdomain; ## mfe.welch
   my $cururl= $c->req->url;  ## /auth/dosome
   $cururl =~ s{\?.*}{}; ## strip any parameters

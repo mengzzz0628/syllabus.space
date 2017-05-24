@@ -13,6 +13,7 @@ use autodie;
 
 use Archive::Zip;
 use Crypt::CBC;
+use Crypt::DES;
 use Crypt::Blowfish;
 use Data::Dumper;
 use Digest::MD5;

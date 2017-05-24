@@ -65,7 +65,7 @@ __DATA__
      <%== btnblock("/instructor/studentdetailedlist", '<i class="fa fa-users"></i> Students', 'Enrolled List') %>
      <%== btnblock("/instructor/gradecenter", '<i class="fa fa-star"></i> Grades', 'Saved Scores') %>
      <%== btnblock("/instructor/cioform", '<i class="fa fa-wrench"></i> Course', 'Set Class Parameters') %>
-     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio', 'Set Bio Parameters') %>
+     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio', 'Set My Profile') %>
 
      <%== btnblock("/showtweets", '<i class="fa fa-rss"></i> Class', 'Activity Monitor (<a href="/rss?rss=1">pure rss</a>)') %>
      <%== btnblock("/showseclog", '<i class="fa fa-lock"></i> Sec Log', 'Security Records') %>

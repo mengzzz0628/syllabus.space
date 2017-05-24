@@ -58,7 +58,7 @@ __DATA__
      <%== btnblock("/student/filecenter", '<i class="fa fa-files-o"></i> Files', 'Old Exams, etc') %>
 
      <%== btnblock("/student/gradecenter", '<i class="fa fa-star"></i> Grades', 'Saved Scores') %>
-     <%== btnblock("/auth/usettings", '<i class="fa fa-cog"></i> Bio', 'Set My Profile') %>
+     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio', 'Set My Profile') %>
 
      <%== btnblock("/showseclog", '<i class="fa fa-lock"></i> Sec Log', 'Security Records') %>
      <%== btnblock("/showtweets", '<i class="fa fa-rss"></i> Class', 'Activity Monitor') %>

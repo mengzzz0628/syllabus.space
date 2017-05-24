@@ -50,32 +50,34 @@ __DATA__
 %layout 'instructor';
 
 <main>
-  
-  <h2>Instructor FAQ and Info</h2>
-  
+
+  <h1>Instructor FAQ and Info</h1>
+
   <dl class="dl faq">
-  
-  <dt>What is <i>not</i> intuitive using syllabus.space?  Have an idea to make it easier and better?  Found a dead link?</dt>
 
-  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-syllabus-space">let me know</a>.  I cannot guarantee that I will follow it, but I will consider it.</dd>
+  <dt>What is <i>not</i> intuitive using this website (SylSpace on <%= $ENV{'sitename'} %>)?  Have an idea to make it easier and better?  Found a dead link?</dt>
 
+  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-<%= $ENV{'sitename'} %>">let me know</a>.  I cannot guarantee that I will follow it, but I will consider it.</dd>
 
-  <dt>What is syllabus.space?</dt>
-  
-  <dd>Syllabus.space is a third-generation web class management system, with an intentional focus on simplicity.  Its most important functionalities are:
+  <dt>What is SylSpace on <%= $ENV{'sitename'} %>?</dt>
+
+  <dd>SylSpace is a third-generation web course management system, with an intentional focus on ease-of-use and simplicity.  The software is SylSpace, the main site designed to run it is <a href="http://syllabus.space">syllabus.space</a>.  (You are currently running it on <a href="<%= $ENV{'sitename'} %>"><%= $ENV{'sitename'} %></a> right now.)  There is almost no learning curve involved in using the system.
+
+  <p style="padding-top:1em">Its most important functionalities are:
 <ul>
   <li> A messaging system from instructor to students (to avoid spam filters and emails). </li>
   <li> An equiz system to allow instructors to design and post quizzes, in which the question numbers can change with each browser refresh. </li>
-  <li> A file posting system, both for tasks and homeworks [with student-uploadable responses] and for useful files (such as the syllabus, a faq [for students], etc). </li>
+  <li> A file posting system, both for tasks and homeworks [with student-uploadable responses] and for useful files (such as a syllabus, a class faq, etc). </li>
   <li> A grading platform which allows instructors to keep track of task grades and allows students to see their grades as they are entered. </li>
   </ul>
-  Instructors can ignore facilities that they are not interested in.
+  Instructors can ignore facilities that they are not interested in.  Students can enroll in courses with an instructor-set coursesecret (or none if none set).  The typical installation has an open corporate finance course for student self-testing.
   </dd>
+
+
+
+  <dt>Do I need to run SylSpace on my own webserver?</dt>
   
-  
-  <dt>Do I need to run syllabus.space on my own webserver?</dt>
-  
-  <dd>No.  Instructors can get accounts on syllabus.space (this website) for their classes.  Please contact <a href="mailto:ivo.welch@gmail.com">ivo welch</a>.  The advantage is zero setup costs.  The disadvantage is <b>no</b> guarantees.   (Even google has had downtime on occasions!  Incidentally, other websites typically also do not offer guarantees.)  If you run your site on syllabus.space (rather than on your own web server), you must have some flexibility and tolerance for issues.</dd>
+  <dd>No.  Instructors can get accounts on syllabus.space for their classes.  Please contact <a href="mailto:ivo.welch@gmail.com">ivo welch</a>.  The advantage is zero setup costs.  The disadvantage is <b>no</b> guarantees.   (Even google has had downtime on occasions!  Incidentally, other websites typically also do not offer guarantees.)  If you run your site on syllabus.space (rather than on your own web server), you must have some flexibility and tolerance for issues.</dd>
   
   
 
@@ -100,12 +102,12 @@ __DATA__
   <dd>You can set it yourself in the <a href="/instructor/csettings">course settings</a>.  It allows an instructor to limit access to students who know the course secret.  Usually, the instructor tells students in the first class.</dd>
   
   
-  <dt>Why does syllabus.space not require or store passwords?</dt>
+  <dt>Why does SylSpace not require or store passwords?</dt>
   
   <dd>Because we rely on email-address-based authentication via other services, in particular google and facebook.  If the linked google account becomes compromised, so will be the access to syllabus.space.  This is less bad than it sounds, because most websites have a password recovery feature that is also compromised when the email (google) account is compromised.  Put simply, you are toast if you lose control of your email account.</dd>
   
   
-  <dt>How can I post a syllabus?</dt>
+  <dt>How can I post a syllabus for my students?</dt>
   
   <dd>Upload a <u>syllabus.pdf</u> and/or <u>syllabus.html</u> file.  A <a href="/html/ifaq/syllabus.html">basic html syllabus is here</a>, my <a href="/html/ifaq/syllabus-sophisticated.html">more sophisticated syllabus is here</a>.  Here is a <a href="/html/ifaq/syllabus-sophisticated.png">snapshot</a> of how it looks for my students.  To start writing your own syllabus, right-click on the syllabus when it has rendered, save as (html) source, and start editing it to your like. <!-- If you want to use this, you have two format choices:  please download the html code (by clicking on view source in your browser), strip everything up to and including the <b>&lt;body&gt;</b> and after the <b>&lt;/body&gt;</b>, and upload this as syllabus.html as your file. --> </dd>
   
@@ -271,7 +273,7 @@ __DATA__
   # perl mksite.pl testsite you@emailhost
   # morbo -v Sylspace  ## and now open http://localhost:3000/ on your browser  </pre>
 
-a  <p><tt>/var/sylspace</tt> is hardcoded in 2-3 places.  If you do not want to use this, you need to fix it.  I do not believe that <tt>http://...syllabus.space</tt> is hardcoded anywhere, but some of the documentation refers to it as the server on which it runs.</p>
+a  <p><tt>/var/sylspace</tt> is hardcoded in 2-3 places.  If you do not want to use this, you need to fix it.  There are a very few hardcodes to syllabus.space (e.g., for OAuth or the systemd SylSpace.conf config file).  I do not believe that <tt>http://*syllabus.space</tt> is hardcoded anywhere, but some of the documentation refers to it as the server on which it runs.</p>
 
   <p>Because all content is stored in the unix filesystem, it is easy for an instructor to view and interpret all of his/her data, too.  It also makes debugging a lot easier.</p>
 
@@ -290,15 +292,17 @@ a  <p><tt>/var/sylspace</tt> is hardcoded in 2-3 places.  If you do not want to 
 
   <dt>What is the software license?</dt>
 
-  <dd>The syllabus.space software is free under the <a href="https://choosealicense.com/licenses/agpl-3.0/">GNU AGPLv3</a> license.</dd>
+  <dd>The SylSpace software is free under the <a href="https://choosealicense.com/licenses/agpl-3.0/">GNU AGPLv3</a> license.</dd>
 
 </dl>
 
-<h2> Site FAQ </h2>
+
+<h1> Site FAQ </h1>
 
   <%== $allfaq %>
 
-<h2> Instructor-added Student FAQ </h2>
+
+<h1> Student FAQ </h1>
 
   <%== $isfaq %>
 

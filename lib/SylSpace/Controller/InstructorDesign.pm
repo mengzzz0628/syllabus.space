@@ -26,7 +26,7 @@ __DATA__
 
 @@ instructordesign.html.ep
 
-%title 'Design an Equiz';
+%title 'design an equiz question';
 %layout 'instructor';
 
 <main>

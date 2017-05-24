@@ -18,8 +18,10 @@ sub logandreturn {
 sub google {
   my ( $self, $access_token, $userinfo ) = @_;
   my $name = $userinfo->{displayName};
-  ## dani did this: my $emailptr = grep {$_->{type} eq 'account'} @{ $userinfo->{emails} };
-  my $email = $userinfo->{emails}->[0]->{value};
+  ## we could also pick off first and last name, but it ain't worth it
+  my @emaillist = grep {$_->{type} eq 'account'} @{ $userinfo->{emails} };
+  my $email= $emaillist[0]->{value};
+  ## my $email = $userinfo->{emails}->[0]->{value};
   return logandreturn( $self, $email, $name, 'google' );
 }
 
@@ -27,6 +29,7 @@ sub github {
   my ( $self, $access_token, $userinfo ) = @_;
 
   (defined($userinfo->{email})) or die "sadly, you have not confirmed your email with github, so you cannot use it to confirm it.\n";
+  ($userinfo->{email} =~ /gmail.com$/) and die "sorry, but gmail accounts must be validated by google, not github";
 
   return logandreturn( $self, $userinfo->{email}, $userinfo->{name}, 'github' );
 }
@@ -40,6 +43,7 @@ sub facebook {
   if (!$res->{email}) {
     return $self->render(text => "Can't get your email from facebook, please try another auth method.");
   }
+  ($res->{email} =~ /gmail.com$/) and die "sorry, but gmail accounts must be validated by google, not facebook";
 
   return logandreturn( $self, $res->{email}, $res->{name}, "facebook");
 }
@@ -50,8 +54,6 @@ get '/auth/authenticator' => sub {
   my $c = shift;
 
   (my $subdomain = standard( $c )) or return global_redirect($c);
-
-  ## sudo( $subdomain, $c->session->{uemail} );
 
   $c->render(template => 'AuthAuthenticator' );
 };
@@ -65,60 +67,70 @@ __DATA__
 
 @@ AuthAuthenticator.html.ep
 
-%title 'Authenticate Your Email Identity';
+%title 'authenticate email';
 %layout 'auth';
 
-<% use SylSpace::Model::Controller qw(domain); %>
 <% use SylSpace::Model::Controller qw(btnblock); %>
 
 <main>
+
+<p> To learn more about this site, please visit the <a href="/aboutus">about us</a> page.</p>
 
 <hr />
 
 <nav>
 
-   <div class="row top-buffer text-center">
+   <script src='https://www.google.com/recaptcha/api.js'></script>
+
+  <p style="font-size:small;">Direct Authentication is the fastest and most reliable method to authenticate.</p>
+
+   <div class="row text-center">
      <%== btnblock('/auth/google/authenticate', '<i class="fa fa-google"></i> Google', 'Your Gmail ID') %>
      <%== btnblock('/auth/github/authenticate', '<i class="fa fa-github"></i> Github', 'Your Github ID<br />Disabled Until Approved', 'btn-disabled') %>
      <%== btnblock('/auth/facebook/authenticate', '<i class="fa fa-facebook"></i> Facebook', 'Your Facebook ID<br />Disabled Until Approved', 'btn-disabled') %>
-     <%== btnblock('/auth/ucla/authenticate', '<i class="fa fa-university"></i> UCLA', 'Your UCLA ID<br />Disabled Until Approved', 'btn-disabled') %>
-
-  </div>
+     <%== btnblock('/auth/ucla/authenticate', '<i class="fa fa-university"></i> UCLA', 'Your University ID<br />Disabled Until Approved', 'btn-disabled') %>
+   </div>
 
   <hr />
 
-  <div class="row">
-    <form name="registration" method="post" action="/auth/sendmail/authenticate">
+  <p style="font-size:small;padding-top:1em;">Sendmail is slow and may take up to 10 minutes to arrive&mdash;if you are lucky and no spam filter blocks it.</p>
 
-   <div class="col-md-3">
-         <div class="input-group">
-            <span class="input-group-addon">Name: <i class="fa fa-user"></i></span>
-           <input type="text" class="form-control" placeholder="joe schmoe" name="name" required />
-         </div>
-   </div>
+  <form name="registration" method="post" action="/auth/sendmail/authenticate">
+       <input type="hidden" class="form-control" value="no name" name="name" />
 
-   <div class="col-md-3">
+    <div class="row text-center">
+
+       <div class="col-md-5">
          <div class="input-group">
             <span class="input-group-addon">Email: <i class="fa fa-email"></i></span>
             <input class="form-control" placeholder="joe.schmoe@ucla.edu" name="email" type="email" required />
          </div>
-    </div>
+       </div>
 
-     <div class="col-md-1">
+       <div class="col-md-2">
           <div class="input-group">
              <button class="btn btn-default" type="submit" value="submit">Send Authorization Email</button>
           </div>
       </div>
 
-      </form>
+
+     <% if ($ENV{'ONLOCALHOST'}) { %>
+        <hr />
+        <div class="row top-buffer text-center">
+           <%== btnblock('/auth/test', '<i class="fa fa-users"></i> Local Users', 'Listed Users -- Remove in Production', 'btn-default btn-md', 'w') %>
+        </div>
+      <% } else { %>
+          <div class="col-md-offset-1 col-md-4">
+              <div class="g-recaptcha" data-sitekey="6Le1siIUAAAAAIJbH9Ij2UCYg-tPO8Q8bA7nYCPn"></div>
+          </div>
+      <% } %>
+
     </div> <!-- row -->
 
+  </form>
+
+<p style="font-size:x-small"><a href="/auth/magic">magic</a> is only useful to the cli site admin</p>
+
 </nav>
-
-  <hr />
-
-<p>Advice: Sendmail only wakes up every minute or so.  It may take 0-5 minutes for an email to arrive in your mailbox, provided some spam filter did not catch it along the way.  Our recommendation is to use the direct authentication buttons whenever you can.</p>
-
-<hr />
 
 </main>

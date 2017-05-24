@@ -39,10 +39,13 @@ __DATA__
 
   <%== mkdatatable('gradebrowser') %>
 
+  <% if (defined($all)) { %>
   <table class="table" style="width: auto !important; margin:2em;" id="gradebrowser">
      <%== showmygrades($all) %>
   </table>
-
+  <% } else { %>
+      <p> No grade data posted just yet </p>
+  <% } %>
 
 </main>
 
@@ -50,8 +53,10 @@ __DATA__
   sub showmygrades {
     my $all= shift;
     my $rs= "";
-    $rs.= "<caption> Student ".$all->{uemail}->[0]." </caption>\n<thead> <tr> <th>Task</th> <th>Grade</th> </tr> </thead>\n";
+    $rs.= "<caption> Student ".$all->{uemail}->[0]." </caption>
+           <thead> <tr> <th>Task</th> <th>Grade</th> </tr> </thead>\n";
 
+    $rs .= "<tbody>\n";
     foreach my $hw (@{$all->{hw}}) {
       foreach my $st (@{$all->{uemail}}) {
 	$rs.= "<tr> <th> $hw </th> \n";

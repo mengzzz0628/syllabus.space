@@ -16,7 +16,7 @@ get '/student/hwcenter' => sub {
   (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
 
   $c->stash( filelist => sfilelistall($subdomain, $c->session->{uemail}, "hw*"),
-	     sownfilelist => sownfilelist( $subdomain, $c->session->{uemail} )
+	     sownfilelist => scalar sownfilelist( $subdomain, $c->session->{uemail} ),
 	   );
 };
 
@@ -86,7 +86,8 @@ __DATA__
       . "<td> ". btn("/student/fileview?f=$fname", "$pencil $fname") . "</td>"
       . "<td style=\"text-align:left\"> due $duein (<span class=\"epoch0\">$duetime</span>)<br />due GMT ". localtime($_->[1])."<br />now GMT ".localtime()."</td>"
       . "<td> $uploadform </td>"
-      . '<td> '.$sownfilelist{$fname}.' </td>' ."</tr>";
+      . '<td> '.($sownfilelist{$fname}||"no upload yet").' </td>'
+      ."</tr>";
   }
   ($counter) or return "<tr colspan=\"3\"><td>$counter publicly posted homeworks at the moment</td> </tr>";
 

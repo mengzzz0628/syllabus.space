@@ -11,9 +11,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/aboutus' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
-
-  ## sudo( $subdomain, $c->session->{uemail} );
+  ## anyone is allowed to read this --- (my $subdomain = standard( $c )) or return global_redirect($c);
 
   $c->stash( );
 };
@@ -33,13 +31,15 @@ __DATA__
 
 <h2>Basics</h2>
 
-  <p>syllabus.space is free course administration and equizzing software, written in <a href="http://mojolicious.org/">Mojolicious</a> (perl) and <a href="http://getbootstrap.com">Bootstrap</a> (with <a href="http://fontawesome.io/">fontawesome icons</a>) in early 2017 by Ivo Welch (<a href="ivo.welch@gmail.com">ivo.welch@gmail.com</a>).</p>
+  <p>SylSpace is free course administration and equizzing software, written in <a href="http://mojolicious.org/">Mojolicious</a> (perl) and <a href="http://getbootstrap.com">Bootstrap</a> (with <a href="http://fontawesome.io/">fontawesome icons</a>) in early 2017 by Ivo Welch (<a href="ivo.welch@gmail.com">ivo.welch@gmail.com</a>).</p>
 
-  <p>For basic help, please visit the <a href="/faq">FAQ</a>.</p>
+<h2>Features and Screenshots</h2>
+
+  <p>For basic information, please visit the <a href="/faq">FAQ</a>.</p>
 
 <h2>License</h2>
 
-  <p>The syllabus.space software is free under the <a href="https://choosealicense.com/licenses/agpl-3.0/">GNU AGPLv3</a> license.</p>
+  <p>The SylSpace software is free under the <a href="https://choosealicense.com/licenses/agpl-3.0/">GNU AGPLv3</a> license.</p>
 
 <h2>Legal</h2>
 

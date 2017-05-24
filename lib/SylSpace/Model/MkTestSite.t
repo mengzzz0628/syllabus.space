@@ -1,62 +1,40 @@
 #!/usr/bin/perl -w
-
 use strict;
 use common::sense;
 use utf8;
 use warnings FATAL => qw{ uninitialized };
 use autodie;
 
-use feature ':5.20';
-use feature 'signatures';
-no warnings qw(experimental::signatures);
-
-################################################################
-## not used, but we want to make sure that these modules are installed.
-use common::sense;
-use File::Path;
-use File::Touch;
-use File::Copy;
-use Email::Valid;
 use Perl6::Slurp;
-use Archive::Zip;
-use FindBin;
-use Mojolicious::Plugin::RenderFile;
-use Data::Dumper;
-sub arrlen { (ref ($_[0]) eq 'ARRAY') and return scalar @{$_[0]}; return scalar @_; }
+use File::Glob qw(bsd_glob);
 
 use lib '../..';
+
+################################################################
+
 use SylSpace::Model::Model qw(:DEFAULT _websitemake _webcourseremove biosave usernew userenroll courselistenrolled ciosave msgsave filewrite filesetdue gradetaskadd gradesave ciobuttonsave cptemplate sudo);
 
 use Test2::Bundle::Extended;
 use Test2::Plugin::DieOnFail;
 
-my $v= _webcourseremove("*");  ## but not users and templates
-
+_webcourseremove("*");  ## but not users and templates
 
 my %bioinstructor = ( uniname => 'ucla anderson', regid => 'na', firstname => 'ivo', lastname => 'welch', birthyear => 1971,
 		      email => 'ivo.welch@gmail.com', zip => 90095, country => 'US', cellphone => '(310) 555-1212',
 		      email2 => 'ivo.welch@anderson.ucla.edu', tzi => tziserver(), optional => '' );
 
-my %biokingsfield = ( uniname => 'harvard law', regid => 'na', firstname => 'charles', lastname => 'kingsfield', birthyear => 1971,
-		      email2 => 'charles.kingsfield@anderson.ucla.edu', zip => 90095, country => 'US', cellphone => '(310) 555-1212',
-		      email => 'instructor@gmail.com', tzi => tziserver(), optional => '' );
-
 my $iemail= $bioinstructor{email};
 
-note '
-################ website creation, user registration, and user enrollment
+note '################ website creation';
 
-';
-
-my @courselist=qw(corpfin.test);
+my @courselist=qw(corpfin.test syllabus.test);
 
 foreach (@courselist) {  ok( _websitemake($_, $iemail), "created $_ site" ); }
 
-ok( scalar @{courselistenrolled($iemail)} == scalar @courselist, "need enrollment info on $#courselist+1 existing courses: ".scalar @{courselistenrolled($iemail)}. " vs ".scalar @courselist);
+my @enrolledcourses= keys %{courselistenrolled($iemail)};
+ok( scalar @enrolledcourses == scalar @courselist, "check info on enrolled courses" );
 
-note '
-################ auth: user bios
-';
+note '################ auth: instructor';
 
 ok( biosave( $iemail, \%bioinstructor), 'written biodata for instructor '.$iemail );
 
@@ -66,21 +44,29 @@ my %biostudent = ( uniname => 'harvard law', regid => 'na', firstname => 'james'
 		   email2 => 'james.hart@gmail.com', zip => 90049, country => 'US', cellphone => '(312) 555-1212',
 		   email => 'student@gmail.com', tzi => tziserver(), optional => '' );
 
-ok( biosave('student@gmail.com', \%biostudent), 'written biodata for student' );
+ok( biosave('student@gmail.com', \%biostudent), 'written biodata for (largely useless) student' );
 
 ok( userenroll($courselist[0], 'student@gmail.com'), 'enrolled student' );
 
-note '
-################ course validity testing and modification
-';
 
-my %ciosample = ( uniname => 'harvard law', unicode => 'law101', coursesecret => '', cemail => 'the.paper.chase@gmail.com',
+note '################ course init';
+
+my %ciocorpfin = ( uniname => 'syllabus-ucla', unicode => 'na', coursesecret => '', cemail => 'ivo.welch@gmail.com',
 		  anothersite => 'http://ivo-welch.info',
-		  department => 'law', subject => 'contract law', meetroom => 'Austin-Hall', meettime => 'TR 9:00-5:00',
-		  domainlimit => '', hellomsg => 'watch the movie' );
+		  department => 'management', subject => 'corporate finance', meetroom => 'internet', meettime => 'MTWRF 9:00-5:00',
+		  domainlimit => '', hellomsg => 'enjoy!' );
+
+my %ciosyllabus = ( uniname => 'syllabus', unicode => 'na', coursesecret => 'learn', cemail => 'ivo.welch@gmail.com',
+		  anothersite => 'http://ivo-welch.info',
+		  department => 'teaching', subject => 'meta-syllabus itself', meetroom => 'internet', meettime => 'MTWRF 9:00-5:00',
+		  domainlimit => '', hellomsg => 'enjoy!' );
 
 sudo($courselist[0], $iemail);  ## become the instructor
-ok( ciosave($courselist[0], \%ciosample), 'instructor writes sample cio sample' );
+sudo($courselist[1], $iemail);  ## become the instructor
+
+note '#ok, su';
+ok( ciosave($courselist[0], \%ciocorpfin), 'instructor writes sample cio sample' );
+ok( ciosave($courselist[1], \%ciosyllabus), 'instructor writes sample cio sample' );
 
 ## buttons
 
@@ -91,43 +77,47 @@ push(@buttonlist, ['http://gmail.com', 'gmail', 'send email']);
 
 ciobuttonsave( $courselist[0], \@buttonlist );
 
-note '
-################ messaging system
-';
+note '################ initial message';
 
-ok( msgsave($courselist[0], { subject => 'Test Welcome', body => 'Welcome to the testing site.  Note that everything is public and nothing stays permanent here.  I often replace the testsite with a similar new one.', priority => 5 }, 1233), 'posting 1233' );
+ok( msgsave($courselist[0], { subject => 'Test Welcome', body => 'Welcome to the testing site.  Note that everything is public and nothing stays permanent here.  I often replace this testsite with a similar new one.', priority => 5 }, 1233), 'posting 1233' );
 
-note '
-################ file storage and retrieval system
-';
 
-ok( filewrite($courselist[0], $iemail, 'hw1.txt', "please do this first homework\n"), 'writing hw1.txt');
-ok( filewrite($courselist[0], $iemail, 'syllabus.txt', "<h2>please read this syllabus</h2>\n"), 'writing syllabus.txt' );
-my $e2n= "02a-welch-tvm.equiz"; ok( -e $e2n, "have test for 2medium.equiz for use in Model subdir" );
-ok( filewrite($courselist[0], $iemail, $e2n, scalar slurp($e2n)), "writing $e2n" );
+note '################ initial files';
 
-ok( cptemplate($courselist[0], 'starters'), "cannot copy starters template" );
-ok( cptemplate($courselist[0], 'tutorials'), "cannot copy tutorials template" );
-## ok( cptemplate($courselist[0], 'corpfin'), "cannot copy corpfin template" );
+ok( filewrite($courselist[1], $iemail, 'hw1.txt', "please do this first homework\n"), 'writing hw1.txt');
+ok( filewrite($courselist[1], $iemail, 'syllabus.txt', "<h2>please read this simple txt syllabus</h2>\n"), 'writing syllabus.txt' );
+
+ok( cptemplate($courselist[0], 'corpfinintro'), "cannot copy corpfin template" );
+
+
+ok( cptemplate($courselist[1], 'starters'), "cannot copy starters template" );
+ok( cptemplate($courselist[1], 'tutorials'), "cannot copy tutorials template" );
 
 ####
-ok( filesetdue($courselist[0], 'hw1.txt', time()+60*60*24*14), "set hw1.txt open for 2 weeks");
-ok( filesetdue($courselist[0], $e2n, time()+60*60*24*14), "set e2n open for 4 weeks");
+my $MONTH = 60*60*24*30;
+foreach my $fnm (bsd_glob("../../../templates/equiz/corpfinintro/*.equiz")) {
+  $fnm =~ s{.*/}{};
+  ok( filesetdue($courselist[0], $fnm, time()+$MONTH), "publish $fnm");
+}
 
-note '
-################ grade center
-';
+my $ssshtml="syllabus-sophisticated.html";
+my $sshtml= "../../../public/html/ifaq/$ssshtml"; ok( -e $sshtml, "have $ssshtml" );
+ok(  filewrite($courselist[0], $iemail, $ssshtml, scalar slurp($sshtml)), 'writing $ssshtml' );
+ok( filesetdue($courselist[0], $ssshtml, time()+$MONTH), "publish $ssshtml");
+
+ok( filesetdue($courselist[1], 'hw1.txt', time()+$MONTH), "publish hw1.txt open for 1 month");
+ok( filesetdue($courselist[1], 'syllabus.txt', time()+$MONTH), "publish syllabus.txt open for 1 month");
+
+note '################ initial grades';
 
 ok( gradetaskadd($courselist[0], qw(hw1 hw2 midterm)), "hw1, hw2 midterm all allowed now" );
 
 ok( gradesave($courselist[0], 'student@gmail.com', 'midterm', 'badfail' ), "grade midterm for student");
 
-note '
-################ backup
-';
-
 done_testing();
 
+
+################
 sub tziserver {
   my $off_h=1;
   my @local=(localtime(time+$off_h*60*60));

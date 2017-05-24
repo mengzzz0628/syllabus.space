@@ -15,9 +15,12 @@ post '/instructor/msgsave' => sub {
 
   sudo( $subdomain, $c->session->{uemail} );
 
-  my $msgid= msgsave($subdomain, $c->req->body_params->to_hash);
   my $subject= $c->req->body_params->param('subject');
+  ($subject =~ /\w/) or die "you must give a message subject";
   my $priority= $c->req->body_params->param('priority');
+
+  my $msgid= msgsave($subdomain, $c->req->body_params->to_hash);
+
   my $msg= "posted new message $msgid: '$subject', priority $priority";
 
   tweet($c->tx->remote_address, $subdomain, 'instructor', $msg );

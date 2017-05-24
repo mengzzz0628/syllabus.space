@@ -26,7 +26,7 @@ __DATA__
 
 @@ instructorinstructorlist.html.ep
 
-%title 'Current Course Instructors';
+%title 'current course instructors';
 %layout 'instructor';
 
 <main>

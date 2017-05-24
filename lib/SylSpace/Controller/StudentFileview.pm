@@ -27,6 +27,6 @@ get '/student/fileview' => sub {
 
   (my $extension= $fname) =~ s{.*\.}{};
 
-  return ($fname =~ /\.(txt|text|html|htm|csv)$/i) ? $c->render(text => $filecontent, format => 'txt') :
+  return ($fname =~ /\.(txt|text|csv)$/i) ? $c->render(text => $filecontent, format => 'txt') :
     $c->render(data => $filecontent, format => $extension);
 };

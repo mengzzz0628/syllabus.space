@@ -37,7 +37,7 @@
 	<div class="container-fluid" id="nbh">
 	  <div class="navbar-header">
 	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w0-collapse"><span class="icon-bar"></span></button>
-	    <a class="navbar-brand" href="/"><b><!--<img src="/favicon.ico" alt="equiz avatar" />--> Syllabus.Space: <%= $self->session->{uemail} %> </b></a>
+	    <a class="navbar-brand" href="/"><b><%= $ENV{sitename} %>: <%= $self->session->{uemail}||"no email yet" %> </b></a>
 	  </div> <!-- navbar-header -->
 	  <div id="w0-collapse" class="collapse navbar-collapse">
 	    <ul id="w1" class="navbar-nav navbar-right nav">
@@ -90,7 +90,7 @@
           <a class="btn btn-danger" href="/logout"> <i class="fa fa-power-off"></i> logout user </a>
 	</div> <!--container:gohomeorup -->
 
-        <p style="font-size:x-small;padding:1em;margin:1em;">Please notify <a href="mailto:ivo.welch@gmail.com?subject=security breach on syllabus.space">ivo welch</a> immediately if you discover an exploitable security bug that would allow unauthorized extraction of data.</p>
+        <p style="font-size:x-small;padding:1em;margin:1em;">Please notify <a href="mailto:ivo.welch@gmail.com?subject=security+breach+on+<%= $ENV{sitename}%>">ivo welch</a> immediately if you discover an exploitable security bug that would allow unauthorized extraction of data.</p>
       </footer>
 
 

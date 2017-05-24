@@ -8,7 +8,7 @@ use SylSpace::Model::Model qw(isenrolled isinstructor _suundo);
 use SylSpace::Model::Controller qw(global_redirect standard domain);
 
 ################################################################
-## a redirector
+## a redirector for instructors and students (not for auth!!)
 ################################################################
 
 my $torealhome = sub {
@@ -45,7 +45,7 @@ __DATA__
 
 <!DOCTYPE html>
   <html>
-    <head><title>Server error: Please Go Back</title></head>
+    <head><title>Server Error: Please Go Back</title></head>
 
     <body>
 
@@ -60,9 +60,9 @@ __DATA__
 
   <h2> Security? </h2>
 
-  <p>The source to the syllabus.space system is public on <a href="https://github.com/iwelch/syllabus.space">github</a>, so it is not a security breach if you learn details about where the error has occurred (or a little more information why).</p>
+  <p>The source code for SylSpace, running on this <%= $ENV{'sitename'} %> site, is public on <a href="https://github.com/iwelch/syllabus.space">github</a>, so it is not a security breach if you learn details about where the error has occurred (or a little more information why).</p>
 
-  <p>However, if you notice a compromise of internal data that you should not have seen, or if you discover an exploitable security breach, please contact <a href="mailto:ivo.welch@gmail.com?subject=security breach on syllabus.space">ivo welch</a> urgently.</p>
+  <p>However, if you notice a compromise of internal data that you should not have seen, or if you discover an exploitable security breach, please contact <a href="mailto:ivo.welch@gmail.com?subject=security breach on <%= $ENV{'sitename'} %>">ivo welch</a> urgently.</p>
 
   </main>
 

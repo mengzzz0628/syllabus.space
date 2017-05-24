@@ -6,19 +6,26 @@ plugin 'Mojolyst' => {controllers => 'SylSpace::Controller'};
 plugin 'RenderFile';
 plugin 'browser_detect';
 
+use FindBin;
 use Data::Dumper;
+
+$ENV{'sitename'}= "syllabus.space";  ## could be deduced from $ENV{HOSTNAME} =~ s/-/\./;
+$ENV{'sitepath'}= $FindBin::Bin;
+## the full executable is in $ENV{MOJO_EXE} or in $ENV{'sitepath'}/$0;
 
 ################################################################################################################################
 
 {
-  (my $pgmname= $0) =~ s{.*/}{};
-  (-l "$pgmname.conf") or die "\nFATAL ERROR: you cannot have the authentication secrets configuration file $pgmname.conf in the github'ed  directory.\n".
-    "it must be a symbolic link to somewhere safe!\n";
-  print "[Authentication secrets resolve to ".readlink("$pgmname.conf")."]\n";
+  (my $pgmname= $0) =~ s{.*/}{};  ## usually SylSpace
+
+  (-e "$ENV{'sitepath'}/$pgmname.conf") or die "\nFATAL: no authentication secrets config file $ENV{'sitepath'}/$pgmname.conf\n";
+  (-l "$ENV{'sitepath'}/$pgmname.conf") or die "\nFATAL: authentication secrets config file $ENV{'sitepath'}/$pgmname.conf is in the github'ed  directory, not a link!\n";
+  print "[Authentication secrets are symlink to ".readlink("$ENV{'sitepath'}/$pgmname.conf")."]\n";
 
   plugin 'Config';
 
   my $credentials = app->plugin('Config')->{oauth};
+  (defined($credentials)) or die "internal error: I cannot read the oauth information from the config file\n";
 
   if (my $google = $credentials->{google}) {
     my ($key, $secret) = @$google;
@@ -57,8 +64,8 @@ use Data::Dumper;
 }
 
 ################################################################################################################################
-## http://user.course.syllabus.space -> syllabus.space
-## http://syllabus.space -> syllabus.space
+## http://user.course.$ENV{'sitename'} -> $ENV{'sitename'}
+## http://$ENV{'sitename'} -> $ENV{'sitename'}
 *Mojo::URL::domain = sub {
   my $self= shift;
   my $fulldomain= $self->to_abs->host;
@@ -73,8 +80,8 @@ use Data::Dumper;
 };
 
 
-## http://user.course.syllabus.space -> user.course
-## http://syllabus.space -> undef
+## http://user.course.$ENV{'sitename'} -> user.course
+## http://$ENV{'sitename'} -> undef
 *Mojo::URL::subdomain = sub {
   my $self= shift;
   my $fulldomain= $self->to_abs->host;
@@ -101,7 +108,7 @@ app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; ma
 
 if (defined($ENV{'HYPNOTOAD_EXE'})) {
   $ENV{'ONLOCALHOST'}=0;
-  app->config(hypnotoad => {listen => ['http://syllabus.space:80']});
+  app->config(hypnotoad => {listen => ['http://'.$ENV{'sitename'}.':80']});
 } else {
   (defined($ENV{'MOJO_REUSE'})) or die "do not know which Mserver is being used\n";
   ($ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'}) =~ /^[0-9]+\.0\.0\./)?1:0;
@@ -110,8 +117,10 @@ if (defined($ENV{'HYPNOTOAD_EXE'})) {
 if ($ENV{'ONLOCALHOST'}) {
   warn "localhost mode only --- logging out does not work correctly\n";
 } else {
-  our $domain=".syllabus.space";
+  our $domain='.'.$ENV{'sitename'};
   app->sessions->cookie_domain($domain);
 }
+
+print "Starting App now\n";
 
 app->start();

@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
 
+### this is for testing and demonstrating cookie sharing across subdomains
+
 #my $cookiedomain;
 #my $cookiedomain= "localhost";
 

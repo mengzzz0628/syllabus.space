@@ -31,7 +31,7 @@ __DATA__
 
 @@ InstructorSitebackup.html.ep
 
-%title 'Site Backup';
+%title 'course site backup';
 %layout 'instructor';
 
 <main>
@@ -40,6 +40,6 @@ __DATA__
 
   <p>Your zipped backup file has been created and will download in a moment.</p>
 
-  <p>Naturally, if the syllabus.space webserver dies or is compromised, only your local backup will survive.  So please make sure to keep it in a safe place!</p>
+  <p>Naturally, if the $ENV{'sitename'} webserver dies or is compromised, only your local backup will survive.  So please make sure to keep it in a safe place!</p>
 
 </main>

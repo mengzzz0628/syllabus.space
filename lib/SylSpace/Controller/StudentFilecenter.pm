@@ -39,14 +39,14 @@ __DATA__
 
  <nav>
    <div class="row top-buffer text-center">
-    <%== filehash2string( $filelist ) %>
+    <%== filefilehash2string( $filelist ) %>
    </div>
  </nav>
 
 </main>
 
-  <%
-     sub filehash2string {
+<%
+     sub filefilehash2string {
        my $filehashptr= shift;
        defined($filehashptr) or return "";
        my $filestring= '';
@@ -60,7 +60,7 @@ __DATA__
 
          (my $shortname = $_->[0]) =~ s/\.file$//;
          my $duein= timedelta($_->[1] , time());
-         $filestring .= btnblock("view?f=".($_->[0]), '<i class="fa fa-pencil"></i> '.($_->[0]), "");
+         $filestring .= btnblock("/student/fileview?f=".($_->[0]), '<i class="fa fa-pencil"></i> '.($_->[0]), "", "btn-default", "w");
        }
        ($counter) or return "<p>no publicly posted files at the moment</p>";
 

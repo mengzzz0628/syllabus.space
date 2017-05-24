@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(isenrolled cioread hassyllabus);
+use SylSpace::Model::Model qw(isenrolled cioread hassyllabus instructorlist);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -15,7 +15,9 @@ get '/student/quickinfo' => sub {
 
   (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
 
-  $c->stash( cioread => cioread($subdomain), requestsyllabus => hassyllabus($subdomain)  );
+  my $instructorlist= instructorlist( $subdomain );
+
+  $c->stash( cioread => cioread($subdomain), requestsyllabus => hassyllabus($subdomain), instructorlist => $instructorlist  );
 };
 
 1;
@@ -34,6 +36,7 @@ __DATA__
 <h1>Quick Course Facts</h1>
 
   <table class="table" style="width: auto !important; margin: 2em;">
+    <tr> <th> Instructor(s) </th> <td> <%= join(" ", @$instructorlist) %> </td> </tr>
     <tr> <th> Subject Matter </th> <td> <%= $cioread->{subject} %> </td> </tr>
     <tr> <th> Course Code </th> <td> <%= $cioread->{unicode} %> </td> </tr>
     <tr> <th> Department </th> <td> <%= $cioread->{department} %> </td> </tr>

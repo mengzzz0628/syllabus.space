@@ -41,6 +41,7 @@ get '/enter' => sub {
   ($subdomain eq "auth") and die "you cannot enter the /auth course --- it does not exist!\n";
   ## return $c->flash(message => 'auth likes only index')->redirect_to('/auth/index');  ## we cannot enter the auth course site
 
+  ## unmorph if needed
   student2instructor( $subdomain, $c->session->{uemail} );  ## just make sure that we morph back if we were a morphed instructor
   seclog($c->tx->remote_address, $subdomain, $c->session->{uemail}||"no one", "entering course site $subdomain" );
 

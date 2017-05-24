@@ -1,30 +1,32 @@
 
-* reasonable production error messages
-   exception.development.html.ep = mojo/debug.html.ep (with mojo/menubar.html.ep) exception.html.ep 
+MORE IMPORTANT
 
-* audit for all sudo in all controller and all model functions
+get hypnotoad running via service
+
+BUG* students list their own upload, but not see it (needs Student/Viewown)
+
+BUG* student can squirrel away file with wrong file name for homework, and/or not displayed?
 
 * https rather than http (joel berger, mojolicious hypnotoad)
 
-* bioiscomplete, cioiscomplete
-
 * SMS confirmation on new computers --- instructors, special sites (e.g., book.ivo-welch.info/instructor)
 
-* bulk registration of students, with limits to authentication on a particular computer?
+* maybe bulk registration of students, with limits to authentication to local method
+
+* add more automatic tests, esp with respect to web controller
+
+* unenroll from a course?  course info stays, but student does not see it in signed-up list?
+
+* complete captcha for email sending
+
+
+LESS IMPORTANT
 
 * users can limit authentication to specific method only (e.g., via email only, via google only, via facebook only, via local only)
 
-* add permanent testsite, instructor read-only  readonly.testsite.syllabus.space
-
 * maybe prevent original instructor from being removed by TA
 
-* add more automatic tests, esp with respect to web
+* grep all Model/Model.pm functions for sudo double-security safety
 
-* carton?  docker?
-
-* unenroll from a course
-
-* in MkTestSite, copy the corpfin template and make the files all public; also, add a syllabus, etc.,  maybe make ivowel an instructor, too.
-
-
+* add permanent testsite, instructor read-only  readonly.testsite.syllabus.space
 

@@ -35,7 +35,7 @@ get '/student/faq' => sub {
 ## use Mojolicious::Plugin::ContentManagement::Type::Markdown;
 ## ($allfaq) or $allfaq = $markdown->translate(slurp("/faq.md"));
 
-  $c->stash( allfaq => $body, isfaq => $isfaq, template => 'faq' );
+  $c->stash( allfaq => $body, isfaq => $isfaq, template => 'studentfaq' );
 };
 
 1;
@@ -44,18 +44,18 @@ get '/student/faq' => sub {
 
 __DATA__
 
-@@ faq.html.ep
+@@ studentfaq.html.ep
 
-%title 'Student FAQ';
+%title 'student faq';
 %layout 'student';
 
 <main>
 
 <dl class="dl faq">
 
-  <dt>What is <i>not</i> intuitive using syllabus.space?  Have an idea to make it easier and better?  Found a dead link?</dt>
+  <dt>What is <i>not</i> intuitive using SylSpace?  Have an idea to make it easier and better?  Found a dead link?</dt>
 
-  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-syllabus-space">let me know</a>.  I cannot guarantee that I will follow your recommendation(s), but I will consider it.</dd>
+  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-SylSpace">let me know</a>.  I cannot guarantee that I will follow your recommendation(s), but I will consider it.</dd>
 
   <dt>Why won't my file upload?</dt>
 
@@ -65,7 +65,7 @@ __DATA__
 
 <hr />
 
-<h3> Site FAQ </h3>
+<h1> Site FAQ </h1>
 
   <%== $allfaq %>
 

@@ -34,23 +34,17 @@ __DATA__
 
 <% use SylSpace::Model::Controller qw(domain btnblock); %>
 
-%title 'choose your class';
+%title 'choose course';
 %layout 'auth';
 
 <main>
 
 <hr />
 
-   <div class="row top-buffer text-center">
-     <%== btnblock('/auth/bioform', '<i class="fa fa-user"></i> '.$self->session->{uemail}, 'Change My Biographical Information', 'btn-default', 'w') %>
-   </div>
-
-  <hr />
-
 <h3> Enrolled Courses </h3>
 
   <div class="row top-buffer text-center">
-    <%== coursebuttonsenter($self, $courselistenrolled, $email, 1) %>
+    <%== coursebuttonsentry($self, $courselistenrolled, $email, 1) %>
   </div>
 
 <hr />
@@ -77,6 +71,14 @@ __DATA__
      <%== btnblock("/logout", '<i class="fa fa-sign-out"></i> Logout', 'from authentication', "btn-danger", 'w') %>
   </div>
 
+  <hr />
+
+<h3> Change Biographical Information and Settings </h3>
+
+   <div class="row top-buffer text-center">
+     <%== btnblock('/auth/bioform', '<i class="fa fa-user"></i> '.$self->session->{uemail}, 'Change My Biographical Information', 'btn-default btn-xs', 'w') %>
+   </div>
+
 </main>
 
 
@@ -84,34 +86,36 @@ __DATA__
 
   use SylSpace::Model::Controller qw(obscure);
 
-sub coursebuttonsenter {
+sub coursebuttonsentry {
   my ($self, $courselist, $email)= @_;
 
   ## users want a sort by subdomain name first, then subsubdomain, then ...
   ## websites names are in reverse order
 
-  (@{$courselist}) or return "<p>No courses enrolled yet.</p>";
+  my @courselist= keys %{$courselist};
+
+  (@courselist) or return "<p>No courses enrolled yet.</p>";
 
   my %displaylist;
-  foreach (@{$courselist}) {
+  foreach (@courselist) {
     $displaylist{ $_ } = join(" : ", reverse(split(/\./, $_)));
   }
 
   ## add a number of how many courses qualify from this list for possible combination
   my %subdomcount;
-  foreach (@$courselist) {
+  foreach (@courselist) {
     my @f=split(/\./, $_); my $le=pop( @f );
     ++$subdomcount{ $le };
   }
   my %freq; my %group;
-  foreach (@$courselist) {
+  foreach (@courselist) {
     my @f=split(/\./, $_); my $le=pop( @f );
     $freq{$_} = $subdomcount{ $le };
     $group{$le} .= $_."\n";
   }
 
   my $rs='';
-  foreach (@$courselist) {
+  foreach (@courselist) {
     $rs .= btnblock( 'http://'.$_.'.'.domain($self).'/enter?e='.obscure( time().':'.$email.':'.$self->session->{expiration} ),
 		     '<i class="fa fa-circle"></i> '.$displaylist{$_},
 		     '', # $group{$_}." ".$freq{$_}||"N",
@@ -126,24 +130,26 @@ sub coursebuttonsenter {
 sub coursebuttonsenroll {
   my ($self, $courselist, $email)= @_;
 
-  (@{$courselist}) or return "<p>No courses available.</p>";
+  my @courselist= keys %{$courselist};
+
+  (@courselist) or return "<p>No courses available.</p>";
 
   ## users want a sort by subdomain name first, then subsubdomain, then ...
   ## websites names are in reverse order
 
   my %displaylist;
-  foreach (@{$courselist}) {
+  foreach (@courselist) {
     $displaylist{ $_ } = join(" : ", reverse(split(/\./, $_)));
   }
 
   ## add a number of how many courses qualify from this list for possible combination
   my %subdomcount;
-  foreach (@$courselist) {
+  foreach (@courselist) {
     my @f=split(/\./, $_); my $le=pop( @f );
     ++$subdomcount{ $le };
   }
   my %group;
-  foreach (@$courselist) {
+  foreach (@courselist) {
     my @f=split(/\./, $_); my $le=pop( @f );
     push(@{$group{$le}}, $_);
   }
@@ -153,19 +159,21 @@ sub coursebuttonsenroll {
     my @displaylist= @{$group{$g}};
 
     sub imbtn {
-      my ( $url, $maintext, $subtext, $displaylist )= @_;
-      return btnblock($url, '<i class="fa fa-circle-o"></i> '.$displaylist->{$maintext}, $subtext, 'btn-default', 'w');
+      my ( $maintext, $subtext, $displaylist, $coursehassecret )= @_;
+      my $url= ($coursehassecret) ? '/auth/userenrollform?c='.$maintext : '/auth/userenrollsavenopw?course='.$maintext ;
+      my $icon=  ($coursehassecret) ? '<i class="fa fa-lock"></i> ': '<i class="fa fa-circle-o"></i> ';
+      return btnblock($url, $icon.$displaylist->{$maintext}, $subtext." ".($coursehassecret||"no secret"), 'btn-default', 'w');
     }
 
     if (scalar(@displaylist) == 1) {
       my $course= $displaylist[0];
-      $rs .= imbtn( '/auth/userenrollform?c='.$course, $course, "singleton", \%displaylist )."\n";
+      $rs .= imbtn( $course, "singleton", \%displaylist, $courselist->{$course} )."\n";
     } else {
       $rs .= qq(<button type="button" class="btn btn-block" data-toggle="collapse" data-target="#$g">\n<h3>$g</h3></button>);
 
       $rs .= qq(<div id="$g" class="collapse">);
       foreach my $x (@displaylist) {
-	$rs .= imbtn( "/auth/userenrollform?c=$x", $x, "multiple $_", \%displaylist )."\n";
+	$rs .= imbtn( $x, "multiple", \%displaylist, $courselist->{$x}  )."\n";
       }
       $rs .= qq(</div>\n);
     }

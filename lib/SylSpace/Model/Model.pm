@@ -5,13 +5,13 @@ use base 'Exporter';
 ## @ISA = qw(Exporter);
 
 our @EXPORT_OK=qw(
- sudo tzi
+ sudo tzi tokenmagic
 
  isinstructor ismorphed
  instructorlist instructoradd instructordel
 
  sitebackup isvalidsitebackupfile courselistenrolled courselistnotenrolled
- usernew userenroll isenrolled instructor2student student2instructor coursesecret userexists
+ usernew userenroll isenrolled instructor2student student2instructor getcoursesecret userexists
 
  readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
 
@@ -59,7 +59,7 @@ my $var="/var/sylspace";  ## this should be hardcoded and unchanging
 
 =head1 Title
 
-  Model.pm --- the model driving syllabus.space
+  Model.pm --- the model driving SylSpace
 
 =head1 Description
 
@@ -218,7 +218,7 @@ sub courselistnotenrolled( $uemail ) { return _courselist( $uemail, 0 ); }
 
 ## inefficient, but unimportantly inefficient
 sub _courselist( $uemail, $enrolltype ) {
-  my $fnames;  my @coursenames;
+  my $fnames;  my %coursenames;
   foreach (bsd_glob("$var/sites/*")) {
     (-d $_) or next;
     if (defined($uemail)) {
@@ -229,15 +229,31 @@ sub _courselist( $uemail, $enrolltype ) {
       }
     }
     (my $snm=$_) =~ s{.*/}{};
-    push(@coursenames, $snm);
+    $coursenames{$snm}= defined(getcoursesecret( $snm ))?1:0; ## the hash tells us whether the course has a required secret or not
   }
-  return \@coursenames;
+  return \%coursenames;
 }
 
-sub coursesecret( $subdomain ) { 
+################################################################
+
+sub getcoursesecret( $subdomain ) { 
   (defined($subdomain)) or die "you need a secret for a course, not for nothing";
-  return bsd_glob("$var/sites/$subdomain/secret=*");
+  $subdomain =~ s{^.*/}{};
+  my $sf=bsd_glob("$var/sites/$subdomain/secret=*");
+  (defined($sf)) or return undef;
+  $sf =~ s{.*secret\=}{};
+  return $sf;
 }
+
+sub setcoursesecret( $subdomain, $secret ) {
+  if ((!defined($secret)) || ($secret =~ /^\s*$/)) {
+    unlink(bsd_glob("$var/sites/$subdomain/secret=*"));  ## or ignore
+    return;
+  }
+  _confirmnotdangerous( $secret, "bad secret" );
+  touch("$var/sites/$subdomain/secret=$secret");
+}
+
 
 
 ################
@@ -331,7 +347,7 @@ sub ciosave( $subdomain, $ciodataptr ) {
   $subdomain= _confirmsudoset( $subdomain );
   _checkvalidagainstschema( $ciodataptr, 'c' );
 
-  touch("$var/sites/$subdomain/secret=".$ciodataptr->{coursesecret});
+  setcoursesecret($subdomain, $ciodataptr->{coursesecret});
   return _safewrite( $ciodataptr, "$var/sites/$subdomain/cinfo.yml" )
 }
 
@@ -354,6 +370,8 @@ sub ciobuttons( $subdomain ) {
 
 sub hassyllabus( $subdomain ) {
   my $s= (bsd_glob("$var/sites/$subdomain/instructor/files/syllabus.*"));
+  (defined($s)) or $s= (bsd_glob("$var/sites/$subdomain/instructor/files/syllabus*.*"));
+  (defined($s)) or return undef;
   $s =~ s{.*/}{};
   return (_ispublic( $subdomain, $s )) ? $s : undef;
 }
@@ -391,6 +409,18 @@ sub studentlist( $subdomain ) {
 =cut
 
 ################################################################
+
+sub tokenmagic( $uemail ) {
+  (-e "$var/tmp/magictoken") or return undef;
+  my @lines= slurp("$var/tmp/magictoken");
+  $lines[0] =~ s{^now\:\s*}{}; chomp($lines[0]); # =~ s{\s*[\r\n]*}{}ms;
+  $lines[1] =~ s{^then\:\s*}{}; chomp($lines[1]); # =~ s{\s*[\r\n]*}{}ms;
+  (lc($lines[0]) eq lc($uemail)) or die "bad token magic file email.  you are '$uemail', not '$lines[0]'";
+  (_checkemail($lines[1])) or die "you cannot possibly turn yourself into an invalid email of $lines[1]";
+  unlink("$var/tmp/magictoken");
+  return $lines[1];
+}
+
 
 sub instructor2student( $subdomain, $uemail) {
   $subdomain= _confirmsudoset( $subdomain );  ## ok, we are the instructor!

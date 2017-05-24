@@ -26,7 +26,8 @@ get '/instructor/filesetdue' => sub {
 
   tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, ' published '. $params->param('f'). ", due $whendue (GMT ".gmtime($whendue).')' );
 
-  my $msg= "set due to $whendue [".($params->param('duedate')).' '.($params->param('duetime')).' server time]';
+  my $msg=  ($params->param('dueepoch')) ? "set due to 6 months" : 
+    "set due to $whendue [".($params->param('duedate')).' '.($params->param('duetime')).' server time]';
   $c->flash(message => $msg)->redirect_to($c->req->headers->referrer);
 };
 

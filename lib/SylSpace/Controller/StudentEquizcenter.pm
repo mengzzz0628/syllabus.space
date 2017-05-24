@@ -39,7 +39,7 @@ __DATA__
 
  <nav>
    <div class="row top-buffer text-center">
-    <%== filehash2string( $filelist ) %>
+    <%== equizfilehash2string( $filelist ) %>
    </div>
  </nav>
 
@@ -47,7 +47,7 @@ __DATA__
 
 
 <%
-sub filehash2string {
+sub equizfilehash2string {
   my $filehashptr= shift;
   (defined($filehashptr)) or return "";
   my $filestring= '';

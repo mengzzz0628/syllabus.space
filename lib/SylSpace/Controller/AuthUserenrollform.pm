@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(coursesecret);
+use SylSpace::Model::Model qw(getcoursesecret);
 use SylSpace::Model::Controller qw(standard global_redirect);
 
 ################################################################
@@ -14,7 +14,7 @@ get '/auth/userenrollform' => sub {
   (my $subdomain = standard( $c )) or return global_redirect($c);
 
   my $coursename= $c->req->query_params->param('c');
-  my $secret= coursesecret($coursename);
+  my $secret= getcoursesecret($coursename);
 
   (defined($secret)) or $secret="";
 
