@@ -70,11 +70,14 @@ __DATA__
 %title 'authenticate email';
 %layout 'auth';
 
-<% use SylSpace::Model::Controller qw(btnblock); %>
+<% use SylSpace::Model::Controller qw(btnblock msghash2string); %>
 
 <main>
 
 <p> To learn more about this site, please visit the <a href="/aboutus">about us</a> page.</p>
+
+  <%== msghash2string( [{ msgid => 0, priority => 5, time => 1495672668, subject => 'Course Quizzes Wanted',
+			body => 'We are looking for equiz-suitable questions from finance and economics courses.  If you are an instructor who has written a non-copyright-ed set of suitable (short-form) questions and answers that you would like to share with students and colleagues, please contact <a href="mailto:ivo.welch@gmail.com?subject=share+quiz">ivo welch</a>.  If the material is suitable, we will take over the coding of your questions into syllabus.space equiz form and post them online for everyone to use (with attribution, of course).  The questions will have different inputs and answers each time a student refreshes the quiz, and thus will be more useful.'}] ) %>
 
 <hr />
 
@@ -93,7 +96,7 @@ __DATA__
 
   <hr />
 
-  <p style="font-size:small;padding-top:1em;">Sendmail is slow and may take up to 10 minutes to arrive&mdash;if you are lucky and no spam filter blocks it.</p>
+  <p style="font-size:small;padding-top:1em;">Sendmail is slow, requires you to complete a captcha (to avoid bots), and may take up to 10 minutes to arrive&mdash;if you are lucky and no spam filter blocks it.</p>
 
   <form name="registration" method="post" action="/auth/sendmail/authenticate">
        <input type="hidden" class="form-control" value="no name" name="name" />

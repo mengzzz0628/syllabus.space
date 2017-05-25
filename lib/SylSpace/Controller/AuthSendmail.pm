@@ -48,12 +48,24 @@ get '/auth/sendmail/callback' => sub {
 
   superseclog( $c->tx->remote_address, $email, "got email callback for $name and $email" );
 
-  ## for captcha verification:
-  ## POST URL: https://www.google.com/recaptcha/api/siteverify
-  ##     secret= googlerecaptcha->{secretkey}
-  ##     response= $post->{g-recaptcha-response}
-  ##     remoteip= $ENV{'remoteip'}
-  ## Mojo::UserAgent->new->post(url => https://www.google.com/recaptcha/api/siteverify, secret => googlerecaptcha->{secretkey}, remoteip=> $ENV{'remoteip'} )
+  if (0) {
+    ## not tested and probably not working
+    my $gcaptcha= {
+		   url => 'https://www.google.com/recaptcha/api/siteverify',
+		   response => $params->{g-recaptcha-response},
+		   secretkey => $c->plugin('Config')->{googlerecaptcha}->{secretkey},
+		   remoteip => $ENV{'remoteip'},  ## could be wrong;
+		  };
+    my $ua  = Mojo::UserAgent->new;
+    my $tx = $ua->post($gcaptcha->{url} => form => $gcaptcha );
+    if (my $res = $tx->success) { say $res->body }
+    else {
+      my $err = $tx->error;
+      die "$err->{code} response: $err->{message}" if $err->{code};
+      die "Connection error: $err->{message}";
+    }
+  }
+
 
   if ($name and $email) {
     $c->session(uemail => $email, name => $name)->redirect_to('/index');

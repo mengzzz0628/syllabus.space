@@ -356,7 +356,7 @@ return '
 ## used by both student and instructor, this draws all messages at the
 ## top of their home page
 
-sub msghash2string( $msgptr, $msgurlback, $listofread=undef, $tzformat=undef ) {
+sub msghash2string( $msgptr, $msgurlback="", $listofread=undef, $tzformat=undef ) {
   (defined($msgptr)) or die "internal error";
 
   my %listofread;
