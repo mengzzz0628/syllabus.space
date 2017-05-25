@@ -5,14 +5,14 @@ MORE IMPORTANT
 
 * https rather than http (joel berger, mojolicious hypnotoad)
 
+* use Paypal micropayments as 2FA for instructors and/or special sites (e.g., book.ivo-welch.info/instructor)
+
 
 MEDIUM IMPORTANT
 
 * add more automatic tests, esp with respect to web controller
 
 * unenroll from a course?  course info stays, but student does not see it in signed-up list?
-
-* SMS confirmation on new computers --- instructors, special sites (e.g., book.ivo-welch.info/instructor)
 
 
 LESS IMPORTANT

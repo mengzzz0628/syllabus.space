@@ -20,6 +20,7 @@ my $authroot= sub {
   ## ($c->req->url->to_abs->host() =~ m{auth\.\w}) or $c->redirect_to('http://auth.'.domain($c).'/auth');  ## wipe off anything beyond on url
 
   (defined($c->session->{uemail})) or return $c->flash(message => "you had no identity.  please authenticate")->redirect_to('/auth/authenticator');
+
   (defined($c->session->{expiration})) or return $c->flash(message => $c->session->{uemail}." is now a zombie. please authenticate")->redirect_to('/auth/authenticator');
   (time()< $c->session->{expiration}) or return $c->flash(message => "you expired. please authenticate")->redirect_to('/auth/authenticator');
 

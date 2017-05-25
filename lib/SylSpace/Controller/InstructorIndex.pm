@@ -72,7 +72,7 @@ __DATA__
      <%== btnblock("/instructor/faq", '<i class="fa fa-question-circle"></i> Help', 'FAQ and More') %>
      <%== btnblock("/instructor/sitebackup", '<i class="fa fa-cloud-download"></i> Backup', 'Backup My Account') %>
 
-     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio', 'Set My Profile') %>
+     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio <i class="fa fa-link"></i>', 'Set My Profile') %>
    </div>
 
   <%== btnstring($btnptr) %>

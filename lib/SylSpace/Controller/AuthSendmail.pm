@@ -12,7 +12,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 use Mojo::JWT;
 
 use Email::Valid;
-use Email::Sender::Simple 'try_to_sendmail';
+use Email::Sender::Simple 'sendmail';
 use Email::Sender::Transport::SMTP::TLS;
 use Email::Simple::Creator;
 
@@ -34,6 +34,8 @@ post '/auth/sendmail/authenticate' => sub {
     return $c->stash(error => 'Missing required parameter email' )->render(template => 'AuthSendmail');
   }
 
+  $c->stash(email => $email);
+
   if (_send_email($c, $email, $name)) {
     return $c->stash(error => '')->render(template => 'AuthSendmail');
   }
@@ -54,8 +56,10 @@ get '/auth/sendmail/callback' => sub {
 
   superseclog( $c->tx->remote_address, $email, "got email callback for $name and $email" );
 
+  ($email) or die "sorry, but our callback to authenticate you failed because we had no or an invalid email";
+
   if ($name and $email) {
-    $c->session(uemail => $email, name => $name)->redirect_to('/index');
+    $c->session(uemail => $email, name => $name, expiration => time()+60*60, ishuman => time())->redirect_to('/index');
   } else {
     $c->stash(error => 'Missing required parameter')->render(template => 'AuthSendmail', $email => $params->{email} );;
   }
@@ -87,17 +91,17 @@ sub _send_email {
   my $message = Email::Simple->create(
     header => [
       From    => $config->{email}{message}{from},
-      To      => $c->param('email'),
+      To      => $email,
       Subject => 'Confirm your email',
     ],
     body => "Follow this link: $url",
   );
 
-  say "logging email sent to ".$c->param('email');
+  superseclog( $c->tx->remote_address, $c->param('email'), "requesting sending email to ".$c->param('email') )
 
   throttle();  ## to prevent nasty DDOSs on other sites
 
-  return try_to_sendmail($message, { transport => _getTransport($c) });
+  return sendmail($message, { transport => _getTransport($c) });
 }
 
 1;

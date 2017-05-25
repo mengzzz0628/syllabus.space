@@ -169,7 +169,7 @@ sub coursebuttonsenroll {
       my $course= $displaylist[0];
       $rs .= imbtn( $course, "singleton", \%displaylist, $courselist->{$course} )."\n";
     } else {
-      $rs .= qq(<button type="button" class="btn btn-block" data-toggle="collapse" data-target="#$g">\n<h3>$g</h3></button>);
+      $rs .= qq(<button type="button" class="btn btn-primary btn-block" data-toggle="collapse" data-target="#$g">\n<h3>$g</h3></button>);
 
       $rs .= qq(<div id="$g" class="collapse">);
       foreach my $x (@displaylist) {

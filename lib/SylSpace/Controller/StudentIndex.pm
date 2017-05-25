@@ -64,7 +64,7 @@ __DATA__
      <%== btnblock("/showtweets", '<i class="fa fa-rss"></i> Class', 'Activity Monitor') %>
      <%== btnblock("/student/faq", '<i class="fa fa-question-circle"></i> Help', 'FAQ and More') %>
 
-     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio', 'Set My Profile') %>
+     <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio <i class="fa fa-link"></i>', 'Set My Profile') %>
 
     </div>
 
