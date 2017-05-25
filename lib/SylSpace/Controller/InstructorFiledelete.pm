@@ -11,13 +11,13 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 get '/instructor/filedelete' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $fname= $c->req->query_params->param('f');
 
-  filedelete( $subdomain, $c->session->{uemail}, $fname);
+  filedelete( $course, $c->session->{uemail}, $fname);
 
   ## we cannot go back, because the page no longer exists! return $c->redirect_to($c->req->headers->referrer);
   return $c->flash( message=> "completely deleted file $fname" )->redirect_to( ''.(($fname =~ /^hw/) ? 'hwcenter' : ($fname =~ /\.equiz$/) ? 'equizcenter' : 'filecenter'));

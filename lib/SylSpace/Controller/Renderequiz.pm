@@ -11,18 +11,18 @@ use SylSpace::Model::Controller qw(standard global_redirect domain);
 
 my $renderequiz= sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  # students can run this, too.  sudo( $subdomain, $c->session->{uemail} );
+  # students can run this, too.  sudo( $course, $c->session->{uemail} );
 
   ## we allow students to run expired equizzes (if they know the names);  feature or bug
 
   my $quizname=$c->req->query_params->param('f');
   my $domain= $c->req->url->to_abs->host;
   ($domain =~ /localhost/) and $domain .= ":3000";
-  $c->stash( content => renderequiz( $subdomain, $c->session->{uemail}, $quizname, "http://$domain/equizgrade" ),
+  $c->stash( content => renderequiz( $course, $c->session->{uemail}, $quizname, "http://$domain/equizgrade" ),
 	     quizname => $quizname,
 	     template => 'renderequiz' );
 };

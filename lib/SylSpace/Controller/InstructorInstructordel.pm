@@ -11,13 +11,13 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/instructor/instructordel' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $ne=$c->req->query_params->param('deliemail');
 
-  instructordel( $subdomain, $c->session->{uemail}, $ne );
+  instructordel( $course, $c->session->{uemail}, $ne );
   $c->flash( message => "unset $ne as an instructor" )->redirect_to('/instructor/instructorlist')
 };
 

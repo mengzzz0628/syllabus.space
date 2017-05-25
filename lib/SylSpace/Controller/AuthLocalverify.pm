@@ -10,7 +10,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 post '/auth/localverify' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $uemail= $c->req->body_params->param('uemail');
   my $pw= $c->req->body_params->param('pw');

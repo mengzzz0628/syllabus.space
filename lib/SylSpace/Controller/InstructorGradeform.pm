@@ -11,14 +11,14 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 get '/instructor/gradeform' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $taskname= $c->req->query_params->param('taskn');
-  my $studentlist= studentlist($subdomain);
+  my $studentlist= studentlist($course);
   my $sgl; foreach (@$studentlist) { $sgl->{$_}=""; }
-  my $gah= gradesashash( $subdomain );
+  my $gah= gradesashash( $course );
   foreach (@{$gah->{uemail}}) {
     $sgl->{$_}= ($gah->{grade}->{$_}->{$taskname}) || "";
   }

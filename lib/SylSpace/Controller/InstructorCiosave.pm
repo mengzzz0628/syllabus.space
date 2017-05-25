@@ -11,13 +11,13 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 post '/instructor/ciosave' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  ciosave( $subdomain, $c->req->body_params->to_hash ) or die "evil submission\n";
+  ciosave( $course, $c->req->body_params->to_hash ) or die "evil submission\n";
 
-  tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, "updated course settings" );
+  tweet($c->tx->remote_address, $course, $c->session->{uemail}, "updated course settings" );
   $c->flash(message => "Updated Course Settings")->redirect_to("/instructor");
 };
 

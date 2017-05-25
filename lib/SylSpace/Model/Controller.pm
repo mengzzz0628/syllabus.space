@@ -63,7 +63,7 @@ sub standard {
   my $c= shift;
 
   my $domain= $c->req->url->domain;  ## mfe.welch.$ENV{'sitename'}:3000
-  my $subdomain= $c->req->url->subdomain; ## mfe.welch
+  my $course= $c->req->url->subdomain; ## mfe.welch
   my $cururl= $c->req->url;  ## /auth/dosome
   $cururl =~ s{\?.*}{}; ## strip any parameters
 
@@ -71,7 +71,7 @@ sub standard {
 
   my $reloginurl="http://auth.$domain/auth/index";
 
-  if ($subdomain eq 'auth') {
+  if ($course eq 'auth') {
     ## already in http://auth.$domain/...  --> never redirect, always allowed
     my @authallowedurls= qw(/auth/index /auth /logout /auth/logout /auth/facebook
 			/auth/localverify /auth/userenrollsave /auth/userenrollsave
@@ -83,7 +83,7 @@ sub standard {
 
   defined($c->session->{uemail}) or return retredirect($reloginurl, "no identity yet");
 
-  if ($subdomain eq 'auth') {
+  if ($course eq 'auth') {
     ($cururl eq '/auth/goclass') and return 'auth';  ## also now ok; will not redirect
     return retredirect($reloginurl, "unknown url. start over");  ## no other urls on aux are ok
   }
@@ -92,12 +92,12 @@ sub standard {
   ($cururl =~ m{^/auth/goclass}) and return retredirect("http://auth.$domain/auth/goclass", "/auth requests channel back ");
   ($cururl =~ m{^/auth/}) and return retredirect($reloginurl, "/auth requests channel back ");
 
-  ($subdomain =~ /\w/) or return retredirect($reloginurl, "the base domain is not defined");
-  ($subdomain =~ /^www\./) and return retredirect($reloginurl, "the www domain (on $subdomain) is not defined");
+  ($course =~ /\w/) or return retredirect($reloginurl, "the base domain is not defined");
+  ($course =~ /^www\./) and return retredirect($reloginurl, "the www domain (on $course) is not defined");
 
 
   (time() > $c->session->{expiration}) and return retredirect($reloginurl, "your session has expired.");
-  return $subdomain;
+  return $course;
 }
 
 

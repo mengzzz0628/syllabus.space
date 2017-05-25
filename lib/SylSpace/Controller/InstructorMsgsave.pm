@@ -11,19 +11,19 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 post '/instructor/msgsave' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $subject= $c->req->body_params->param('subject');
   ($subject =~ /\w/) or die "you must give a message subject";
   my $priority= $c->req->body_params->param('priority');
 
-  my $msgid= msgsave($subdomain, $c->req->body_params->to_hash);
+  my $msgid= msgsave($course, $c->req->body_params->to_hash);
 
   my $msg= "posted new message $msgid: '$subject', priority $priority";
 
-  tweet($c->tx->remote_address, $subdomain, 'instructor', $msg );
+  tweet($c->tx->remote_address, $course, 'instructor', $msg );
   $c->flash( message => $msg )->redirect_to('/instructor');  ## usually one posts only one message
 };
 

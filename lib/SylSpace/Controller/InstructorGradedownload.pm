@@ -11,9 +11,9 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get '/instructor/gradedownload' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   sub wide {
     my $all= gradesashash( $_[0] );
@@ -40,8 +40,8 @@ get '/instructor/gradedownload' => sub {
   }
 
   my $sf= $c->req->query_params->param('sf');
-  ($sf eq "w") and return $c->render(text => wide( $subdomain ), format => 'csv');
-  return $c->render(text => flong( $subdomain ), format => 'csv');
+  ($sf eq "w") and return $c->render(text => wide( $course ), format => 'csv');
+  return $c->render(text => flong( $course ), format => 'csv');
   die "sorry, what format is $sf supposed to be?";
 };
 

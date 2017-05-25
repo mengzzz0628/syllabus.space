@@ -11,13 +11,13 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/student/student2instructor' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  ismorphed($subdomain, $c->session->{uemail}) or die "you are not a morphed instructor for $subdomain?!";
+  ismorphed($course, $c->session->{uemail}) or die "you are not a morphed instructor for $course?!";
 
-  student2instructor($subdomain, $c->session->{uemail});
+  student2instructor($course, $c->session->{uemail});
 
   return $c->flash( message => "student unmorphed back to instructor" )->redirect_to('/instructor');
 };

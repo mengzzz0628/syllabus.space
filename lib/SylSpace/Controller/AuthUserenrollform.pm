@@ -11,7 +11,7 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 get '/auth/userenrollform' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $coursename= $c->req->query_params->param('c');
   my $secret= getcoursesecret($coursename);

@@ -11,12 +11,12 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/student/hwcenter' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  $c->stash( filelist => sfilelistall($subdomain, $c->session->{uemail}, "hw*"),
-	     sownfilelist => scalar sownfilelist( $subdomain, $c->session->{uemail} ),
+  $c->stash( filelist => sfilelistall($course, $c->session->{uemail}, "hw*"),
+	     sownfilelist => scalar sownfilelist( $course, $c->session->{uemail} ),
 	   );
 };
 
@@ -49,7 +49,7 @@ __DATA__
      </table>
   </div>
 
-  <p>Any answer that you want to upload must begin with the homework file name, too.  For example, if the homework is named 'hwa1.txt', name your answer file something like 'hwa1-answer.pdf' (no spaces or weird characters, please).  The filename congruance is a security check for your own sake.</p>
+  <p>You should name your answer file to start with the homework file name, too.  For example, if the homework is named 'hwa1.txt', name your answer file something like 'hwa1-answer.pdf' (no spaces or weird characters, please).</p>
 </main>
 
 

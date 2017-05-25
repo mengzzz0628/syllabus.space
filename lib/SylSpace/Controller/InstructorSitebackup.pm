@@ -11,11 +11,11 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/instructor/sitebackup' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  my $filename= sitebackup( $subdomain );
+  my $filename= sitebackup( $course );
   (-e $filename) or die "internal error: zip file $filename vanished";
 
   (isvalidsitebackupfile($filename)) or die "internal error: '$filename' is not a good site backup file\n";

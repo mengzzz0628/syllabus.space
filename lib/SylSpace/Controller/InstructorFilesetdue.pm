@@ -13,18 +13,18 @@ use Mojo::Date;
 
 get '/instructor/filesetdue' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $params= $c->req->query_params;
 
   my $whendue= ($params->param('dueepoch')) ||
     epochof( $params->param('duedate'), $params->param('duetime'), tzi($c->session->{uemail}) );
 
-  my $r= filesetdue( $subdomain, $params->param('f'), $whendue );
+  my $r= filesetdue( $course, $params->param('f'), $whendue );
 
-  tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, ' published '. $params->param('f'). ", due $whendue (GMT ".gmtime($whendue).')' );
+  tweet($c->tx->remote_address, $course, $c->session->{uemail}, ' published '. $params->param('f'). ", due $whendue (GMT ".gmtime($whendue).')' );
 
   my $msg=  ($params->param('dueepoch')) ? "set due to 6 months" : 
     "set due to $whendue [".($params->param('duedate')).' '.($params->param('duetime')).' server time]';

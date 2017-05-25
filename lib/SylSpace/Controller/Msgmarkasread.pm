@@ -11,12 +11,12 @@ use SylSpace::Model::Controller qw( standard global_redirect);
 
 get '/msgmarkasread' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $msgid= $c->req->query_params->param('msgid');
   my $uemail= $c->session->{uemail};
 
-  msgmarkasread($subdomain, $uemail, $msgid);
+  msgmarkasread($course, $uemail, $msgid);
   my $subject= $c->req->body_params->param('subject')||"no subject";
   my $priority= $c->req->body_params->param('priority')||"no priority";
 

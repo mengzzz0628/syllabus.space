@@ -11,20 +11,20 @@ use SylSpace::Model::Controller qw(global_redirect standard msghash2string globa
 
 my $ihm= sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   (bioiscomplete($c->session->{uemail})) or $c->flash( message => 'You first need to complete your bio!' )->redirect_to('http://auth.'.domain($c).'/usettings');
 
-  (cioiscomplete($subdomain)) or $c->flash( message => 'You first need to complete the course settings!' )->redirect_to('/instructor/csettings');
+  (cioiscomplete($course)) or $c->flash( message => 'You first need to complete the course settings!' )->redirect_to('/instructor/csettings');
 
   $c->stash(
-	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkasread"),
-	    btnptr => ciobuttons( $subdomain )||undef,
-	    lasttweet => showlasttweet( $subdomain )||"no tweet yet",
+	    msgstring => msghash2string(msgshownotread( $course, $c->session->{uemail} ), "/msgmarkasread"),
+	    btnptr => ciobuttons( $course )||undef,
+	    lasttweet => showlasttweet( $course )||"no tweet yet",
 	    template => 'instructor',
 	   );
 };

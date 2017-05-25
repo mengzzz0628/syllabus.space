@@ -11,7 +11,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/aboutus' => sub {
   my $c = shift;
-  ## anyone is allowed to read this --- (my $subdomain = standard( $c )) or return global_redirect($c);
+  ## anyone is allowed to read this --- (my $course = standard( $c )) or return global_redirect($c);
 
   $c->stash( );
 };

@@ -13,9 +13,9 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/hwcenter' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isinstructor($subdomain, $c->session->{uemail})) and return $c->redirect_to('/instructor/hwcenter');
+  (isinstructor($course, $c->session->{uemail})) and return $c->redirect_to('/instructor/hwcenter');
   return $c->redirect_to('/student/hwcenter');
 };
 

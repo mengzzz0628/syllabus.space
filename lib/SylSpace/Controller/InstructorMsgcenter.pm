@@ -10,12 +10,12 @@ use SylSpace::Model::Controller qw(global_redirect  standard msghash2string);
 
 get '/instructor/msgcenter' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  my @msglistread=msglistread($subdomain, $c->session->{uemail});
-  $c->stash( msgstring => msghash2string( msgread( $subdomain ), "/msgmarkasread", \@msglistread, tzi($c->session->{uemail}) ) );
+  my @msglistread=msglistread($course, $c->session->{uemail});
+  $c->stash( msgstring => msghash2string( msgread( $course ), "/msgmarkasread", \@msglistread, tzi($c->session->{uemail}) ) );
 };
 
 1;

@@ -13,11 +13,11 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/student/gradecenter' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  my $all= gradesashash( $subdomain, $c->session->{uemail} );  ## just my own grades!
+  my $all= gradesashash( $course, $c->session->{uemail} );  ## just my own grades!
 
   $c->stash( all => $all );
 };

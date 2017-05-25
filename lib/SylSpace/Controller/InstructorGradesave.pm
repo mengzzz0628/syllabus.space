@@ -11,9 +11,9 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get '/instructor/gradesave' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $params=$c->req->query_params;
   my $phash= $params->to_hash();
@@ -29,9 +29,9 @@ get '/instructor/gradesave' => sub {
   }
 
   ## may not work, because filenames are now args and not given.  please check
-  gradesave($subdomain, \@semail, \@taskname, \@newgrade);
+  gradesave($course, \@semail, \@taskname, \@newgrade);
 
-  seclog($c->tx->remote_address, $subdomain, 'instructor', "changed many grades [to enhance please]" );
+  seclog($c->tx->remote_address, $course, 'instructor', "changed many grades [to enhance please]" );
 
   $c->flash( message=> "submitted many grades" )->redirect_to("gradecenter");
 };

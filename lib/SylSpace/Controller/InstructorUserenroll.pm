@@ -11,15 +11,15 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 get '/instructor/userenroll' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $newstudent= $c->req->query_params->param('newuemail');
   (defined($newstudent)) or die "silly you.  I need a student!\n";
 
   usernew( $newstudent );
-  userenroll( $subdomain, $newstudent, 1 );
+  userenroll( $course, $newstudent, 1 );
 
   $c->flash(message => "Added new student '$newstudent'" )->redirect_to( $c->req->headers->referrer );
 };

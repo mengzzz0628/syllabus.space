@@ -11,17 +11,17 @@ use SylSpace::Model::Controller qw(global_redirect  standard msghash2string doma
 
 my $shm= sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   (bioiscomplete($c->session->{uemail})) or $c->flash( message => 'You first need to complete your bio!' )->redirect_to('http://auth.'.domain($c).'/usettings');
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
   $c->stash(
-	    msgstring => msghash2string(msgshownotread( $subdomain, $c->session->{uemail} ), "/msgmarkasread"),
-	    btnptr => ciobuttons( $subdomain )||undef,
-	    ismorphed => ismorphed( $subdomain,$c->session->{uemail} ),
-	    lasttweet => showlasttweet( $subdomain )||"",
+	    msgstring => msghash2string(msgshownotread( $course, $c->session->{uemail} ), "/msgmarkasread"),
+	    btnptr => ciobuttons( $course )||undef,
+	    ismorphed => ismorphed( $course,$c->session->{uemail} ),
+	    lasttweet => showlasttweet( $course )||"",
 	    template => 'student',
 	   );
 

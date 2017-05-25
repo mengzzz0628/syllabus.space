@@ -34,13 +34,11 @@ post '/auth/sendmail/authenticate' => sub {
     return $c->stash(error => 'Missing required parameter email' )->render(template => 'AuthSendmail');
   }
 
-  throttle();  ## to prevent nasty DDOSs on other sites
-
   if (_send_email($c, $email, $name)) {
     return $c->stash(error => '')->render(template => 'AuthSendmail');
   }
 
-  die "Failed to send email";
+  die "Failed to send email, without a useful error message";
   $c->stash(error => 'Failed to send email')->render(template => 'AuthSendmail');
 };
 
@@ -59,7 +57,7 @@ get '/auth/sendmail/callback' => sub {
   if ($name and $email) {
     $c->session(uemail => $email, name => $name)->redirect_to('/index');
   } else {
-    $c->stash(error => 'Missing required parameter')->render(template => 'AuthSendmail');;
+    $c->stash(error => 'Missing required parameter')->render(template => 'AuthSendmail', $email => $params->{email} );;
   }
 };
 
@@ -94,7 +92,9 @@ sub _send_email {
     body => "Follow this link: $url",
   );
 
-  say $c->param('email');
+  say "logging email sent to ".$c->param('email');
+
+  throttle();  ## to prevent nasty DDOSs on other sites
 
   return try_to_sendmail($message, { transport => _getTransport($c) });
 }
@@ -120,12 +120,13 @@ __DATA__
     <%= $error %>
   </p>
 % } else {
-  <h2>We sent an email to you.</h2>
+  <h2>We sent an email to <a href="mailto:<%= $email %>"><%= $email %></a>.</h2>
 % }
 
   <p>
-  If you typed your email address correctly, you should be receiving an email from us.
-  Please check your mailbox for a confirmation email with link.  If you do not receive an email from us within 5-10 minutes, check for any spam filters along the way.  The email should be sent by  '<%= $ENV{sitename} %>@gmail.com'.
+  If you typed your email address (<a href="mailto:<%= $email %>"><%= $email %></a>) correctly, you should be receiving an email from us.</p>
+
+  <p> Please check your mailbox for a confirmation email with link.  If you do not receive an email from us within 5-10 minutes, check for any spam filters along the way.  The email should be sent by  '<%= $ENV{sitename} %>@gmail.com'.  It will be valid for 15 minutes.</p>
 
   <p><b>Warning:</b> Some email spam filters may be blocking us.  Make sure to whitelist us.  Here is more information on <a href="http://onlinegroups.net/blog/2014/02/25/how-to-whitelist-an-email-address/">whitelisting</a> us (e.g., <a href="http://smallbusiness.chron.com/whitelist-domain-office-365-74321.html">office365</a> and <a href="https://support.microsoft.com/en-us/kb/2545137">office365</a>)?  If you never receive an email&mdash;even after having whitelisted us&mdash;then please try a gmail account.  We know that gmail can receive our emails.</p>
 

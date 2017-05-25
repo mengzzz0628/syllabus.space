@@ -11,11 +11,11 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 post '/equizgrade' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  my $result= equizgrade($subdomain, $c->session->{uemail}, $c->req->body_params->to_hash);
+  my $result= equizgrade($course, $c->session->{uemail}, $c->req->body_params->to_hash);
 
   $c->stash( eqanswer => equizanswerrender($result) );
 };

@@ -11,11 +11,11 @@ use SylSpace::Model::Controller qw(global_redirect  standard drawform);
 
 get '/instructor/cioform' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  $c->stash( udrawform=> drawform( readschema('c'), cioread($subdomain) ), udrawbuttons => ciobuttons($subdomain) );
+  $c->stash( udrawform=> drawform( readschema('c'), cioread($course) ), udrawbuttons => ciobuttons($course) );
 };
 
 

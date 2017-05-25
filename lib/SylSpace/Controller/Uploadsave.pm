@@ -12,7 +12,7 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 post '/uploadsave' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   return $c->render(text => 'File is too big for M', status => 200) if $c->req->is_limit_exceeded;
 
@@ -26,22 +26,22 @@ post '/uploadsave' => sub {
   my $filecontents = $uploadfile->asset->slurp();  ## could be done more efficiently by working with the diskfile
 
   # Check file size by instructor type
-  ## (isinstructor($subdomain, $c-session->{uemail}) or return $c->render(text => 'File is too big for s', status => 200) if ($filesize>1024*1024*16);
+  ## (isinstructor($course, $c-session->{uemail}) or return $c->render(text => 'File is too big for s', status => 200) if ($filesize>1024*1024*16);
 
   my $infiletype= ($filename =~ m{^hw}i) ? 'hw' : ($filename =~ m{\.equiz$}i) ? 'equiz' : 'file';  # to
   my $referto;
-  if (isinstructor( $subdomain, $c->session->{uemail})) {
+  if (isinstructor( $course, $c->session->{uemail})) {
     ## an instructor can upload anything
-    filewrite($subdomain, $c->session->{uemail}, $filename, $filecontents);
-    seclog( $c->tx->remote_address, $subdomain, 'instructor ', $c->session->{uemail}." uploaded ". $filename );  ## student uploads are public
+    filewrite($course, $c->session->{uemail}, $filename, $filecontents);
+    seclog( $c->tx->remote_address, $course, 'instructor ', $c->session->{uemail}." uploaded ". $filename );  ## student uploads are public
     $referto= "/instructor/${infiletype}center";
 
-    ($filename =~ /^syllabus\./i) and filesetdue( $subdomain, $filename, time()+60*60*24*365 );  ## special rule: make syllabus available for 1 year
-    ($filename =~ /^faq\./i) and filesetdue( $subdomain, $filename, time()+60*60*24*365 );  ## special rule: make syllabus available for 1 year
+    ($filename =~ /^syllabus\./i) and filesetdue( $course, $filename, time()+60*60*24*365 );  ## special rule: make syllabus available for 1 year
+    ($filename =~ /^faq\./i) and filesetdue( $course, $filename, time()+60*60*24*365 );  ## special rule: make syllabus available for 1 year
 
   } else {
-    (eval { filewrite($subdomain, $c->session->{uemail}, $filename, $filecontents, $hwmatch) }) or die "Problem : $@";
-    tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, " uploaded ".$filename." in response to $hwmatch" );  ## student uploads are public
+    (eval { filewrite($course, $c->session->{uemail}, $filename, $filecontents, $hwmatch) }) or die "Problem : $@";
+    tweet($c->tx->remote_address, $course, $c->session->{uemail}, " uploaded ".$filename." in response to $hwmatch" );  ## student uploads are public
     $referto= "/student/hwcenter";
   }
 

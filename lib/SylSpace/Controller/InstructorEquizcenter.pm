@@ -17,13 +17,13 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get '/instructor/equizcenter' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   $c->stash(
-	    filelist => ifilelistall($subdomain, $c->session->{uemail}, "*equiz"),
-	    subdomain => $subdomain,
+	    filelist => ifilelistall($course, $c->session->{uemail}, "*equiz"),
+	    subdomain => $course,
 	    tzi => tzi( $c->session->{uemail} ) );
 };
 
@@ -58,8 +58,8 @@ __DATA__
   <div class="col-xs-2"> <a href="/instructor/cptemplate?templatename=starters" class="btn btn-default btn-block">starters</a></div>
   <div class="col-xs-2 col-md-offset-0"> <a href="/instructor/cptemplate?templatename=tutorials" class="btn btn-default btn-block">tutorials</a></div>
   <div class="col-xs-2 col-md-offset-0">
-  <!-- %== ($subdomain !~ /fin/) ? '' :
-    ($subdomain =~ /test/) ? '<a href="" class="btn btn-disabled btn-block">corpfinintro disabled</a>' :
+  <!-- %== ($course !~ /fin/) ? '' :
+    ($course =~ /test/) ? '<a href="" class="btn btn-disabled btn-block">corpfinintro disabled</a>' :
                              '<a href="/instructor/cptemplate?templatename=corpfinintro" class="btn btn-default btn-block">corpfinintro</a>' % -->
   <a href="/instructor/cptemplate?templatename=corpfinintro" class="btn btn-default btn-block">corpfinintro</a>'
 </div>

@@ -11,11 +11,11 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get '/instructor/rmtemplates' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  my $numremoved= rmtemplates($subdomain);
+  my $numremoved= rmtemplates($course);
 
   return $c->flash( message=> "deleted $numremoved unchanged template files" )->redirect_to( 'equizcenter' );
 };

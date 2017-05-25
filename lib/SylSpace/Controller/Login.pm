@@ -13,7 +13,7 @@ get '/login' => sub {
 
   $c->session->{uemail}= $c->req->query_params->param('email');
   $c->session->{expiration}= time()+3600*24*365;
-  $c->session->{ishuman}= time().":".$c->ession->{uemail};
+  $c->session->{ishuman}= time().":".$c->session->{uemail};
 
   my $redir='http://auth.'.domain($c).'/auth/goclass';
 

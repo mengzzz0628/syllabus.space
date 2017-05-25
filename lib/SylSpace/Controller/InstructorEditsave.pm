@@ -11,9 +11,9 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 post 'instructor/editsave' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $fname= $c->req->params->param('fname');
 
@@ -26,7 +26,7 @@ post 'instructor/editsave' => sub {
   if (md5_hex($content) eq $c->req->params->param('fingerprint')) {
     $c->flash( message=> "file $fname was unchanged and thus not updated" );
   } else {
-    filewrite( $subdomain, $c->session->{uemail}, $fname, $content );
+    filewrite( $course, $c->session->{uemail}, $fname, $content );
     $c->flash( message=> "file $fname was changed and thus updated" );
   }
   $c->redirect_to("/instructor/equizmore?f=$fname");

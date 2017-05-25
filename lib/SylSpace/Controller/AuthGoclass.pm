@@ -12,7 +12,7 @@ use SylSpace::Model::Controller qw(standard global_redirect timedelta domain);
 get '/auth/goclass' => sub {
   my $c = shift;
 
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   (bioiscomplete($c->session->{uemail})) or $c->flash( message => 'You first need to complete your bio!' )->redirect_to('/auth/bioform');
 

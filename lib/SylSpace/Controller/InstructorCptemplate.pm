@@ -11,16 +11,16 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/instructor/cptemplate' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $templatename= $c->req->query_params->param('templatename');
 
-  ## && ($subdomain !~ /fin/)
+  ## && ($course !~ /fin/)
   ## (($templatename eq /corpfinintro/)) and die "only fin classes are allowed to use the corpfinintro template";
 
-  my $nc= cptemplate( $subdomain, $templatename );
+  my $nc= cptemplate( $course, $templatename );
 
   return $c->flash( message => "copied $nc equiz files from template $templatename")->redirect_to( 'equizcenter' );
 };

@@ -10,7 +10,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/auth/settimeout' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $timeout= $c->req->query_params->param('tm');
 

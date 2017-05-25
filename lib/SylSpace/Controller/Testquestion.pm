@@ -11,7 +11,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/testquestion' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $starter = '
 :N: Starter Question
@@ -42,7 +42,7 @@ get '/testquestion' => sub {
     }
   }
 
-  ## sudo( $subdomain, $c->session->{uemail} );
+  ## sudo( $course, $c->session->{uemail} );
 
   my $executable= sub {
     my $loc=`pwd`; chomp($loc); $loc.= "/Model/eqbackend/eqbackend.pl";

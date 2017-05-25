@@ -11,14 +11,14 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/instructor/filemore' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $fname=  $c->req->query_params->param('f');
   (defined($fname)) or die "need a filename for filemore.\n";
 
-  $c->stash( detail => ifilelist1($subdomain, $c->session->{uemail}, $fname),
+  $c->stash( detail => ifilelist1($course, $c->session->{uemail}, $fname),
 	     tzi => tzi( $c->session->{uemail} ) );
 };
 

@@ -29,7 +29,7 @@ get '/enter' => sub {
     (Email::Valid->address($postemail)) or die "email address '$postemail' could not possibly be valid\n";
     $c->session->{expiration}= $postexpiration;
     $c->session->{uemail}= $postemail;
-    $c->session->{ishuman}= time().":".$c->ession->{uemail};
+    $c->session->{ishuman}= time().":".$c->session->{uemail};
   } else {
     (Email::Valid->address($c->session->{uemail})) or die "email address '".$c->session->{uemail}."' could not possibly be valid\n";
   }
@@ -37,14 +37,14 @@ get '/enter' => sub {
   (($postexpiration - time()) > 60 ) or die "Sorry, but your expiration is almost here.  Please reauthorize or extend!\n";
 
   ## now we are ready for the rest of our work on this subdomain
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  ($subdomain eq "auth") and die "you cannot enter the /auth course --- it does not exist!\n";
+  ($course eq "auth") and die "you cannot enter the /auth course --- it does not exist!\n";
   ## return $c->flash(message => 'auth likes only index')->redirect_to('/auth/index');  ## we cannot enter the auth course site
 
   ## unmorph if needed
-  student2instructor( $subdomain, $c->session->{uemail} );  ## just make sure that we morph back if we were a morphed instructor
-  seclog($c->tx->remote_address, $subdomain, $c->session->{uemail}||"no one", "entering course site $subdomain" );
+  student2instructor( $course, $c->session->{uemail} );  ## just make sure that we morph back if we were a morphed instructor
+  seclog($c->tx->remote_address, $course, $c->session->{uemail}||"no one", "entering course site $course" );
 
   return $c->flash( message => "hello $postemail" )->redirect_to('/index');
 };

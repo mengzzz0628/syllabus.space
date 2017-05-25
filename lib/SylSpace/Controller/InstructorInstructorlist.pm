@@ -11,11 +11,11 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/instructor/instructorlist' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  $c->stash( instructors => instructorlist( $subdomain ) );
+  $c->stash( instructors => instructorlist( $course ) );
 };
 
 1;

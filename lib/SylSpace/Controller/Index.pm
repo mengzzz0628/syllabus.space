@@ -14,18 +14,18 @@ use SylSpace::Model::Controller qw(global_redirect standard domain);
 my $torealhome = sub {
   my $c = shift;
 
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  ($subdomain eq "auth") and return $c->redirect_to('/auth/index');
+  ($course eq "auth") and return $c->redirect_to('/auth/index');
 
-  (isenrolled( $subdomain, $c->session->{uemail} ))
+  (isenrolled( $course, $c->session->{uemail} ))
     or return $c->flash(message => 'we do not know who you are, so you need to authenticate')->redirect_to('http://auth'.domain($c).'/index');
 
   _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
 
-  my $desturl= isinstructor( $subdomain, $c->session->{uemail} ) ? '/instructor' : '/student';
+  my $desturl= isinstructor( $course, $c->session->{uemail} ) ? '/instructor' : '/student';
 
-  return $c->flash(message => $c->session->{uemail}." logs into $subdomain")->redirect_to($desturl)
+  return $c->flash(message => $c->session->{uemail}." logs into $course")->redirect_to($desturl)
 };
 
 
@@ -40,12 +40,10 @@ __DATA__
 
 @@ exception.production.html.ep
 
-$self->stash( color => 'orange' );
-
 %title 'please go back';
 %layout 'auth';
 
-  <main>
+  <main style="background-color:orange">
     <h1>Exception</h1>
 
       <p style="padding:2em;background-color:white"><%= $exception->message %></p>

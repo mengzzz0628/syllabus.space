@@ -11,11 +11,11 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get '/instructor/faq' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  my $isfaq= fileread( $subdomain, $c->session->{uemail}, 'faq' ) || "<p>the instructor has not added her own faq</p>\n" ;
+  my $isfaq= fileread( $course, $c->session->{uemail}, 'faq' ) || "<p>the instructor has not added her own faq</p>\n" ;
 
   use Perl6::Slurp;
   my $body= slurp("public/html/faq.html");

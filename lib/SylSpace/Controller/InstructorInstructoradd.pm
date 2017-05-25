@@ -11,13 +11,13 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 post '/instructor/instructoradd' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $ne=$c->req->body_params->param('newiemail');
 
-  instructoradd( $subdomain, $ne );
+  instructoradd( $course, $ne );
   $c->flash( message => "set $ne instructor" )->redirect_to('/instructor/instructorlist')
 };
 

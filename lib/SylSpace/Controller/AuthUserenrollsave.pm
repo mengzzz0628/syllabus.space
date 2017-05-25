@@ -11,7 +11,7 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 post '/auth/userenrollsave' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $coursename= $c->req->body_params->param('course');
   my $secret= $c->req->body_params->param('secret');
@@ -33,7 +33,7 @@ post '/auth/userenrollsave' => sub {
 
 get '/auth/userenrollsavenopw' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   my $coursename= $c->req->query_params->param('course');
 

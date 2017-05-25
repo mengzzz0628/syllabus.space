@@ -11,7 +11,7 @@ use SylSpace::Model::Controller qw(standard global_redirect  drawform);
 
 get '/auth/bioform' => sub {
   my $c = shift;
-  # (my $subdomain = standard( $c )) or return global_redirect($c);
+  # (my $course = standard( $c )) or return global_redirect($c);
 
   userexists($c->session->{uemail}) or die "internal error: you were never created";
 

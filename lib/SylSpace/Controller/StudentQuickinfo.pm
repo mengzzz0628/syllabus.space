@@ -11,13 +11,13 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/student/quickinfo' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  my $instructorlist= instructorlist( $subdomain );
+  my $instructorlist= instructorlist( $course );
 
-  $c->stash( cioread => cioread($subdomain), requestsyllabus => hassyllabus($subdomain), instructorlist => $instructorlist  );
+  $c->stash( cioread => cioread($course), requestsyllabus => hassyllabus($course), instructorlist => $instructorlist  );
 };
 
 1;

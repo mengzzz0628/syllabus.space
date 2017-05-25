@@ -11,12 +11,12 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get 'instructor/edit' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $filename= $c->req->query_params->param('f');
-  my $filecontent= fileread( $subdomain, $c->session->{uemail}, $filename );
+  my $filecontent= fileread( $course, $c->session->{uemail}, $filename );
   my $filelength= length($filecontent);
 
   $filecontent =~ s/\r\n/\r/g;

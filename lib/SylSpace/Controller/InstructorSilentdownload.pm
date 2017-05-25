@@ -11,9 +11,9 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get 'instructor/silentdownload' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   plugin 'RenderFile';  ## ask viktor why $c->render_file is not seen
 
@@ -23,7 +23,7 @@ get 'instructor/silentdownload' => sub {
     $fullfilename = $fname;
   } else {
     $fname =~ s{.*/}{};
-    $fullfilename= fullfilename( $subdomain, $c->session->{uemail}, $fname);
+    $fullfilename= fullfilename( $course, $c->session->{uemail}, $fname);
     (-e $fullfilename) or die "file $fullfilename is not retrievable: $!\n";
   }
 

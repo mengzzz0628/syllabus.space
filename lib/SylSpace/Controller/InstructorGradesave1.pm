@@ -13,17 +13,17 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 get '/instructor/gradesave1' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
   my $uemail= $c->req->query_params->param('uemail');
   my $task= $c->req->query_params->param('task');
   my $grade= $c->req->query_params->param('grade');
 
-  gradesave($subdomain, $uemail, $task, $grade);
+  gradesave($course, $uemail, $task, $grade);
 
-  seclog($c->tx->remote_address, $subdomain, 'instructor', "changed grade for $uemail $task $grade" );
+  seclog($c->tx->remote_address, $course, 'instructor', "changed grade for $uemail $task $grade" );
 
   $c->flash( message=> "added grade for '$uemail', task '$task': $grade" )->redirect_to("gradecenter");
 

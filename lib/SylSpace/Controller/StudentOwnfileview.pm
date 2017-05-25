@@ -11,12 +11,12 @@ use SylSpace::Model::Controller qw(global_redirect standard);
 
 get '/student/ownfileview' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  (isenrolled($subdomain, $c->session->{uemail})) or $c->flash( message => "first enroll in $subdomain please" )->redirect_to('/auth/goclass');
+  (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
   my $fname= $c->req->query_params->param('f');
-  my $filecontent= sownfileread( $subdomain, $c->session->{uemail}, $fname );
+  my $filecontent= sownfileread( $course, $c->session->{uemail}, $fname );
 
   (defined($filecontent)) or return $c->flash(message => "file $fname cannot be found")->redirect_to($c->req->headers->referrer);
   (length($filecontent)>0) or return $c->flash(message => "file $fname was empty")->redirect_to($c->req->headers->referrer);

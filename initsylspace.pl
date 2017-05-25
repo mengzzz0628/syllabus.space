@@ -71,43 +71,25 @@ use Mojolicious::Plugin::Web::Auth;
 
 my $var="/var/sylspace";
 
-if (-w $var) {
-  die "[good -- $var exists and is writeable, aborting for safety]\n";
-} else {
-  (-e "/var") or die "internal error: your computer has no /var directory";
-  (-r "/var") or die "internal error: I cannot read the /var directory";
+(-w $var) and die "[$var exists and is writeable, aborting for safety]\n";
 
-  (-w "/var") or die "internal error: I cannot write to the /var directory.  please run this script as sudo";
-  mkdir("$var") or die "internal error: I could not mkdir $var: $!";
-  chmod(0777, $var) or die "chmod: failed on opening $var to the public: $!\n";
-  print STDERR "created $var\n";
+(-e "/var") or die "internal error: your computer has no /var directory.  is this windows??";
+(-r "/var") or die "internal error: I cannot read the /var directory";
+(-w "/var") or die "internal error: I cannot write to the /var directory.  please run this script as sudo";
+
+mkdir("$var") or die "internal error: I could not mkdir $var: $!";
+chmod(0777, $var) or die "chmod: failed on opening $var to the public: $!\n";
+say STDERR "made $var";
+
+
+foreach (qw(users courses tmp templates)) {
+  (-e "$var/$_") and next; ## actually should not happen usually
+  mkdir("$var/$_") or die "cannot make $var/$_: $!\n";
+  chmod(0777, "$var/$_") or die "chmod: failed on chmod-ing $var/$_ to the public: $!\n";
+  say STDERR "made $var/$_";
 }
 
-my $varu="$var/users";
-if (!(-e $varu)) {
-  mkdir($varu) or die "cannot make $varu\n";
-  chmod(0777, $varu) or die "chmod: failed on opening $varu to the public: $!\n";
-  say STDERR "made $var";
-}
-
-if (!(-e "$var/sites")) {
-  mkdir("$var/sites") or die "cannot make $var/sites\n";
-  chmod(0777, "$var/sites") or die "chmod: failed on opening $varu/sites to the public: $!\n";
-  say STDERR "made $var/sites";
-}
-
-if (!(-e "$var/tmp")) {
-  mkdir("$var/tmp") or die "cannot make $var/tmp\n";
-  chmod(0777, "$var/tmp") or die "chmod: failed on opening $varu/tmp to the public: $!\n";
-  say STDERR "made $var/tmp";
-}
-
-if (!(-e "$var/templates")) {
-  mkdir("$var/templates") or die "cannot make $var/templates\n";
-  system("cp -a templates/equiz/* $var/templates/");
-  say STDERR "copied templates";
-}
-
+system("cp -a templates/equiz/* $var/templates/");
 if (!(-e "$var/secrets.txt")) {
   open(my $FO, ">", "$var/secrets.txt"); for (my $i=0; $i<30; ++$i) { print $FO mkrandomstring(32)."\n"; } close($FO);
 }

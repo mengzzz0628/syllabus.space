@@ -14,11 +14,11 @@ use SylSpace::Model::Controller qw(global_redirect  standard);
 
 get '/instructor/filecenter' => sub {
   my $c = shift;
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
-  sudo( $subdomain, $c->session->{uemail} );
+  sudo( $course, $c->session->{uemail} );
 
-  $c->stash( filelist => ifilelistall($subdomain, $c->session->{uemail}, "X" ),
+  $c->stash( filelist => ifilelistall($course, $c->session->{uemail}, "X" ),
 	   tzi => tzi( $c->session->{uemail} )  ); ## X means not hw and not equiz
 };
 

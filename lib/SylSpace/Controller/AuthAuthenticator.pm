@@ -53,7 +53,7 @@ sub facebook {
 get '/auth/authenticator' => sub {
   my $c = shift;
 
-  (my $subdomain = standard( $c )) or return global_redirect($c);
+  (my $course = standard( $c )) or return global_redirect($c);
 
   $c->render(template => 'AuthAuthenticator' );
 };
@@ -83,6 +83,11 @@ __DATA__
 
 <nav>
 
+  <% if ($ENV{'ONLOCALHOST'}) { %>
+     <p> Direct Authentication does not work on localhost. </p>
+     <div style="background-color:black">
+  <% } %>
+
   <p style="font-size:small;">Direct Authentication is the fastest and most reliable method to authenticate.</p>
 
    <div class="row text-center">
@@ -93,6 +98,10 @@ __DATA__
    </div>
 
   <hr />
+
+  <% if ($ENV{'ONLOCALHOST'}) { %>
+     </div>
+  <% } %>
 
   <p style="font-size:small;padding-top:1em;">Sendmail is slow, throttled per server (to avoid bot DDOS attacks on other servers), may take up to 10 minutes to arrive, and is only valid for 15 minutes&mdash;if you are lucky and no spam filter blocks it.</p>
 
@@ -118,7 +127,7 @@ __DATA__
      <% if ($ENV{'ONLOCALHOST'}) { %>
         <hr />
         <div class="row top-buffer text-center">
-           <%== btnblock('/auth/test', '<i class="fa fa-users"></i> Local Users', 'Listed Users -- Remove in Production', 'btn-default btn-md', 'w') %>
+           <%== btnblock('/auth/test', '<i class="fa fa-users"></i> Local Users', 'Listed Users -- Only on Localhost', 'btn-default btn-md', 'w') %>
         </div>
       <% } %>
 
