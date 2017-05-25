@@ -83,8 +83,6 @@ __DATA__
 
 <nav>
 
-   <script src='https://www.google.com/recaptcha/api.js'></script>
-
   <p style="font-size:small;">Direct Authentication is the fastest and most reliable method to authenticate.</p>
 
    <div class="row text-center">
@@ -96,17 +94,17 @@ __DATA__
 
   <hr />
 
-  <p style="font-size:small;padding-top:1em;">Sendmail is slow, requires you to complete a captcha (to avoid bots), and may take up to 10 minutes to arrive&mdash;if you are lucky and no spam filter blocks it.</p>
+  <p style="font-size:small;padding-top:1em;">Sendmail is slow, throttled per server (to avoid bot DDOS attacks on other servers), may take up to 10 minutes to arrive, and is only valid for 15 minutes&mdash;if you are lucky and no spam filter blocks it.</p>
 
   <form name="registration" method="post" action="/auth/sendmail/authenticate">
-       <input type="hidden" class="form-control" value="no name" name="name" />
+       <input style="display:none" class="form-control" value="no name" name="name" />
 
     <div class="row text-center">
 
        <div class="col-md-5">
          <div class="input-group">
             <span class="input-group-addon">Email: <i class="fa fa-email"></i></span>
-            <input class="form-control" placeholder="joe.schmoe@ucla.edu" name="email" type="email" required />
+            <input class="form-control" placeholder="joe.schmoe@ucla.edu" name="outgemaildest" type="email" required />
          </div>
        </div>
 
@@ -122,10 +120,6 @@ __DATA__
         <div class="row top-buffer text-center">
            <%== btnblock('/auth/test', '<i class="fa fa-users"></i> Local Users', 'Listed Users -- Remove in Production', 'btn-default btn-md', 'w') %>
         </div>
-      <% } else { %>
-          <div class="col-md-offset-1 col-md-4">
-              <div class="g-recaptcha" data-sitekey="6Le1siIUAAAAAIJbH9Ij2UCYg-tPO8Q8bA7nYCPn"></div>
-          </div>
       <% } %>
 
     </div> <!-- row -->

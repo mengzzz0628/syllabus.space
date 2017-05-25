@@ -15,10 +15,8 @@ get '/student/faq' => sub {
 
   my $isfaq= fileread( $subdomain, $c->session->{uemail}, 'faq' ) || "<p>the instructor has not added her own faq</p>\n" ;
 
-
-
   use Perl6::Slurp;
-  my $body= slurp("public/html/faq.html");
+  my $body= slurp("$ENV{'sitepath'}/public/html/faq.html");
   my $code= (length($body)<=1) ? 404 : 200;
 
 #  my $allfaq = $c->ua->get("/html/faq.html");
@@ -60,6 +58,10 @@ __DATA__
   <dt>Why won't my file upload?</dt>
 
   <dd>The maximum uupload limit is 16MB/file.</dd>
+
+  <dt>Is it a concern that the site is http, not (SSL-encrypted) https?</dt>
+
+  <dd>Yes and no.  SSL prevents man-in-the-middle (NSA-type or public WiFi) listening-in attacks.  However, we encrypt critical requests and we never ask for passwords.</dd>
 
 </dl>
 

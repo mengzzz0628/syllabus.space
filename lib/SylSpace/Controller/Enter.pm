@@ -29,6 +29,7 @@ get '/enter' => sub {
     (Email::Valid->address($postemail)) or die "email address '$postemail' could not possibly be valid\n";
     $c->session->{expiration}= $postexpiration;
     $c->session->{uemail}= $postemail;
+    $c->session->{ishuman}= time().":".$c->ession->{uemail};
   } else {
     (Email::Valid->address($c->session->{uemail})) or die "email address '".$c->session->{uemail}."' could not possibly be valid\n";
   }

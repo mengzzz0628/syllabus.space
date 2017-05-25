@@ -1,11 +1,17 @@
 
 MORE IMPORTANT
 
-* token must expire on email, and/or be used only once
-
 BUG* students list their own upload, but not see it (needs Student/Viewown)
+	-- 
 
 BUG* student can squirrel away file with wrong file name for homework, and/or not displayed?
+
+	-- in uploadsave calling Model/filewrite, double check existence
+
+
+* lay out all file operations into a secure module that checks the abspath
+
+* honeypot, rotating names + throttled mailer
 
 * https rather than http (joel berger, mojolicious hypnotoad)
 
@@ -30,3 +36,4 @@ LESS IMPORTANT
 
 * add permanent testsite, instructor read-only  readonly.testsite.syllabus.space
 
+* too many INSTRUCTOR files in class directory.  maybe use setflag and getflag for empty files?

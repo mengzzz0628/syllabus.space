@@ -11,7 +11,7 @@ our @EXPORT_OK=qw(
  instructorlist instructoradd instructordel
 
  sitebackup isvalidsitebackupfile courselistenrolled courselistnotenrolled
- usernew userenroll isenrolled instructor2student student2instructor getcoursesecret userexists
+ usernew userenroll isenrolled instructor2student student2instructor userexists getcoursesecret throttle 
 
  readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
 
@@ -255,6 +255,19 @@ sub setcoursesecret( $subdomain, $secret ) {
 }
 
 
+sub throttle( $seconds=5 ) {
+  my @timestamps;
+  ## each unique second throttle shares the same semaphore
+  foreach ( bsd_glob("$var/tmp/throttle$seconds=*") ) {
+    (defined($_)) or next;
+    push(@timestamps, $_);
+    (my $timestamp= $_) =~ s{.*throttle$seconds=}{};
+    ($timestamp > 1000000) or die "non-sensible timestamp $timestamp in file system";
+    ($timestamp + $seconds <= time()) or sleep($seconds);  ## conservative
+  }
+  touch("$var/tmp/throttle$seconds=".time());
+  foreach (@timestamps) { unlink($_); }  ## files may have disappeared already, but noone cares
+}
 
 ################
 ## creates a new user.  users can register themselves

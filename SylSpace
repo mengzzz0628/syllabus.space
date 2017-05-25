@@ -11,7 +11,10 @@ use Data::Dumper;
 
 $ENV{'sitename'}= "syllabus.space";  ## could be deduced from $ENV{HOSTNAME} =~ s/-/\./;
 $ENV{'sitepath'}= $FindBin::Bin;
-$ENV{'siteicolor'}='#ffc8b3'; $ENV{'sitescolor'}='white'; $ENV{'siteacolor'}='AntiqueWhite';
+$ENV{'siteicolor'}=$ENV{'sitescolor'}='white'; $ENV{'siteacolor'}='AntiqueWhite';
+$ENV{'jumboscolor'}='darkblue'; $ENV{'jumboicolor'}='darkred'; $ENV{'jumboacolor'}='darkgreen';
+
+
 
 ## the full executable is in $ENV{MOJO_EXE} or in $ENV{'sitepath'}/$0;
 

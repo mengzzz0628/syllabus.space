@@ -9,10 +9,7 @@ h1 { letter-spacing: 0px; }
 body.instructor { background-color:#d5f9ed; }
 body.student { background-color:white; }
 
-/*
-table.hdr span.gravatar img { border: 1px solid #5a698b; }
-table.hdr span.gravatarbottom { background-color:white; font-size:120%; }
-*/
+/*table.hdr span.gravatar img { border: 1px solid #5a698b; }table.hdr span.gravatarbottom { background-color:white; font-size:120%; } */
 
 table.hdr { font-size:100%; }
 table.hdr span.hdruid { font-size:80%; text-align:left; }

@@ -4,13 +4,14 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(superseclog);
+use SylSpace::Model::Model qw(superseclog throttle);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
 
 use Mojo::JWT;
 
+use Email::Valid;
 use Email::Sender::Simple 'try_to_sendmail';
 use Email::Sender::Transport::SMTP::TLS;
 use Email::Simple::Creator;
@@ -19,20 +20,27 @@ post '/auth/sendmail/authenticate' => sub {
   my $c = shift;
 
   my $name = $c->param('name');
-  my $email = $c->param('email');
+  ($name eq 'no name') or die "we are already overloaded!\n";
 
   if (!$name) {
     return $c->stash(error => 'Missing required parameter name' )->render(template => 'AuthSendmail');
   }
 
+  my $email = $c->param('outgemaildest');
+  ($email) or die "Missing email\n";
+  (Email::Valid->address($email)) or die "email address '$email' could not possibly be valid\n";
+
   if (!$email) {
     return $c->stash(error => 'Missing required parameter email' )->render(template => 'AuthSendmail');
   }
+
+  throttle();  ## to prevent nasty DDOSs on other sites
 
   if (_send_email($c, $email, $name)) {
     return $c->stash(error => '')->render(template => 'AuthSendmail');
   }
 
+  die "Failed to send email";
   $c->stash(error => 'Failed to send email')->render(template => 'AuthSendmail');
 };
 
@@ -47,25 +55,6 @@ get '/auth/sendmail/callback' => sub {
   my $email = $params->{email};
 
   superseclog( $c->tx->remote_address, $email, "got email callback for $name and $email" );
-
-  if (0) {
-    ## not tested and probably not working
-    my $gcaptcha= {
-		   url => 'https://www.google.com/recaptcha/api/siteverify',
-		   response => $params->{g-recaptcha-response},
-		   secretkey => $c->plugin('Config')->{googlerecaptcha}->{secretkey},
-		   remoteip => $ENV{'remoteip'},  ## could be wrong;
-		  };
-    my $ua  = Mojo::UserAgent->new;
-    my $tx = $ua->post($gcaptcha->{url} => form => $gcaptcha );
-    if (my $res = $tx->success) { say $res->body }
-    else {
-      my $err = $tx->error;
-      die "$err->{code} response: $err->{message}" if $err->{code};
-      die "Connection error: $err->{message}";
-    }
-  }
-
 
   if ($name and $email) {
     $c->session(uemail => $email, name => $name)->redirect_to('/index');
@@ -85,7 +74,7 @@ sub _getTransport {
 
 ################
 sub _jwt {
-  return Mojo::JWT->new(secret => shift->app->secrets->[0]);
+  return Mojo::JWT->new(secret => shift->app->secrets->[0], expires => time()+15*60);  ## 15 minutes
 }
 
 ################

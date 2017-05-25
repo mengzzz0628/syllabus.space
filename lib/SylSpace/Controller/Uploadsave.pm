@@ -40,8 +40,8 @@ post '/uploadsave' => sub {
     ($filename =~ /^faq\./i) and filesetdue( $subdomain, $filename, time()+60*60*24*365 );  ## special rule: make syllabus available for 1 year
 
   } else {
-    tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, " uploaded ".$filename." in response to $hwmatch" );  ## student uploads are public
     (eval { filewrite($subdomain, $c->session->{uemail}, $filename, $filecontents, $hwmatch) }) or die "Problem : $@";
+    tweet($c->tx->remote_address, $subdomain, $c->session->{uemail}, " uploaded ".$filename." in response to $hwmatch" );  ## student uploads are public
     $referto= "/student/hwcenter";
   }
 

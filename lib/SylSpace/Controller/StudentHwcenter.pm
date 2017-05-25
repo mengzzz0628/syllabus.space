@@ -62,7 +62,7 @@ __DATA__
   foreach (@$sownfilelist) {
     /^(.*)\.response\.(.*)$/ or next;
     (/\.old$/) and next;
-    $sownfilelist{ $1 } = "<a href=\"/student/viewown?f=$_\">$2</a>";
+    $sownfilelist{ $1 } = "<a href=\"/student/ownfileview?f=$_\">$2</a>";
   }
 
   my $counter=0;
@@ -77,7 +77,7 @@ __DATA__
     my $uploadform=
       qq(<form action="/uploadsave" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
           <label for="idupload">Upload: </label>
-          <input type="file" name="uploadfile" id="idupload" style="display:inline"  >
+         <input type="file" name="uploadfile" id="idupload" style="display:inline"  >
           <input type="hidden" name="hwtask" value="$_->[0]"  ><br />
           <button class="btn btn-default btn-block" type="submit" value="submit">Go</button>
       </form>);

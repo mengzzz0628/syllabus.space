@@ -1,5 +1,5 @@
 %layout 'sylspace';
 
-<% $self->stash( color => $ENV{'sitescolor'}, homeurl => '/student' ); %>
+<% $self->stash( bgcolor => $ENV{'sitescolor'}, fgcolor => $ENV{'jumboscolor'}, homeurl => '/student' ); %>
 
 <%= content %>
