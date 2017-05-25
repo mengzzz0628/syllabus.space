@@ -88,6 +88,8 @@ sub _send_email {
   my $jwt = _jwt($c)->claims({name => $name, email => $email})->encode;
   my $url = $c->url_for('/auth/sendmail/callback')->to_abs->query(jwt => $jwt);
 
+  defined($email) or die "internal error---what is your email??";
+
   my $message = Email::Simple->create(
     header => [
       From    => $config->{email}{message}{from},
@@ -97,7 +99,7 @@ sub _send_email {
     body => "Follow this link: $url",
   );
 
-  superseclog( $c->tx->remote_address, $c->param('email'), "requesting sending email to ".$c->param('email') )
+  superseclog( $c->tx->remote_address, $email, "requesting sending email to ".$email );
 
   throttle();  ## to prevent nasty DDOSs on other sites
 
