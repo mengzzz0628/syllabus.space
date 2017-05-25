@@ -1,29 +1,18 @@
 
 MORE IMPORTANT
 
-BUG* students list their own upload, but not see it (needs Student/Viewown)
-	-- 
-
-BUG* student can squirrel away file with wrong file name for homework, and/or not displayed?
-
-	-- in uploadsave calling Model/filewrite, double check existence
-
-
-* lay out all file operations into a secure module that checks the abspath
-
-* honeypot, rotating names + throttled mailer
+*** currently, the emailer is stubbornly refusing us
 
 * https rather than http (joel berger, mojolicious hypnotoad)
 
-* SMS confirmation on new computers --- instructors, special sites (e.g., book.ivo-welch.info/instructor)
 
-* maybe bulk registration of students, with limits to authentication to local method
+MEDIUM IMPORTANT
 
 * add more automatic tests, esp with respect to web controller
 
 * unenroll from a course?  course info stays, but student does not see it in signed-up list?
 
-* complete captcha for email sending
+* SMS confirmation on new computers --- instructors, special sites (e.g., book.ivo-welch.info/instructor)
 
 
 LESS IMPORTANT
@@ -37,3 +26,8 @@ LESS IMPORTANT
 * add permanent testsite, instructor read-only  readonly.testsite.syllabus.space
 
 * too many INSTRUCTOR files in class directory.  maybe use setflag and getflag for empty files?
+
+* could enhance honeypot with dozens of hidden fields and one real one, which is indicated by a token
+
+* maybe bulk registration of students, with limits to authentication to local method
+

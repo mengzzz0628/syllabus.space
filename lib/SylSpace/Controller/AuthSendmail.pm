@@ -38,7 +38,7 @@ post '/auth/sendmail/authenticate' => sub {
     return $c->stash(error => '')->render(template => 'AuthSendmail');
   }
 
-  die "Failed to send email, without a useful error message";
+  die "Failed to send email to '$email' with name '$name', for some unknown reason without a useful error message";
   $c->stash(error => 'Failed to send email')->render(template => 'AuthSendmail');
 };
 
@@ -72,7 +72,8 @@ sub _getTransport {
 
 ################
 sub _jwt {
-  return Mojo::JWT->new(secret => shift->app->secrets->[0], expires => time()+15*60);  ## 15 minutes
+#  return Mojo::JWT->new(secret => shift->app->secrets->[0], expires => time()+15*60);  ## 15 minutes
+  return Mojo::JWT->new(secret => shift->app->secrets->[0]);
 }
 
 ################
