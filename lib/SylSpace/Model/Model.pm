@@ -23,7 +23,7 @@ our @EXPORT_OK=qw(
  ifilelistall ifilelist1
  sfilelistall sfileread sownfilelist sownfileread
  filelistsfiles filesetdue collectstudentanswers filewrite fileread fullfilename filedelete
- cptemplate rmtemplates
+ cptemplate rmtemplates listtemplates
 
  gradetaskadd gradesave gradesashash gradesasraw gradesfortask2table
 
@@ -1015,6 +1015,12 @@ sub collectstudentanswers( $course, $filename ) {
 
 ################################################################
 
+sub listtemplates( ) {
+  my @list= bsd_glob("$var/templates/*");
+  foreach (@list) { s{$var/templates/}{}; }
+  return \@list;
+}
+
 
 sub cptemplate( $course, $templatename ) {
   $course= _confirmsudoset( $course );
@@ -1044,6 +1050,7 @@ sub rmtemplates( $course ) {
   _cleandeadlines($course);
   return $count;
 }
+
 
 
 

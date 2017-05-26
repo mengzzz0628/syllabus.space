@@ -51,17 +51,17 @@ __DATA__
   <nav>
 
    <div class="row top-buffer text-center">
-     <%== btnblock("/student/msgcenter", '<i class="fa fa-paper-plane"></i> Messages', 'From Instructor') %>
+     <%== btnblock("/student/quickinfo", '<i class="fa fa-info-circle"></i> Quick', 'Location, Instructor') %>
      <%== btnblock("/student/equizcenter", '<i class="fa fa-pencil"></i> Equizzes', 'Test Yourself') %>
      <%== btnblock("/student/hwcenter", '<i class="fa fa-folder-open"></i> HWork', 'Assignments') %>
-
      <%== btnblock("/student/filecenter", '<i class="fa fa-files-o"></i> Files', 'Old Exams, etc') %>
 
-     <%== btnblock("/student/quickinfo", '<i class="fa fa-info-circle"></i> Quick', 'Location, Instructor') %>
      <%== btnblock("/student/gradecenter", '<i class="fa fa-star"></i> Grades', 'Saved Scores') %>
+     <%== btnblock("/student/msgcenter", '<i class="fa fa-paper-plane"></i> Messages', 'From Instructor') %>
 
      <%== btnblock("/showseclog", '<i class="fa fa-lock"></i> Sec Log', 'Security Records') %>
      <%== btnblock("/showtweets", '<i class="fa fa-rss"></i> Class', 'Activity Monitor') %>
+
      <%== btnblock("/student/faq", '<i class="fa fa-question-circle"></i> Help', 'FAQ and More') %>
 
      <%== btnblock("/auth/bioform", '<i class="fa fa-cog"></i> Bio <i class="fa fa-link"></i>', 'Set My Profile') %>

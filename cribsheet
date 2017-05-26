@@ -1,9 +1,6 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
 
-## Documentation browser under "/perldoc"
-## plugin 'PODRenderer';
-
 my $indexpage= sub {
   my $c = shift;  ## $c here is the same as $self in template
   $c->stash( stasha => 'pass via stasha' );
@@ -101,25 +98,27 @@ __DATA__
   <h2> FORM GET </h2>
 
   <p>Getting something:</p>
-  <form action='/' method='GET'>
-    <input name="sometext" value="this was get" />
-    <input type="submit">
+  <form action='/' method='GET' id="formget">
+    <input id="getsometext" name="sometext" value="this was get" />
+    <input id="getsubmit" type="submit">
   </form>
 
   <p>Get Result: <span><%= ($self->req->query_params->param("sometext")) || "no text yet" %></span></p>
 
+  <p>In hash form, query_params: <span><%= dumper $c->req->query_params->to_hash %></span>
+
 
   <h2> FORM POST </h2>
 
-  <form action='/?ab=12' method='POST'>
-    <input name="somepost" value="this was post" />
-    <input type="submit">
+  <form action='/?ab=12' method='POST' id="formpost">
+    <input id="postsometext" name="somepost" value="this was post" />
+    <input id="postsubmit" type="submit">
   </form>
 
   <p>Post Result: <span><%= ($self->req->params->param("somepost")) || "no text yet" %></span> .
  ab: <span><%= ($self->req->query_params->param("ab")) || "ab not seen" %></span></p>
 
-  <p>In hash form: <span><%= dumper $c->req->params->to_hash %></span>
+  <p>In hash form, post_params: <span><%= dumper $c->req->body_params->to_hash %></span>
 
 
   <h2> FILE UPLOAD </h2>
