@@ -65,18 +65,22 @@ __DATA__
 
   <h2> Redirection </h2>
 
-  <p>To redirect in perl code, use <span> $self->flash( message => "you are redirected" )->$c->redirect_to($url); </span>
+  <p>To note a message and redirect in perl code, use <span> $self->flash( message => "you are redirected" )->$c->redirect_to($url); </span>.
+
+  <p>Usually, you then have a <span>&lt;%= $message %&gt;</span> in your receiving page.</p>
 
 
   <h2> Using Templates </h2>
 
-  <p><span>&lt;% perl_code(); &gt;</span>
+  <p><span>&lt;% perl_code(); %&gt;</span>
 
-  <p><span>&lt;%= $escaped_perl_variable &gt;</span>
+  <p><span>&lt;%= $escaped_perl_variable %&gt;</span>
 
-  <p><span>&lt;%== $unescaped_perl_variable &gt;</span>
+  <p><span>&lt;%== $unescaped_perl_variable %&gt;</span>
 
-  <p>stasha: <span><%= $stasha %></span> <span><%= $stashb %></span>
+  <p>Current Stashes: <span><%= stash('stasha') %></span> <span><%= stash('stashb') %>. <br />Less safe than <span>&lt;%= stash('stashb')||'undef' %&gt;: <span>&lt;%= $stashb %&gt; </span>
+
+
 
 
   <h2>The Current URLs</h2>
@@ -92,7 +96,7 @@ __DATA__
   <tr> <td>Path_Query</td> <td> <%= $cururl->path_query %> </td> </tr>
   </table>
 
-  <p>Referer: <span><%== dumper $self->req->headers %></span>
+  <p>and its referer: <span><%== $self->req->headers->referrer %></span>
 
 
   <h2> FORM GET </h2>
@@ -125,7 +129,7 @@ __DATA__
 
    <form action="/" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
      <label for="idupload">Upload A New File: </label>
-     <input type="file" name="uploadfile" id="idupload" style="display:inline"  ><br />
+     <input type="file" name="uploadfile" id="idupload" style="display:inline"  > 
      <input type="submit" >
    </form>
 
@@ -139,7 +143,7 @@ __DATA__
   }
   sub toprint {
     $_ = $_[0];
-    return "<table> <tr> <th>Field</th> <th>Content<th> </tr>
+    return "<table> <tr> <th>Field</th> <th>Content</th> </tr>
                     <tr> <td>Filename</td> <td>".$_->[0]."</td> </tr>
                     <tr> <td>Filesize</td> <td>".$_->[1]."</td> </tr>
                     <tr> <td>First 80 characters </td> <td>".$_->[2]."</td> </tr>
@@ -150,27 +154,21 @@ __DATA__
   <p><%== toprint(tellmeuploadinfo($self)) %></p>
 
 
-  <h2> Cookie </h2>
+  <h2> Sample Cookie </h2>
 
   <p>Cookie Counter: <span> <%= $self->session->{count} || "no cookie yet" %> </span> </p>
 
   <% $self->session->{count}= ($self->session->{count} || 0)+1; %>
 
 
+  <h2> Other Template Files and Defaults </h2>
+
+  <p> For static files and exception handling, run in a production environment <tt> # morbo -v -m production -l localhost:3000 </tt>, and then point to a bad URL, like <a href="http://localhost:3000/bad">http://localhost:3000/bad</a></p>
+
+
   <h2> User Agent </h2>
 
   <p><span> <%= $c->req->headers->user_agent %> </p>
-
-
-
-  <h2> Other Template Files and Defaults </h2>
-
-  <p> For static files and exception handling, look at the end of the code. </p>
-
-    <pre> morbo -v -m production </pre>
-
-    then point to <a href="http://localhost:3000/bad">http://localhost:3000/bad</a></p>
-
 
   <h2> ENV </h2>
 
@@ -201,7 +199,11 @@ this is basic test.txt, which can be viewed at http://localhost:3000/test.txt wh
 <html>
   <head>
     <title><%= title %></title>
-    <style> table { border: 1px solid black; } span { background-color:white; padding:0.5ex; } </style>
+    <style>
+    table { border: 3px solid black; background-color:white; }
+    th, td { border: 1px solid black; padding: 3pt; }
+    span { background-color:white; padding:0.5ex; }
+    </style>
   </head>
 
   <body style="margin:3em; background-color:beige">
