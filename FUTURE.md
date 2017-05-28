@@ -29,4 +29,4 @@ LESS IMPORTANT
 
 * maybe bulk registration of students, with limits to authentication to local method
 
-* make market for instructors and students
+* make market for instructors and students: 1c/quiz?

@@ -7,16 +7,18 @@ plugin 'RenderFile';
 plugin 'browser_detect';
 
 use FindBin;
+## the full executable is in $ENV{MOJO_EXE} or in $ENV{'sitepath'}/$0;
+
 use Data::Dumper;
 
 $ENV{'sitename'}= "syllabus.space";  ## could be deduced from $ENV{HOSTNAME} =~ s/-/\./;
 $ENV{'sitepath'}= $FindBin::Bin;
-$ENV{'siteicolor'}=$ENV{'sitescolor'}='white'; $ENV{'siteacolor'}='AntiqueWhite';
-$ENV{'jumboscolor'}='darkblue'; $ENV{'jumboicolor'}='darkred'; $ENV{'jumboacolor'}='darkgreen';
 
+$ENV{'siteacolor'}='AntiqueWhite'; $ENV{'jumboacolor'}='darkgreen';
+$ENV{'siteicolor'}=$ENV{'sitescolor'}='white';
+$ENV{'jumboscolor'}='darkblue';
+$ENV{'jumboicolor'}='darkred';
 
-
-## the full executable is in $ENV{MOJO_EXE} or in $ENV{'sitepath'}/$0;
 
 ################################################################################################################################
 ## unfortunately, you have to be connected to the correct diretory; I think Mojolyst does not work otherwise
@@ -24,9 +26,10 @@ $ENV{'jumboscolor'}='darkblue'; $ENV{'jumboicolor'}='darkred'; $ENV{'jumboacolor
 
 {
   (my $pgmname= $0) =~ s{.*/}{};  ## usually SylSpace
+  my $configfile="$ENV{'sitepath'}/$pgmname.conf";
 
-  (-e "$ENV{'sitepath'}/$pgmname.conf") or die "\nFATAL: no authentication secrets config file $ENV{'sitepath'}/$pgmname.conf\n";
-  (-l "$ENV{'sitepath'}/$pgmname.conf") or die "\nFATAL: authentication secrets config file $ENV{'sitepath'}/$pgmname.conf is in the github'ed  directory, not a link!\n";
+  (-e $configfile) or die "\nFATAL: no authentication secrets config file '$configfile'\n";
+  (-l $configfile) or die "\nFATAL: authentication secrets config file '$configfile' is in the github'ed  directory, not a link!\n";
   print "[Authentication secrets are symlink to ".readlink("$ENV{'sitepath'}/$pgmname.conf")."]\n";
 
   plugin 'Config';
@@ -103,12 +106,6 @@ $ENV{'jumboscolor'}='darkblue'; $ENV{'jumboicolor'}='darkred'; $ENV{'jumboacolor
 
 
 ################################################################################################################################
-# use MIME::Base64;
-# use Digest::MD5 qw(md5 md5_hex md5_base64);
-## could use either the snippet or /var/sylspace/secrets.txt
-## my $midf= (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id";
-## app->secrets([ md5_base64($midf.$0), 'moniker', 'aha']);
-
 use Perl6::Slurp;
 my @pwsecret=slurp('/var/sylspace/secrets.txt');
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
@@ -116,8 +113,11 @@ app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; ma
 if (defined($ENV{'HYPNOTOAD_EXE'})) {
   $ENV{'ONLOCALHOST'}=0;
   app->config(hypnotoad => {listen => ['http://'.$ENV{'sitename'}.':80']});
+} elsif (($ENV{TEST2_ACTIVE})&&(!defined($ENV{'MOJO_REUSE'}))) {
+  ## not really working.  just a start.
+  ($ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'}) =~ /^[0-9]+\.0\.0\./)?1:0;
 } else {
-  (defined($ENV{'MOJO_REUSE'})) or die "do not know which Mserver is being used\n";
+  (defined($ENV{'MOJO_REUSE'})) or die "No ENV{MOJO_REUSE}: I do not know which Mserver is being used\n";
   ($ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'}) =~ /^[0-9]+\.0\.0\./)?1:0;
 }
 
@@ -128,6 +128,6 @@ if ($ENV{'ONLOCALHOST'}) {
   app->sessions->cookie_domain($domain);
 }
 
-print "Starting App now\n";
+print "$0: Starting App now\n";
 
 app->start();

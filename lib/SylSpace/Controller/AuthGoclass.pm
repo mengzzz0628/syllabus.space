@@ -115,10 +115,10 @@ sub coursebuttonsentry {
   }
 
   my $rs='';
-  foreach (@courselist) {
+  foreach (sort @courselist) {
     $rs .= btnblock( 'http://'.$_.'.'.domain($self).'/enter?e='.obscure( time().':'.$email.':'.$self->session->{expiration} ),
 		     '<i class="fa fa-circle"></i> '.$displaylist{$_},
-		     '', # $group{$_}." ".$freq{$_}||"N",
+		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll",     ### $group{$_}." ".$freq{$_}||"N",
 		     'btn-default',
 		     'w' )."\n";
   }
@@ -162,20 +162,23 @@ sub coursebuttonsenroll {
       my ( $maintext, $subtext, $displaylist, $coursehassecret )= @_;
       my $url= ($coursehassecret) ? '/auth/userenrollform?c='.$maintext : '/auth/userenrollsavenopw?course='.$maintext ;
       my $icon=  ($coursehassecret) ? '<i class="fa fa-lock"></i> ': '<i class="fa fa-circle-o"></i> ';
-      return btnblock($url, $icon.$displaylist->{$maintext}, $subtext." ".($coursehassecret||"no secret"), 'btn-default', 'w');
+      return "  ".btnblock($url, $icon.$displaylist->{$maintext}, $subtext, 'btn-default', 'w');
     }
 
     if (scalar(@displaylist) == 1) {
       my $course= $displaylist[0];
-      $rs .= imbtn( $course, "singleton", \%displaylist, $courselist->{$course} )."\n";
+      $rs .= imbtn( $course, "singleton", \%displaylist, $courselist->{x} )."\n";
     } else {
-      $rs .= qq(<button type="button" class="btn btn-primary btn-block" data-toggle="collapse" data-target="#$g">\n<h3>$g</h3></button>);
+      my $mb= "<i class=\"fa fa-briefcase\"></i>";  ## or use 'plus-circle'
+      $rs .= qq(\n<div class="col-xs-12 col-md-6"><button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#$g"> <h3> $mb $g </h3></button><p>&nbsp;</p></div>\n);
 
-      $rs .= qq(<div id="$g" class="collapse">);
+      $rs .= qq(\t<div id="$g" class="collapse">\n);
+      my $cntup=0;
       foreach my $x (@displaylist) {
-	$rs .= imbtn( $x, "multiple", \%displaylist, $courselist->{$x}  )."\n";
+	++$cntup;
+	$rs .= "\t\t".imbtn( $x, "$cntup of ".scalar(@displaylist), \%displaylist, $courselist->{$x}  )."\n";
       }
-      $rs .= qq(</div>\n);
+      $rs .= qq(\t</div>\n);
     }
   }
 

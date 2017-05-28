@@ -11,7 +11,7 @@ our @EXPORT_OK=qw(
  instructorlist instructoradd instructordel
 
  sitebackup isvalidsitebackupfile courselistenrolled courselistnotenrolled
- usernew userenroll isenrolled instructor2student student2instructor userexists getcoursesecret throttle 
+ usernew userenroll userdisroll isenrolled instructor2student student2instructor userexists getcoursesecret throttle 
 
  readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
 
@@ -222,7 +222,7 @@ sub _courselist( $uemail, $enrolltype ) {
   foreach (bsd_glob("$var/courses/*")) {
     (-d $_) or next;
     if (defined($uemail)) {
-      my $isenrolled= (-d "$_/$uemail");
+      my $isenrolled= ((-d "$_/$uemail")&&(!(-e "$_/disabled=1")));
       if (defined($enrolltype)) {
 	(($enrolltype) && (!$isenrolled)) and next;
 	((!$enrolltype) && ($isenrolled)) and next;
@@ -295,7 +295,10 @@ sub userenroll( $course, $uemail, $iswebsitecreator=0 ) {
     (-e "$var/courses/$course/instructor/files") or die "why does instructor for $course not have any files?";
   }
 
-  (-e "$var/courses/$course/$uemail") and return _checkemail($uemail, $course);  ## mild error-- we already exist
+  if (-e "$var/courses/$course/$uemail") {
+    unlink("$var/courses/$course/disabled=1"); ## in case...
+    return _checkemail($uemail, $course);  ## mild error-- we already exist
+  }
 
   mkdir("$var/courses/$course/$uemail") or die "could not make $course/$uemail: $!\n";
   mkdir("$var/courses/$course/$uemail/msgs") or die "could not make $course/$uemail/msgs: $!\n";
@@ -308,12 +311,20 @@ sub userenroll( $course, $uemail, $iswebsitecreator=0 ) {
 }
 
 sub isenrolled( $course, $uemail ) {
+  ## if you were enrolled but are now disabled, we still call you enrolled
+  ## effectively, you could still access course pages, but because the course no longer
+  ## appears in your list of enrolled courses, getting there would require entering the URL by hand
+  ## rather than entering via button press
   ($course =~ /^[\w][\w\-\.]*[\w]/) or die "bad subdomain name $course";
   ($course eq "auth") and return 0;
   (-e "$var/courses/$course") or die "no such course $course.\n";
   return (-e "$var/courses/$course/$uemail");
 }
 
+sub userdisroll( $course, $uemail ) {
+  (-e "$var/courses/$course") or die "no such course $course.\n";
+  (-e "$var/courses/$course/$uemail") and touch("$var/courses/$course/disabled=1");
+}
 
 ################################################################
 

@@ -29,7 +29,7 @@
   </head>
 
 
-  <body style="background-color:<%= stash("bgcolor") || 'lightblue' %>">
+  <body style="background-color:<%= stash('bgcolor') || 'white' %>">
 
     <div class="container-fluid" id="headbardraw">
 
@@ -53,7 +53,7 @@
 
       <header>
 
-	<div class="jumbotron" style="background-color:<%= stash('fgcolor') || 'blue' %>">
+	<div class="jumbotron" style="background-color:<%= stash('fgcolor') || 'yellow' %>">
 
           <%== ($self->session->{flash}->{message}) ?
 	  '<div class="alert alert-success" role="alert">'.($self->session->{flash}->{message}).'</div>' :
