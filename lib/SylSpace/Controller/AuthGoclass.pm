@@ -170,7 +170,7 @@ sub coursebuttonsenroll {
       $rs .= imbtn( $course, "singleton", \%displaylist, $courselist->{x} )."\n";
     } else {
       my $mb= "<i class=\"fa fa-briefcase\"></i>";  ## or use 'plus-circle'
-      $rs .= qq(\n<div class="col-xs-12 col-md-6"><button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#$g"> <h3> $mb $g </h3></button><p>&nbsp;</p></div>\n);
+      $rs .= qq(\n<div class="col-xs-12 col-md-6"><button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#$g"> <h3> $mb $g </h3></button><p>Multiple</p></div>\n);
 
       $rs .= qq(\t<div id="$g" class="collapse">\n);
       my $cntup=0;

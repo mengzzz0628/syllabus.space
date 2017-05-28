@@ -10,8 +10,6 @@ MEDIUM IMPORTANT
 
 * add more automatic tests, esp with respect to web controller
 
-* unenroll from a course?  course info stays, but student does not see it in signed-up list?
-
 
 LESS IMPORTANT
 
