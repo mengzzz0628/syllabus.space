@@ -83,7 +83,7 @@ __DATA__
 
 <nav>
 
-  <% if ($ENV{'ONLOCALHOST'}) { %>
+  <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
      <p> Direct Authentication does not work on localhost. </p>
      <div style="background-color:black">
   <% } %>
@@ -99,7 +99,7 @@ __DATA__
 
   <hr />
 
-  <% if ($ENV{'ONLOCALHOST'}) { %>
+  <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
      </div>
   <% } %>
 
@@ -124,7 +124,7 @@ __DATA__
       </div>
 
 
-     <% if ($ENV{'ONLOCALHOST'}) { %>
+     <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
         <hr />
         <div class="row top-buffer text-center">
            <%== btnblock('/auth/test', '<i class="fa fa-users"></i> Local Users', 'Listed Users -- Only on Localhost', 'btn-default btn-md', 'w') %>

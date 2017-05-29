@@ -21,8 +21,6 @@ LESS IMPORTANT
 
 * add permanent testsite, instructor read-only  readonly.testsite.syllabus.space
 
-* too many INSTRUCTOR files in class directory.  maybe use setflag and getflag for empty files?
-
 * could enhance honeypot with dozens of hidden fields and one real one, which is indicated by a token
 
 * maybe bulk registration of students, with limits to authentication to local method

@@ -5,7 +5,7 @@ use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
 use SylSpace::Model::Model qw(ciobuttons msgshownotread ismorphed isenrolled bioiscomplete showlasttweet);
-use SylSpace::Model::Controller qw(global_redirect  standard msghash2string domain);
+use SylSpace::Model::Controller qw(global_redirect  standard msghash2string);
 
 ################################################################
 
@@ -13,7 +13,10 @@ my $shm= sub {
   my $c = shift;
   (my $course = standard( $c )) or return global_redirect($c);
 
-  (bioiscomplete($c->session->{uemail})) or $c->flash( message => 'You first need to complete your bio!' )->redirect_to('http://auth.'.domain($c).'/usettings');
+  my $curdomainport= $c->req->url->to_abs->domainport;
+
+  (bioiscomplete($c->session->{uemail}))
+    or $c->flash( message => 'You first need to complete your bio!' )->redirect_to("http://auth.$curdomainport/usettings");
 
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 

@@ -14,11 +14,6 @@ use SylSpace::Model::Model qw(bioiscomplete userexists usernew);
 my $authroot= sub {
   my $c = shift;
 
-  my $host=$c->req->url->to_abs->host();
-
-  ## http://mfe.welch.syllabus.space/auth/heck should -> http://auth.welch.syllabus.space/auth/heck
-  ## ($c->req->url->to_abs->host() =~ m{auth\.\w}) or $c->redirect_to('http://auth.'.domain($c).'/auth');  ## wipe off anything beyond on url
-
   (defined($c->session->{uemail})) or return $c->flash(message => "you had no identity.  please authenticate")->redirect_to('/auth/authenticator');
 
   (defined($c->session->{expiration})) or return $c->flash(message => $c->session->{uemail}." is now a zombie. please authenticate")->redirect_to('/auth/authenticator');

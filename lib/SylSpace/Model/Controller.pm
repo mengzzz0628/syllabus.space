@@ -4,7 +4,7 @@ package SylSpace::Model::Controller;
 use base 'Exporter';
 @ISA = qw(Exporter);
 
-our @EXPORT_OK =qw(  standard global_redirect global_redirectmsg domain
+our @EXPORT_OK =qw(  standard global_redirect global_redirectmsg
 		     timedelta epochof epochtwo timezones
 		     btn btnsubmit btnblock btnxs
 		     msghash2string ifilehash2table
@@ -62,9 +62,11 @@ my $global_message;
 sub standard {
   my $c= shift;
 
-  my $domain= $c->req->url->domain;  ## mfe.welch.$ENV{'sitename'}:3000
-  my $course= $c->req->url->subdomain; ## mfe.welch
+
   my $cururl= $c->req->url;  ## /auth/dosome
+  my $domain= $cururl->domainport;  ## mfe.welch.$ENV{'SYLSPACE_sitename'}:3000
+  my $course= $cururl->subdomain; ## mfe.welch
+
   $cururl =~ s{\?.*}{}; ## strip any parameters
 
   sub retredirect { $global_redirecturl= $_[0]; $global_message= $_[1] || ""; return; }
@@ -139,8 +141,8 @@ sub _subdomain( $c ) {
   return $c->req->url->subdomain;
 }
 
-sub domain( $c ) {
-  return $c->req->url->domain;
+sub _domainport( $c ) {
+  return $c->req->url->domainport;
 }
 
 
@@ -533,7 +535,7 @@ EOT
 
 sub actionchoices( $actionchoices, $fname ) {
   my $selector= {
-		 equizrun => btn("/renderequiz?f=$fname", 'run', 'btn-xs btn-default'),
+		 equizrun => btn("/equizrender?f=$fname", 'run', 'btn-xs btn-default'),
 		 view => btn("view?f=$fname", 'view', 'btn-xs btn-default'),
 		 download => btn("download?f=$fname", 'download', 'btn-xs btn-default'),
 		 edit => btn("edit?f=$fname", 'edit', 'btn-xs btn-default') };

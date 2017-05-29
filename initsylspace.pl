@@ -94,6 +94,7 @@ if (!(-e "$var/secrets.txt")) {
   open(my $FO, ">", "$var/secrets.txt"); for (my $i=0; $i<30; ++$i) { print $FO mkrandomstring(32)."\n"; } close($FO);
 }
 
+say STDERR "please extend /etc/hosts to contain 'auth.localhost.test', 'localhost.test' etc.\n";
 
 say STDERR "now create a samplewebsite, e.g., (1) mksite.pl mfe.ucla instructor\@gmail.com or (2) run Model/Model.t or (3) run Model/MkTestSite.t";
 

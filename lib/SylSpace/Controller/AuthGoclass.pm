@@ -5,7 +5,7 @@ use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
 use SylSpace::Model::Model qw(courselistenrolled courselistnotenrolled bioiscomplete);
-use SylSpace::Model::Controller qw(standard global_redirect timedelta domain);
+use SylSpace::Model::Controller qw(standard global_redirect timedelta);
 
 ################################################################
 
@@ -21,7 +21,7 @@ get '/auth/goclass' => sub {
   $c->stash( timedelta => timedelta( $c->session->{expiration} ),
 	     courselistenrolled => courselistenrolled($c->session->{uemail}),
 	     courselistnotenrolled => courselistnotenrolled($c->session->{uemail}),
-	     email => $c->session->{uemail}, domain => domain($c) );
+	     email => $c->session->{uemail} );
 };
 
 1;
@@ -32,7 +32,7 @@ __DATA__
 
 @@ authgoclass.html.ep
 
-<% use SylSpace::Model::Controller qw(domain btnblock); %>
+<% use SylSpace::Model::Controller qw(btnblock); %>
 
 %title 'choose course';
 %layout 'auth';
@@ -115,10 +115,12 @@ sub coursebuttonsentry {
   }
 
   my $rs='';
+  my $curdomainport= $self->req->url->to_abs->domainport;
+
   foreach (sort @courselist) {
-    $rs .= btnblock( 'http://'.$_.'.'.domain($self).'/enter?e='.obscure( time().':'.$email.':'.$self->session->{expiration} ),
+    $rs .= btnblock( "http://$_.$curdomainport/enter?e=".obscure( time().':'.$email.':'.$self->session->{expiration} ),
 		     '<i class="fa fa-circle"></i> '.$displaylist{$_},
-		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll",     ### $group{$_}." ".$freq{$_}||"N",
+		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll on $_ '$curdomainport'",     ### $group{$_}." ".$freq{$_}||"N",
 		     'btn-default',
 		     'w' )."\n";
   }

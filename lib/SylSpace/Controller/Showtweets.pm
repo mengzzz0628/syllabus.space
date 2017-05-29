@@ -16,9 +16,9 @@ get '/showtweets' => sub {
   $c->stash(toprightexit => '<li><a href="/auth/goclass"> <i class="fa fa-sign-out"></i> Exit Course </a></li>');
 
   if (isinstructor($course, $c->session->{uemail})) {
-    $c->stash( bgcolor => $ENV{siteicolor}, homeurl => '/instructor' );
+    $c->stash( bgcolor => $ENV{SYLSPACE_siteicolor}, homeurl => '/instructor' );
   } else {
-    $c->stash( bgcolor => $ENV{sitescolor}, homeurl => '/student' );
+    $c->stash( bgcolor => $ENV{SYLSPACE_sitescolor}, homeurl => '/student' );
   }
 
   ## enrollment not required

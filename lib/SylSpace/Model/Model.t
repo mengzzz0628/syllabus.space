@@ -40,18 +40,24 @@ my $s3email='noone@gmail.com';
 note '
 ################ website creation, user registration, and user enrollment
 ';
-my @c=qw (mfe.welch mba.welch ugrad.welch hs.welch ms.welch gs.welch mba.daniel 2017.mba430.schwartz.ucla);
+my @course=qw (mfe.welch mba.welch ugrad.welch hs.welch mba.daniel year.course.instructor.university);
 
-like(dies { _websitemake($c[0], 'impossibleemail-gmail.com') }, qr/email /, 'good fail on bad i email' );
+my $localhostline = `grep '^127.0.0.1' /etc/hosts`; my @missing;
+foreach ((@course, 'auth', '')) {
+  ($localhostline =~ /$_\.localhost\.test/) or push(@missing, $_);
+}
+(@missing) and die "\n\nplease add '".join(".localhost.test , ", @missing).".localhost.test to /etc/hosts to facilitate testing\n\n";
 
-foreach (@c) {  ok( _websitemake($_, $iemail), "created $_ site" ); }
-ok( !eval { _websitemake($c[0], $iemail) }, 'cannot create mfe a second time' );
+like(dies { _websitemake($course[0], 'impossibleemail-gmail.com') }, qr/email /, 'good fail on bad i email' );
+
+foreach (@course) {  ok( _websitemake($_, $iemail), "created $_ site" ); }
+ok( !eval { _websitemake($course[0], $iemail) }, 'cannot create mfe a second time' );
 
 my @enrolledcourses= keys %{courselistenrolled($iemail)};
 
-ok( scalar @enrolledcourses == scalar @c, "check enrollment info on $#c+1 existing courses for alice");
-ok(  isenrolled($c[0], $iemail), "$iemail is nicely enrolled in $c[0]");
-ok( !isenrolled($c[0], 'unknown@gmail.com'), "unknown is not enrolled in $c[0]");
+ok( scalar @enrolledcourses == scalar @course, "check enrollment info on $#course+1 existing courses for alice");
+ok(  isenrolled($course[0], $iemail), "$iemail is nicely enrolled in $course[0]");
+ok( !isenrolled($course[0], 'unknown@gmail.com'), "unknown is not enrolled in $course[0]");
 
 note '
 ################ auth: user bios
@@ -99,10 +105,10 @@ note '
 ################ enroll users in course
 ';
 
-ok( isinstructor($c[0],$iemail), "$iemail is an instructor for mfe" );
-ok( userenroll($c[0], $s1email), "enrolled $s1email" );
-ok( userenroll($c[0], $s2email), "enrolled $s2email" );
-like(dies { userenroll($c[0], 'nooneyet@gmail.com') }, qr/no such user/, 'cannot enroll non-existing user nooone' );
+ok( isinstructor($course[0],$iemail), "$iemail is an instructor for mfe" );
+ok( userenroll($course[0], $s1email), "enrolled $s1email" );
+ok( userenroll($course[0], $s2email), "enrolled $s2email" );
+like(dies { userenroll($course[0], 'nooneyet@gmail.com') }, qr/no such user/, 'cannot enroll non-existing user nooone' );
 
 
 note '
@@ -113,16 +119,16 @@ my %ciosample = ( uniname => 'ucla', unicode => 'mfe237', coursesecret => 'judy'
 		  department => 'fin', subject => 'advanced corpfin', meetroom => 'B301', meettime => 'TR 2:00-3:30pm',
 		  domainlimit => 'ucla.edu', hellomsg => 'hi friends' );
 
-like(dies { ciosave($c[0], \%ciosample) }, qr/insufficient privileges/, 'student cannot write class info' );
+like(dies { ciosave($course[0], \%ciosample) }, qr/insufficient privileges/, 'student cannot write class info' );
 
-sudo($c[0], $iemail);  ## become the instructor
+sudo($course[0], $iemail);  ## become the instructor
 
 my $w= testmodhash(\%ciosample, 'coursesecret', '&^SD');
 
-like(dies { ciosave($c[0], testmodhash(\%ciosample, 'coursesecret', '&^SD')) }, qr/regex/, 'fail on regex for coursesecret' );
+like(dies { ciosave($course[0], testmodhash(\%ciosample, 'coursesecret', '&^SD')) }, qr/regex/, 'fail on regex for coursesecret' );
 
-ok( ciosave($c[0], \%ciosample), 'instructor writes sample cio sample' );
-ok( my $icio=cioread($c[0]), 'reread cio' );
+ok( ciosave($course[0], \%ciosample), 'instructor writes sample cio sample' );
+ok( my $icio=cioread($course[0]), 'reread cio' );
 ok( _checkvalidagainstschema( $icio, 'c' ), 'is the reread ciodata still valid?' );
 
 ## buttons
@@ -132,58 +138,58 @@ push(@buttonlist, ['http://ivo-welch.info', 'iaw-web', 'go back to root']);
 push(@buttonlist, ['http://gmail.com', 'gmail', 'send email']);
 push(@buttonlist, ['http://book.ivo-welch.info', 'book', 'read book']);
 
-ciobuttonsave( $c[0], \@buttonlist );
+ciobuttonsave( $course[0], \@buttonlist );
 
-ok( ciobuttons($c[0])->[2]->[1] eq 'book', 'ok, book stored right!' );
-ok( ciobuttons($c[0])->[1]->[1] eq 'gmail', 'ok, gmail stored right!' );
+ok( ciobuttons($course[0])->[2]->[1] eq 'book', 'ok, book stored right!' );
+ok( ciobuttons($course[0])->[1]->[1] eq 'gmail', 'ok, gmail stored right!' );
 
 note '
 ################ messaging system
 ';
 
-ok( msgsave($c[0], { subject => 'first msg', body => 'the first message contains nothing', priority => 5 }, 1233), 'posting 1233' );
-ok( msgsave($c[0], { subject => 'second msg', body => 'die zweite auch nichts', priority => 3 }, 1234), 'posting 1234' );
-ok( msgsave($c[0], { subject => 'third msg', body => 'tres nada nada nada', priority => 3 }, 1235), 'posting 1235');
-ok( msgsave($c[0], { subject => 'fourth msg', body => 'ze meiyou meiyou meiyou', priority => 3 }, 1236), 'posting 1236');
-ok( msgsave($c[0], { subject => 'to be killed', body => 'please die', priority => 3 }, 999), 'posting 999');
+ok( msgsave($course[0], { subject => 'first msg', body => 'the first message contains nothing', priority => 5 }, 1233), 'posting 1233' );
+ok( msgsave($course[0], { subject => 'second msg', body => 'die zweite auch nichts', priority => 3 }, 1234), 'posting 1234' );
+ok( msgsave($course[0], { subject => 'third msg', body => 'tres nada nada nada', priority => 3 }, 1235), 'posting 1235');
+ok( msgsave($course[0], { subject => 'fourth msg', body => 'ze meiyou meiyou meiyou', priority => 3 }, 1236), 'posting 1236');
+ok( msgsave($course[0], { subject => 'to be killed', body => 'please die', priority => 3 }, 999), 'posting 999');
 
-ok( msgmarkasread($c[0],$iemail, 1235), 'marking 1235 as read by alice');
+ok( msgmarkasread($course[0],$iemail, 1235), 'marking 1235 as read by alice');
 
-my $msglistnotread= _msglistnotread($c[0],$iemail);
+my $msglistnotread= _msglistnotread($course[0],$iemail);
 ok( scalar @{$msglistnotread} == 4, 'correct n=4 messages unread');
-ok( msgdelete($c[0], 999), 'destroying 999');
-$msglistnotread= _msglistnotread($c[0],$iemail);
+ok( msgdelete($course[0], 999), 'destroying 999');
+$msglistnotread= _msglistnotread($course[0],$iemail);
 ok( scalar @{$msglistnotread} == 3, 'correct n=3 messages unread');
 ok( join(" ",@$msglistnotread) eq join(" ", (1233, 1234, 1236)), 'returned correct list of unread' );
-like( (msgread( $c[0], 1235 ))->[0]->{body}, qr/nada nada nada/, 'read 1235 again' );
+like( (msgread( $course[0], 1235 ))->[0]->{body}, qr/nada nada nada/, 'read 1235 again' );
 
-like( (msgshownotread( $c[0], $iemail ))->[0]->{body}, qr/the first message contains nothing/, 'reading message ok' );
+like( (msgshownotread( $course[0], $iemail ))->[0]->{body}, qr/the first message contains nothing/, 'reading message ok' );
 
 note '
 ################ file storage and retrieval system
 ';
 
-ok( filewrite($c[0], $iemail, 'hw1.txt', "please do the first homework\n"), 'writing hw1.txt');
-ok( filewrite($c[0], $iemail, 'hw2.txt', "please do the second homework.  it is longer.\n"), 'writing hw2.txt');
+ok( filewrite($course[0], $iemail, 'hw1.txt', "please do the first homework\n"), 'writing hw1.txt');
+ok( filewrite($course[0], $iemail, 'hw2.txt', "please do the second homework.  it is longer.\n"), 'writing hw2.txt');
 my $e2n= "2medium.equiz"; ok( -e $e2n, "have test for 2medium.equiz for use in Model subdir" );
-ok( filewrite($c[0], $iemail, $e2n, scalar slurp($e2n)), 'writing $e2n' );
-ok( filewrite($c[0], $iemail, 'syllabus.txt', "<h2>please read this syllabus</h2>\n"), 'writing syllabus.txt' );
-ok( filewrite($c[0], $iemail, 'other.txt', "please do this syllabus\n"), 'writing other.txt' );
+ok( filewrite($course[0], $iemail, $e2n, scalar slurp($e2n)), 'writing $e2n' );
+ok( filewrite($course[0], $iemail, 'syllabus.txt', "<h2>please read this syllabus</h2>\n"), 'writing syllabus.txt' );
+ok( filewrite($course[0], $iemail, 'other.txt', "please do this syllabus\n"), 'writing other.txt' );
 
 ####
-like( dies { filesetdue($c[0], 'hw0.txt', time()+100); }, qr/ does not exist/, 'cannot publish non-existing file' );
+like( dies { filesetdue($course[0], 'hw0.txt', time()+100); }, qr/ does not exist/, 'cannot publish non-existing file' );
 
-ok( filesetdue($c[0], 'hw1.txt', time()+10000), 'published hw1.txt');
-ok( filesetdue($c[0], 'other.txt', time()+10000), 'published other.txt' );
-ok( filesetdue($c[0], 'syllabus.txt', time()+10000), 'published syllabus.txt' );
-ok( filesetdue($c[0], 'other.txt', time()-10000), 'unpublished other.txt' );
-ok( filesetdue($c[0], 'other.txt', time()-10000), 'harmless unpublished again' );
-ok( filesetdue($c[0], 'hw2.txt', time()-100), "unpublished hw2 by setting expiry to be behind us" );
+ok( filesetdue($course[0], 'hw1.txt', time()+10000), 'published hw1.txt');
+ok( filesetdue($course[0], 'other.txt', time()+10000), 'published other.txt' );
+ok( filesetdue($course[0], 'syllabus.txt', time()+10000), 'published syllabus.txt' );
+ok( filesetdue($course[0], 'other.txt', time()-10000), 'unpublished other.txt' );
+ok( filesetdue($course[0], 'other.txt', time()-10000), 'harmless unpublished again' );
+ok( filesetdue($course[0], 'hw2.txt', time()-100), "unpublished hw2 by setting expiry to be behind us" );
 
-my $npub= arrlen(ifilelistall($c[0], $iemail));
+my $npub= arrlen(ifilelistall($course[0], $iemail));
 ok( $npub == 5, "instructor has 5 files" );
 
-my $publicstruct=sfilelistall($c[0], $iemail);
+my $publicstruct=sfilelistall($course[0], $iemail);
 $npub= arrlen($publicstruct);
 ok( $npub == 2, "student should see 2 published files (hw1, syllabus) not $npub" );
 
@@ -193,65 +199,65 @@ ok( $publicstring =~ m{hw1\.txt}, "published contains hw1.txt 1" );
 ok( $publicstring !~ m{other.txt}, "published still contains other.txt 1" );
 ok( $publicstring =~ m{syllabus\.txt}, "we had not published hw2.txt! 1" );
 
-ok( sfileread( $c[0], 'hw1.txt'), "student can read hw1.txt 2" );
-ok( sfileread( $c[0], 'syllabus.txt'), "student can read syllabus.txt 2" );
-like( dies { sfileread( $c[0], 'other.txt') }, qr/no public file/, "student cannnot read unpublished other.txt" );
-like( dies { sfileread( $c[0], 'blahother.txt') }, qr/no public file/, "student cannot read unexisting file" );
+ok( sfileread( $course[0], 'hw1.txt'), "student can read hw1.txt 2" );
+ok( sfileread( $course[0], 'syllabus.txt'), "student can read syllabus.txt 2" );
+like( dies { sfileread( $course[0], 'other.txt') }, qr/no public file/, "student cannnot read unpublished other.txt" );
+like( dies { sfileread( $course[0], 'blahother.txt') }, qr/no public file/, "student cannot read unexisting file" );
 
-ok( filesetdue($c[0], 'other.txt', time()-100), "unpublish 'other.txt' by setdue ");
-ok( filesetdue($c[0], 'hw1.txt', time()+1000), "publish 'hw1.txt' by setdue ");
+ok( filesetdue($course[0], 'other.txt', time()-100), "unpublish 'other.txt' by setdue ");
+ok( filesetdue($course[0], 'hw1.txt', time()+1000), "publish 'hw1.txt' by setdue ");
 
 ## now we do student responses to homeworks
 
 _suundo();
 
-ok( !defined(sownfilelist( $c[0], $s2email )), "you have not yet uploaded hw1" );
-like(dies { sownfileread( $c[0], $s2email, 'hw1.txt' ) }, qr/uploaded/, "charlie cannot read a student submission he has not yet uploaded" );
-like(dies { filewrite($c[0], $s2email, 'hwneanswer.txt', "I have done hwne text\n", 'hwne.txt') },
+ok( !defined(sownfilelist( $course[0], $s2email )), "you have not yet uploaded hw1" );
+like(dies { sownfileread( $course[0], $s2email, 'hw1.txt' ) }, qr/uploaded/, "charlie cannot read a student submission he has not yet uploaded" );
+like(dies { filewrite($course[0], $s2email, 'hwneanswer.txt', "I have done hwne text\n", 'hwne.txt') },
      qr/not collecting/, 'charlie cannot answer nonexisting hw hwne.txt');
 
-ok( filewrite($c[0], $s2email, 'hw1answer.txt', "I have done hw1 text\n", 'hw1.txt'), 'charlie answered hw1.txt');
-my $ownfiles= join(" ", @{sownfilelist( $c[0], $s2email )});
+ok( filewrite($course[0], $s2email, 'hw1answer.txt', "I have done hw1 text\n", 'hw1.txt'), 'charlie answered hw1.txt');
+my $ownfiles= join(" ", @{sownfilelist( $course[0], $s2email )});
 ok( $ownfiles =~ /hw1/, "you have now uploaded hw1" );
 ok( $ownfiles !~ /hw3/, "you had not uploaded hw3" );
 
-sudo($c[0], $iemail);  ## become the instructor
+sudo($course[0], $iemail);  ## become the instructor
 
-ok( collectstudentanswers($c[0], 'hw1.txt') =~ /zip/, "collected properly submitted hw1 answer for charlie" );
+ok( collectstudentanswers($course[0], 'hw1.txt') =~ /zip/, "collected properly submitted hw1 answer for charlie" );
 
 note '
 ################ grade center
 ';
 
-ok( dies { gradeadd($c[0], $s2email, 'hw1', 'fail' ) }, "no hw1 yet registered for new grades");
-ok( gradetaskadd($c[0], qw(hw1 hw2 hw3 midterm)), "hw1, hw2 hw3 midterm all allowed now" );
+ok( dies { gradeadd($course[0], $s2email, 'hw1', 'fail' ) }, "no hw1 yet registered for new grades");
+ok( gradetaskadd($course[0], qw(hw1 hw2 hw3 midterm)), "hw1, hw2 hw3 midterm all allowed now" );
 
-ok( gradesave($c[0], $s2email, 'hw2', 'c-' ), "grade hw2 for charlie");
-ok( gradesave($c[0], $s2email, 'hw3', 'pass' ), "grade hw1 for charlie");
-ok( gradesave($c[0], $s2email, 'hw1', 'pass' ), "grade hw1 for charlie changed");
+ok( gradesave($course[0], $s2email, 'hw2', 'c-' ), "grade hw2 for charlie");
+ok( gradesave($course[0], $s2email, 'hw3', 'pass' ), "grade hw1 for charlie");
+ok( gradesave($course[0], $s2email, 'hw1', 'pass' ), "grade hw1 for charlie changed");
 
-ok( gradesave($c[0], $s1email, 'hw1', 'pass' ), "grade hw1 for bob fail");
-ok( gradesave($c[0], $s1email, 'hw2', 'a-' ), "grade hw2 for bob a-");
-ok( gradesave($c[0], $s1email, 'midterm', 'pass' ), "grade midterm for bob");
+ok( gradesave($course[0], $s1email, 'hw1', 'pass' ), "grade hw1 for bob fail");
+ok( gradesave($course[0], $s1email, 'hw2', 'a-' ), "grade hw2 for bob a-");
+ok( gradesave($course[0], $s1email, 'midterm', 'pass' ), "grade midterm for bob");
 
-ok( dies { gradesave($c[0], 'noone12312@gmail.com', 'midterm', 'pass' ) }, "grade midterm for none12312");
+ok( dies { gradesave($course[0], 'noone12312@gmail.com', 'midterm', 'pass' ) }, "grade midterm for none12312");
 ok( dies { gradesave('mfe2', $s2email, 'test5', 'midterm' ) }, "grade midterm for wrong course");
 
-ok( gradetaskadd($c[0], qw(hw5)), "hw5 is now allowed now" );
-ok( gradesave($c[0], $iemail, "hw5", " 1/3 "), "added grade alice for hw5");
-ok( gradesave($c[0], $s2email, "hw5", " 2/3 "), "added grade charlie for hw5");
+ok( gradetaskadd($course[0], qw(hw5)), "hw5 is now allowed now" );
+ok( gradesave($course[0], $iemail, "hw5", " 1/3 "), "added grade alice for hw5");
+ok( gradesave($course[0], $s2email, "hw5", " 2/3 "), "added grade charlie for hw5");
 
 my $gah;
 my @students;
 
-$gah=gradesashash( $c[0] );  ## instructor call
+$gah=gradesashash( $course[0] );  ## instructor call
 @students= @{$gah->{uemail}};
 ok( $#students==2, "you have three students, $#students: ".join("|", @students) );
 
 ok( $gah->{grade}->{$s1email}->{midterm} eq 'pass', "Sorry, but bob should have passed the midterm, not ".$gah->{grade}->{$s1email}->{midterm});
 ok( !defined($gah->{grade}->{$s1email}->{eq1}), "Good. bob has no eq1 grade" );
 
-$gah=gradesashash( $c[0], $s2email );
+$gah=gradesashash( $course[0], $s2email );
 @students= $gah->{uemail};
 ok( $#students==0, "Sorry, but charlie should have been only one student.  you have ".join("|", @students) );
 ok( $gah->{grade}->{$s2email}->{hw2} eq 'c-', "good.  charlie got a c-" );
@@ -263,14 +269,14 @@ note '
 ################ backup
 ';
 
-ok( (sitebackup( $c[0] ) =~ /mfe.*zip/), "sitebackup worked" );
-#ok( (sitebackup( $c[0] ) =~ /mfe.*zip/), "second long backup worked" );  should be the same and not contain a zip file
+ok( (sitebackup( $course[0] ) =~ /mfe.*zip/), "sitebackup worked" );
+#ok( (sitebackup( $course[0] ) =~ /mfe.*zip/), "second long backup worked" );  should be the same and not contain a zip file
 
 done_testing();
 
-print "\n################ website structure now\n"._websiteshow($c[0])."\n";
+print "\n################ website structure now\n"._websiteshow($course[0])."\n";
 
-# my $g= gradesashash( $c[0], $iemail ); print "glist for instructor: ".(Dumper $g);
+# my $g= gradesashash( $course[0], $iemail ); print "glist for instructor: ".(Dumper $g);
 
 sub tziserver {
   my $off_h=1;

@@ -8,12 +8,12 @@ use SylSpace::Model::Model qw(seclog student2instructor);
 use SylSpace::Model::Controller qw(global_redirect standard global_redirectmsg unobscure);
 
 ################################################################
-
+##
 ## this is a bit tricky.  on localhost, all sorts of browser cookie
 ## transfers fail.  thus, iff we are on localhost, we accept the query
 ## passed parameter.
 ##
-## 
+##
 
 get '/enter' => sub {
   my $c = shift;
@@ -22,7 +22,7 @@ get '/enter' => sub {
   my $timesincepostrequest= (time() - $posttime);
   #($timesincepostrequest<30) or die "Sorry, goclass entry requests always expire after 30 seconds (not $timesincepostrequest).\n";
 
-  if ($ENV{'ONLOCALHOST'}) {
+  if ($ENV{'SYLSPACE_onlocalhost'}) {
     ## do not yet check our site or email yet.  first transfer in our email.
     (defined($c->req->query_params->param("e"))) or die "need an e argument with secret info!\n";
     use Email::Valid;

@@ -5,7 +5,7 @@ use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
 use SylSpace::Model::Model qw(isenrolled isinstructor _suundo);
-use SylSpace::Model::Controller qw(global_redirect standard domain);
+use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
 ## a redirector for instructors and students (not for auth!!)
@@ -18,8 +18,10 @@ my $torealhome = sub {
 
   ($course eq "auth") and return $c->redirect_to('/auth/index');
 
+  my $curdomainport= $c->req->url->to_abs->domainport;
+
   (isenrolled( $course, $c->session->{uemail} ))
-    or return $c->flash(message => 'we do not know who you are, so you need to authenticate')->redirect_to('http://auth'.domain($c).'/index');
+    or return $c->flash(message => 'who are you?  please authenticate')->redirect_to("http://auth.$curdomainport/index");
 
   _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
 
@@ -54,9 +56,9 @@ __DATA__
 
   <h2> Security? </h2>
 
-  <p>The source code for SylSpace, running on this <%= $ENV{'sitename'} %> site, is public on <a href="https://github.com/iwelch/syllabus.space">github</a>, so it is not a security breach if you learn details about where the error has occurred (or a little more information why).</p>
+  <p>The source code for SylSpace, running on this <%= $ENV{'SYLSPACE_sitename'} %> site, is public on <a href="https://github.com/iwelch/syllabus.space">github</a>, so it is not a security breach if you learn details about where the error has occurred (or a little more information why).</p>
 
-  <p>However, if you notice a compromise of internal data that you should not have seen, or if you discover an exploitable security breach, please contact <a href="mailto:ivo.welch@gmail.com?subject=security breach on <%= $ENV{'sitename'} %>">ivo welch</a> urgently.</p>
+  <p>However, if you notice a compromise of internal data that you should not have seen, or if you discover an exploitable security breach, please contact <a href="mailto:ivo.welch@gmail.com?subject=security breach on <%= $ENV{'SYLSPACE_sitename'} %>">ivo welch</a> urgently.</p>
 
   </main>
 

@@ -16,7 +16,7 @@ get '/student/faq' => sub {
   my $isfaq= fileread( $course, $c->session->{uemail}, 'faq' ) || "<p>the instructor has not added her own faq</p>\n" ;
 
   use Perl6::Slurp;
-  my $body= slurp("$ENV{'sitepath'}/public/html/faq.html");
+  my $body= slurp("$ENV{'SYLSPACE_sitepath'}/public/html/faq.html");
   my $code= (length($body)<=1) ? 404 : 200;
 
 #  my $allfaq = $c->ua->get("/html/faq.html");

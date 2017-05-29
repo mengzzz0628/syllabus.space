@@ -11,6 +11,7 @@ use SylSpace::Model::Controller qw(standard global_redirect);
 
 post '/equizgrade' => sub {
   my $c = shift;
+
   (my $course = standard( $c )) or return global_redirect($c);
 
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');

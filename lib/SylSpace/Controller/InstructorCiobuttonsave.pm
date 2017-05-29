@@ -17,13 +17,13 @@ get '/instructor/ciobuttonsave' => sub {
 
   my @buttonlist;
   foreach my $i (0..9) {
-    my $url= $c->req->query_params->param("url$i");
+    my $buttonurl= $c->req->query_params->param("url$i");
     my $titlein= $c->req->query_params->param("titlein$i");
     my $textin= $c->req->query_params->param("textin$i");
 
-    ($url =~ /^http/i) or next;
+    ($buttonurl =~ /^http/i) or next;
     ($titlein) or next;
-    push(@buttonlist, [ $url, $titlein, $textin ])
+    push(@buttonlist, [ $buttonurl, $titlein, $textin ])
   }
 
   ciobuttonsave( $course, \@buttonlist ) or return global_redirect($c);

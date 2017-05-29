@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Controller qw(domain);
+use SylSpace::Model::Controller qw();
 
 use SylSpace::Model::Model qw(_listallusers);  ## for testsites
 
@@ -15,7 +15,15 @@ use SylSpace::Model::Model qw(_listallusers);  ## for testsites
 get '/auth/test' => sub {
   my $c = shift;
 
-  ($c->req->url->to_abs->host() =~ m{auth\.\w}) or $c->redirect_to('http://auth.'.domain($c).'/auth');  ## wipe off anything beyond on url
+  use Class::Inspector;
+  use Data::Dumper;
+
+  ### my @methods =   Class::Inspector->methods( 'Mojo::URL', 'full', 'public' );
+  ###die Dumper \@methods . " ". Dumper $c->req->url->to_abs;
+
+  my $cururl= $c->req->url->to_abs;
+  ($cururl->subdomain =~ /auth/)
+    or $c->redirect_to('http://auth.'.$cururl->domainport.'/auth');  ## wipe off anything beyond on url
 
   $c->render( template => 'authtest', email => $c->session->{uemail}, allusers => _listallusers() );
 };
@@ -28,7 +36,7 @@ __DATA__
 
 @@ authtest.html.ep
 
-<% use SylSpace::Model::Controller qw(domain btnblock btn); %>
+<% use SylSpace::Model::Controller qw(btnblock btn); %>
 
 
 %title 'short-circuit identity';
@@ -61,7 +69,7 @@ __DATA__
 <% sub makelist {
   my $l= shift;
   my $rs;
-  my @ulist= ($ENV{'ONLOCALHOST'}) ? @$l : qw( ivo.welch@gmail.com instructor@gmail.com student@gmail.com );
+  my @ulist= ($ENV{'SYLSPACE_onlocalhost'}) ? @$l : qw( ivo.welch@gmail.com instructor@gmail.com student@gmail.com );
   foreach (@ulist) { $rs .="<li> <a href=\"/login?email=$_\">Make yourself $_</a> </li>\n"; }
   return $rs;
 } %>

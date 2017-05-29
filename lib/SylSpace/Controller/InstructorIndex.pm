@@ -17,7 +17,10 @@ my $ihm= sub {
 
   sudo( $course, $c->session->{uemail} );
 
-  (bioiscomplete($c->session->{uemail})) or $c->flash( message => 'You first need to complete your bio!' )->redirect_to('http://auth.'.domain($c).'/usettings');
+  my $curdomainport= $c->req->url->to_abs->domainport;
+
+  (bioiscomplete($c->session->{uemail}))
+    or $c->flash( message => 'You first need to complete your bio!' )->redirect_to("http://auth.$curdomainport/usettings");
 
   (cioiscomplete($course)) or $c->flash( message => 'You first need to complete the course settings!' )->redirect_to('/instructor/csettings');
 

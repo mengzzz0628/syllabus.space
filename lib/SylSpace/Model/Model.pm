@@ -29,7 +29,7 @@ our @EXPORT_OK=qw(
 
  tweet showtweets showlasttweet seclog showseclog superseclog
 
- renderequiz equizgrade equizanswerrender
+ equizrender equizgrade equizanswerrender
 );
 
 our @EXPORT_DEBUG= qw(_msglistnotread _suundo _websitemake _websiteshow _webcourseremove _storegradeequiz _listallusers _checkvalidagainstschema);
@@ -87,7 +87,9 @@ my $var="/var/sylspace";  ## this should be hardcoded and unchanging
 				security.log <- obvious
 				...enrolled user emails...
 
-  instructors are identified by having a file in their subdomain user directory that says instructor=1
+  instructors are identified by having a file in their subdomain user directory that says instructor=1.  An instructor
+  has an instructor directory, which is used to store files as an instructor (and publish them), and a directory as
+  a user, which is used when the instructor has morphed into a student and/or to store the bio, etc.
 
 =head1 Versions
 
@@ -1196,7 +1198,7 @@ sub showseclog( $course ) {
 
 ################################################################
 
-sub renderequiz( $course, $email, $equizname, $callbackurl ) {
+sub equizrender( $course, $email, $equizname, $callbackurl ) {
   (defined($equizname)) or die "need a filename for equizmore.\n";
   my $equizcontent= fileread( $course, 'instructor', $equizname );  ## quizzes always belong to the instructor
   my $fullequizname= fullfilename( $course, 'instructor', $equizname );
@@ -1261,21 +1263,23 @@ sub equizgrade( $course, $uemail, $posttextashash ) {
 
   my $i=0; my $score=0; my @qlist;
   while (++$i) {
-    sub isanum { return ($_[0] =~ /^\s*[0-9\.]+\s*/); }
+    use Scalar::Util qw(looks_like_number);
+
     my $ia= $posttextashash->{"S-$i"};
     (defined($ia)) or last;
-    (isanum($ia)) or
+    (looks_like_number($ia)) or
       die "sorry, but instructor answer S-$i is not numeric, but '$ia'";
     my $sa= $posttextashash->{"q-stdnt-$i"};
     (defined($sa)) or die "there is no student answer field for $i";
-    (isanum($sa)) or die "sorry, but student answer q-stdnt-$i is not numeric, but '$ia'";
+    (looks_like_number($sa)) or die "sorry, but student answer q-stdnt-$i is not numeric, but '$ia'";
     my $answerdelta= abs($sa - $ia);
     my $precision= ($posttextashash->{"P-$i"})||0.01;
 
     ## the actual grading:
     $posttextashash->{'iscorrect'}= ($answerdelta < $precision);
     $score += $posttextashash->{'iscorrect'};
-    push( @qlist, [ $posttextashash->{"N-$i"}, $posttextashash->{"Q-$i"}, $posttextashash->{"A-$i"}, $ia, $sa, $precision, $posttextashash->{'iscorrect'}?"Correct":"Incorrect" ])
+    push( @qlist, [ $posttextashash->{"N-$i"}, $posttextashash->{"Q-$i"}, $posttextashash->{"A-$i"}, $ia, $sa, $precision,
+		    $posttextashash->{'iscorrect'}?"Correct <i class=\"fa fa-check fa-2x\" style=\"color:green\"></i>":"Incorrect <i class=\"fa fa-close fa-2x\" style=\"color:red\"></i>" ])
   }
   --$i;
 
@@ -1341,7 +1345,6 @@ sub equizanswerrender( $decodedarray ) {
       p.qstnscore::before {  content: "Counted As: "; font-weight: bold;  }
     </style>
     ';
-
 
   foreach (@{$detail}) {
     my $precision= $_[5] || "0.01";

@@ -23,7 +23,6 @@ get '/instructor/equizcenter' => sub {
 
   $c->stash(
 	    filelist => ifilelistall($course, $c->session->{uemail}, "*equiz"),
-	    subdomain => $course,
 	    templatelist => listtemplates(),
 	    tzi => tzi( $c->session->{uemail} ) );
 };

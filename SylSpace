@@ -6,19 +6,30 @@ plugin 'Mojolyst' => {controllers => 'SylSpace::Controller'};
 plugin 'RenderFile';
 plugin 'browser_detect';
 
-use FindBin;
-## the full executable is in $ENV{MOJO_EXE} or in $ENV{'sitepath'}/$0;
-
 use Data::Dumper;
 
-$ENV{'sitename'}= "syllabus.space";  ## could be deduced from $ENV{HOSTNAME} =~ s/-/\./;
-$ENV{'sitepath'}= $FindBin::Bin;
+## MOJO_REUSE = syllabus.test:3000:5
+(defined($ENV{MOJO_REUSE})) or die "weird running environment without MOJO_REUSE";
+## $0 = MOJO_EXE = /Users/ivo/syllabus.space/syllabus.space/SylSpace
+(defined($ENV{MOJO_EXE})) or die "weird running environment without MOJO_EXE";
 
-$ENV{'siteacolor'}='AntiqueWhite'; $ENV{'jumboacolor'}='darkgreen';
-$ENV{'siteicolor'}=$ENV{'sitescolor'}='white';
-$ENV{'jumboscolor'}='darkblue';
-$ENV{'jumboicolor'}='darkred';
+use FindBin;
+use Socket;
 
+$ENV{SYLSPACE_sitepath}= $FindBin::Bin;  ## /Users/ivo/syllabus.space/syllabus.space/
+
+($ENV{SYLSPACE_appname}= $0) =~ s{.*/}{};  ## SylSpace
+($ENV{SYLSPACE_sitename}= $ENV{MOJO_REUSE}) =~ s/:.*//g;  ## syllabus.test
+($ENV{SYLSPACE_sitename} eq 'localhost') and die "\n\nlocalhost is deprecated.  use syllabus.test instead.\n";
+$ENV{SYLSPACE_siteip}= inet_ntoa(inet_aton($ENV{SYLSPACE_sitename}));  ## 127.0.0.1
+$ENV{SYLSPACE_onlocalhost}= ($ENV{SYLSPACE_siteip} eq '127.0.0.1');
+
+
+################
+
+$ENV{SYLSPACE_siteacolor}='AntiqueWhite'; $ENV{SYLSPACE_jumboacolor}='darkgreen';
+$ENV{SYLSPACE_siteicolor}=$ENV{SYLSPACE_sitescolor}='white';
+$ENV{SYLSPACE_jumboscolor}='darkblue'; $ENV{SYLSPACE_jumboicolor}='darkred';
 
 ################################################################################################################################
 ## unfortunately, you have to be connected to the correct diretory; I think Mojolyst does not work otherwise
@@ -26,11 +37,11 @@ $ENV{'jumboicolor'}='darkred';
 
 {
   (my $pgmname= $0) =~ s{.*/}{};  ## usually SylSpace
-  my $configfile="$ENV{'sitepath'}/$pgmname.conf";
+  my $configfile="$ENV{SYLSPACE_sitepath}/$pgmname.conf";
 
   (-e $configfile) or die "\nFATAL: no authentication secrets config file '$configfile'\n";
   (-l $configfile) or die "\nFATAL: authentication secrets config file '$configfile' is in the github'ed  directory, not a link!\n";
-  print "[Authentication secrets are symlink to ".readlink("$ENV{'sitepath'}/$pgmname.conf")."]\n";
+  print STDERR "\n$0: good: authentication secrets are symlink to ".readlink("$ENV{SYLSPACE_sitepath}/$pgmname.conf")."\n";
 
   plugin 'Config';
 
@@ -74,32 +85,30 @@ $ENV{'jumboicolor'}='darkred';
 }
 
 ################################################################################################################################
-## http://user.course.$ENV{'sitename'} -> $ENV{'sitename'}
+## http://user.course.$ENV{SYLSPACE_sitename} -> $ENV{SYLSPACE_sitename}
 ## http://$ENV{'sitename'} -> $ENV{'sitename'}
-*Mojo::URL::domain = sub {
-  my $self= shift;
-  my $fulldomain= $self->to_abs->host;
-  (defined($fulldomain)) or die "internal error trying to decode domain, ".Dumper $self->to_abs;
 
-  ($fulldomain =~ /localhost/) and return "localhost:3000";
-  $fulldomain =~ s{^http.*[^/]*/}{};
+*Mojo::URL::domainonly = sub {
+  return $ENV{SYLSPACE_sitename};
+};
 
-  my @f= split(/\./, $fulldomain);
-  (@f) or return;  ## should never happen, so this is an error return
-  return $f[$#f-1].'.'.$f[$#f];  ## the last two: TLD and Domain
+*Mojo::URL::domainport = sub {
+  my $port= shift->port;
+  defined($ENV{SYLSPACE_sitename}) or die "internal error: no site";
+  (defined($port)) or return $ENV{SYLSPACE_sitename};
+  return $ENV{SYLSPACE_sitename}.':$port';
 };
 
 
-## http://user.course.$ENV{'sitename'} -> user.course
-## http://$ENV{'sitename'} -> undef
+## http://user.course.$ENV{SYLSPACE_sitename} -> user.course
+## http://$ENV{SYLSPACE_sitename} -> undef
 *Mojo::URL::subdomain = sub {
-  my $self= shift;
-  my $fulldomain= $self->to_abs->host;
-  $fulldomain =~ s{^http.*[^/]*/}{};
-
+  my $crequrl= shift;
+  my $fulldomain= $crequrl->to_abs->host;
+  ($fulldomain =~ /(.*)\.localhost$/) and return $1;
   my @f= split(/\./, $fulldomain);
   (@f) or return '';  ## never
-  (pop(@f) ne "localhost") and pop(@f);  ## hehe --- pop again
+  pop(@f); pop(@f);   ## (pop(@f) =~ /localhost$/) or pop(@f);  ## hehe --- pop again
   ($#f>=0) or return '';
   return join('.', @f);
 };
@@ -109,25 +118,13 @@ $ENV{'jumboicolor'}='darkred';
 use Perl6::Slurp;
 my @pwsecret=slurp('/var/sylspace/secrets.txt');
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
+app->config(hypnotoad => { listen => ['http://'.$ENV{'SYLSPACE_sitename'}.':80'] }); ## hypnotoad is serious and never on localhost
 
-if (defined($ENV{'HYPNOTOAD_EXE'})) {
-  $ENV{'ONLOCALHOST'}=0;
-  app->config(hypnotoad => {listen => ['http://'.$ENV{'sitename'}.':80']});
-} elsif (($ENV{TEST2_ACTIVE})&&(!defined($ENV{'MOJO_REUSE'}))) {
-  ## not really working.  just a start.
-  ($ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'}) =~ /^[0-9]+\.0\.0\./)?1:0;
-} else {
-  (defined($ENV{'MOJO_REUSE'})) or die "No ENV{MOJO_REUSE}: I do not know which Mserver is being used\n";
-  ($ENV{'ONLOCALHOST'} = ($ENV{'MOJO_REUSE'}) =~ /^[0-9]+\.0\.0\./)?1:0;
+if ($ENV{'SYLSPACE_onlocalhost'}) {
+  print STDERR "$0: *** localhost mode only --- logging out may not work correctly\n";
+  print STDERR "$0: *** CHROME cannot be used in localhostmode, because it resolves 127.0.0.1 differently\n";
 }
 
-if ($ENV{'ONLOCALHOST'}) {
-  warn "localhost mode only --- logging out does not work correctly\n";
-} else {
-  our $domain='.'.$ENV{'sitename'};
-  app->sessions->cookie_domain($domain);
-}
-
-print "$0: Starting App now\n";
+print STDERR "$0: Starting $ENV{SYLSPACE_appname} now on $ENV{MOJO_REUSE}\n";
 
 app->start();

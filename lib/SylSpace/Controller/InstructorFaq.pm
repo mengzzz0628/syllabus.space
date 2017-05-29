@@ -55,13 +55,13 @@ __DATA__
 
   <dl class="dl faq">
 
-  <dt>What is <i>not</i> intuitive using this website (SylSpace on <%= $ENV{'sitename'} %>)?  Have an idea to make it easier and better?  Found a dead link?</dt>
+  <dt>What is <i>not</i> intuitive using this website ($ENV{'SYLSPACE_appname'} on <%= $ENV{'SYLSPACE_sitename'} %>)?  Have an idea to make it easier and better?  Found a dead link?</dt>
 
-  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-<%= $ENV{'sitename'} %>">let me know</a>.  I cannot guarantee that I will follow it, but I will consider it.</dd>
+  <dd>Please <a href="mailto:ivo.welch@gmail.com?subject=unclear-<%= $ENV{'SYLSPACE_sitename'} %>">let me know</a>.  I cannot guarantee that I will follow it, but I will consider it.</dd>
 
-  <dt>What is SylSpace on <%= $ENV{'sitename'} %>?</dt>
+  <dt>What is $ENV{'SYLSPACE_appname'} on <%= $ENV{'SYLSPACE_sitename'} %>?</dt>
 
-  <dd>SylSpace is a third-generation web course management system, with an intentional focus on ease-of-use and simplicity.  The software is SylSpace, the main site designed to run it is <a href="http://syllabus.space">syllabus.space</a>.  (You are currently running it on <a href="<%= $ENV{'sitename'} %>"><%= $ENV{'sitename'} %></a> right now.)  There is almost no learning curve involved in using the system.
+  <dd>SylSpace is a third-generation web course management system, with an intentional focus on ease-of-use and simplicity.  The software is SylSpace, the main site designed to run it is <a href="http://syllabus.space">syllabus.space</a>.  (You are currently running it on <a href="<%= $ENV{'SYLSPACE_sitename'} %>"><%= $ENV{'SYLSPACE_sitename'} %></a> right now.)  There is almost no learning curve involved in using the system.
 
   <p style="padding-top:1em">Its most important functionalities are:
 <ul>
@@ -212,12 +212,12 @@ __DATA__
   <dt>Can I have multiple classes or accounts</dt>
 
   <dd>
-  <p>As for me, I prefer to name each class by its own subdomain, like
-  <pre>
- http://<b>mba230.welch</b>.syllabus.space<br />
- http://<b>mba230-14a.welch</b>.syllabus.space
-  </pre>
-  This way, I can have my one webbrowser access multiple class sites, too&mdash;each class is its own domain.</p>
+    <p>As for me, I prefer to name each class by its own subdomain, like
+      <pre>
+         http://<b>mba230.welch</b>.syllabus.space<br />
+         http://<b>mba230-14a.welch</b>.syllabus.space
+      </pre>
+     This way, I can have my one webbrowser access multiple class sites, too&mdash;each class is its own domain.</p>
   </dd>
 
   <dt>Can I get my logo onto the students web page instead of the equiz avatar?</dt>
