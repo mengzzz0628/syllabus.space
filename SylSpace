@@ -9,9 +9,15 @@ plugin 'browser_detect';
 use Data::Dumper;
 
 ## MOJO_REUSE = syllabus.test:3000:5
-(defined($ENV{MOJO_REUSE})) or die "weird running environment without MOJO_REUSE";
+if (($ENV{HYPNOTOAD_STOP})||($ENV{HYPNOTOAD_FOREGROUND})) {
+  ## only defined in foreground (defined($ENV{HOSTNAME})) or die "very weird running environment without HOSTNAME: ".(Dumper \%ENV);
+  ## ($ENV{HOSTNAME} eq 'syllabus-space') or die "please run hypnotoad only on the main server, syllabus-space\n";
+  $ENV{MOJO_REUSE}= 'syllabus.space';
+}
+
+(defined($ENV{MOJO_REUSE})) or die "very weird running environment without MOJO_REUSE: ".(Dumper \%ENV);
 ## $0 = MOJO_EXE = /Users/ivo/syllabus.space/syllabus.space/SylSpace
-(defined($ENV{MOJO_EXE})) or die "weird running environment without MOJO_EXE";
+(defined($ENV{MOJO_EXE})) or die "very weird running environment without MOJO_EXE";
 
 use FindBin;
 use Socket;
@@ -24,6 +30,7 @@ $ENV{SYLSPACE_sitepath}= $FindBin::Bin;  ## /Users/ivo/syllabus.space/syllabus.s
 $ENV{SYLSPACE_siteip}= inet_ntoa(inet_aton($ENV{SYLSPACE_sitename}));  ## 127.0.0.1
 $ENV{SYLSPACE_onlocalhost}= ($ENV{SYLSPACE_siteip} eq '127.0.0.1');
 
+(($ENV{SYLSPACE_onlocalhost}) && ($ENV{SYLSPACE_sitename} ne 'syllabus.test')) and die "please test only on syllabus.test";
 
 ################
 
@@ -126,5 +133,7 @@ if ($ENV{'SYLSPACE_onlocalhost'}) {
 }
 
 print STDERR "$0: Starting $ENV{SYLSPACE_appname} now on $ENV{MOJO_REUSE}\n";
+
+app->sessions->cookie_domain( '.'.$ENV{SYLSPACE_sitename} );
 
 app->start();

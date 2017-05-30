@@ -34,6 +34,8 @@ use Test2::Bundle::Extended;
 use Test2::Plugin::DieOnFail;
 use YAML::Tiny;
 
+use Class::Inspector;
+
 use Mojolicious::Lite;
 use Mojolicious::Plugin::RenderFile;
 use Mojolicious::Plugin::Mojolyst;

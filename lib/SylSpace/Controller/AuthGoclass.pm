@@ -120,7 +120,7 @@ sub coursebuttonsentry {
   foreach (sort @courselist) {
     $rs .= btnblock( "http://$_.$curdomainport/enter?e=".obscure( time().':'.$email.':'.$self->session->{expiration} ),
 		     '<i class="fa fa-circle"></i> '.$displaylist{$_},
-		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll on $_ '$curdomainport'",     ### $group{$_}." ".$freq{$_}||"N",
+		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll on $_ '$curdomainport'</a>",     ### $group{$_}." ".$freq{$_}||"N",
 		     'btn-default',
 		     'w' )."\n";
   }

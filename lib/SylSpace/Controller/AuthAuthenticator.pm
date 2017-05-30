@@ -74,7 +74,8 @@ __DATA__
 
 <main>
 
-<p> To learn more about this site, please visit the <a href="/aboutus">about us</a> page.</p>
+
+<p style="margin:1em"> To learn more about this site, please visit the <a href="/aboutus">about us</a> page.</p>
 
   <%== msghash2string( [{ msgid => 0, priority => 5, time => 1495672668, subject => 'Course Quizzes Wanted',
 			body => 'We are looking for equiz-suitable questions from finance and economics courses.  If you are an instructor who has written a non-copyright-ed set of suitable (short-form) questions and answers that you would like to share with students and colleagues, please contact <a href="mailto:ivo.welch@gmail.com?subject=share+quiz">ivo welch</a>.  If the material is suitable, we will take over the coding of your questions into syllabus.space equiz form and post them online for everyone to use (with attribution, of course).  The questions will have different inputs and answers each time a student refreshes the quiz, and thus will be more useful.'}] ) %>
@@ -86,6 +87,8 @@ __DATA__
   <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
      <p> Direct Authentication does not work on localhost. </p>
      <div style="background-color:black">
+  <% } else { %>
+     <p> We are on syllabus.space, not syllabus.test </p>
   <% } %>
 
   <p style="font-size:small;">Direct Authentication is the fastest and most reliable method to authenticate.</p>
@@ -93,9 +96,11 @@ __DATA__
    <div class="row text-center">
      <%== btnblock('/auth/google/authenticate', '<i class="fa fa-google"></i> Google', 'Your Gmail ID') %>
     <!-- <%== btnblock('/auth/github/authenticate', '<i class="fa fa-github"></i> Github', 'Your Github ID<br />Disabled Until Approved', 'btn-disabled') %> -->
-     <%== btnblock('/auth/facebook/authenticate', '<i class="fa fa-facebook"></i> Facebook', 'Your Facebook ID<br />Disabled Until Approved', 'btn-disabled') %>
+    <%== btnblock('/auth/facebook/authenticate', '<i class="fa fa-facebook"></i> Facebook', 'Your Facebook ID') %>
      <%== btnblock('/auth/ucla/authenticate', '<i class="fa fa-university"></i> UCLA', 'Your University ID<br />Disabled Until Approved', 'btn-disabled') %>
    </div>
+
+  <p>For gmail accounts, you must use Google to authenticate.  We will not accept Facebook or other authenticators.</p>
 
   <hr />
 
@@ -103,7 +108,7 @@ __DATA__
      </div>
   <% } %>
 
-  <p style="font-size:small;padding-top:1em;">Sendmail is slow, throttled per server (to avoid bot DDOS attacks on other servers), may take up to 10 minutes to arrive, and is only valid for 15 minutes&mdash;if you are lucky and no spam filter blocks it.</p>
+  <p style="font-size:small;padding-top:1em;">Sendmail is slow, throttled per server (to avoid bot DDOS attacks on other servers), may take up to 10 minutes to arrive, and is only valid for 15 minutes&mdash;if you are lucky and no spam filter blocks it, in which case you will have to debug where your IT department or you have blocked the email.  If possible, avoid it.</p>
 
   <form name="registration" method="post" action="/auth/sendmail/authenticate">
        <input style="display:none" class="form-control" value="no name" name="name" />
@@ -135,7 +140,7 @@ __DATA__
 
   </form>
 
-<p style="font-size:x-small"><a href="/auth/magic">magic</a> is only useful to the cli site admin</p>
+<p style="font-size:x-small;padding-top:1ex"><a href="/auth/magic">magic</a> is only useful to the cli site admin</p>
 
 </nav>
 
