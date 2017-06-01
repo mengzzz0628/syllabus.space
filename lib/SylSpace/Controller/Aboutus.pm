@@ -31,7 +31,7 @@ __DATA__
 
 <h2>Basics</h2>
 
-  <p>SylSpace is free course administration and equizzing software, written in <a href="http://mojolicious.org/">Mojolicious</a> (perl) and <a href="http://getbootstrap.com">Bootstrap</a> (with <a href="http://fontawesome.io/">fontawesome icons</a>) in early 2017 by Ivo Welch (<a href="ivo.welch@gmail.com">ivo.welch@gmail.com</a>).</p>
+  <p>SylSpace is free course administration and equizzing software, written in <a href="http://mojolicious.org/">Mojolicious</a> (perl) and <a href="http://getbootstrap.com">Bootstrap</a> (with <a href="http://fontawesome.io/">fontawesome icons</a>) in early 2017 by Ivo Welch (<a href="ivo.welch@gmail.com">ivo.welch@gmail.com</a>).  Special thanks to Sebastian Riedel for developing M and Stefan Adams for answering many questions on the M forum.</p>
 
 <h2>Features and Screenshots</h2>
 

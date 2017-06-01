@@ -40,6 +40,8 @@ __DATA__
 
   <%== enrollform( $asecret, $coursename ) %>
 
+  <p>Instructors can choose arbitrary registration numbers.</p>
+
 </main>
 
 

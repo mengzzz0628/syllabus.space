@@ -59,7 +59,7 @@ sub equizfilehash2string {
 
     (my $shortname = $_->[0]) =~ s/\.equiz$//;
     my $duein= timedelta($_->[1] , time());
-    $filestring .= btnblock("/renderequiz?f=".($_->[0]),
+    $filestring .= btnblock("/equizrender?f=".($_->[0]),
 			    '<h4><i class="fa fa-pencil"></i> '.$shortname.'</h4>',
 			    $duein."<br />".localtime($_->[1])."<br /><span style=\"font-size:x-small\">add last taken and score if available</span>");
   }
