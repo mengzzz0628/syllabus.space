@@ -44,9 +44,9 @@ my @course=qw (mfe.welch mba.welch ugrad.welch hs.welch mba.daniel year.course.i
 
 my $localhostline = `grep '^127.0.0.1' /etc/hosts`; my @missing;
 foreach ((@course, 'auth', '')) {
-  ($localhostline =~ /$_\.localhost\.test/) or push(@missing, $_);
+  ($localhostline =~ /$_\.syllabus\.test/) or push(@missing, $_);
 }
-(@missing) and die "\n\nplease add '".join(".localhost.test , ", @missing).".localhost.test to /etc/hosts to facilitate testing\n\n";
+(@missing) and die "\n\nplease add '".join(".syllabus.test , ", @missing).".localhost.test to /etc/hosts to facilitate testing\n\n";
 
 like(dies { _websitemake($course[0], 'impossibleemail-gmail.com') }, qr/email /, 'good fail on bad i email' );
 

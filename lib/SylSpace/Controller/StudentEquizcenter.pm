@@ -8,7 +8,7 @@ use feature ':5.20';
 use feature 'signatures';
 no warnings qw(experimental::signatures);
 
-use SylSpace::Model::Model qw(sfilelistall isenrolled);
+use SylSpace::Model::Model qw(sfilelistall isenrolled gradesashash);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -19,7 +19,9 @@ get '/student/equizcenter' => sub {
 
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  $c->stash( filelist => sfilelistall($course, $c->session->{uemail}, "*equiz") );
+  my $allgrades= gradesashash( $course, $c->session->{uemail} );  ## just my own grades!
+
+  $c->stash( filelist => sfilelistall($course, $c->session->{uemail}, "*equiz"), allgrades => $allgrades );
 };
 
 1;
@@ -39,7 +41,7 @@ __DATA__
 
  <nav>
    <div class="row top-buffer text-center">
-    <%== equizfilehash2string( $filelist ) %>
+    <%== equizfilehash2string( $self, $filelist, $allgrades ) %>
    </div>
  </nav>
 
@@ -47,9 +49,14 @@ __DATA__
 
 
 <%
+  use strict;
+
 sub equizfilehash2string {
+  my $self= shift;
   my $filehashptr= shift;
   (defined($filehashptr)) or return "";
+  my $allgrades= shift;
+
   my $filestring= '';
 
   my $counter=0;
@@ -59,9 +66,15 @@ sub equizfilehash2string {
 
     (my $shortname = $_->[0]) =~ s/\.equiz$//;
     my $duein= timedelta($_->[1] , time());
+
+    my $uemail=$self->session->{uemail};
+
+    my $lastgrade= $allgrades->{ grade }->{ $uemail } ->{ $_->[0] } || "no grade yet";
+    my $lastdate= $allgrades->{ epoch }->{ $uemail }->{ $_->[0] } || "no date";
+
     $filestring .= btnblock("/equizrender?f=".($_->[0]),
 			    '<h4><i class="fa fa-pencil"></i> '.$shortname.'</h4>',
-			    $duein."<br />".localtime($_->[1])."<br /><span style=\"font-size:x-small\">add last taken and score if available</span>");
+			    'due '.$duein."<br />".localtime($_->[1])."<br /><span style=\"font-size:x-small\">Last Taken: ".timedelta($lastdate).": Score $lastgrade</span>");
   }
   ($counter) or return "<p>no publicly posted equizzes at the moment</p>";
 

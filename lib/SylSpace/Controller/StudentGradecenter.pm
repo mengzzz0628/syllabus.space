@@ -17,9 +17,9 @@ get '/student/gradecenter' => sub {
 
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  my $all= gradesashash( $course, $c->session->{uemail} );  ## just my own grades!
+  my $allgrades= gradesashash( $course, $c->session->{uemail} );  ## just my own grades!
 
-  $c->stash( all => $all );
+  $c->stash( allgrades => $allgrades );
 };
 
 1;
@@ -39,9 +39,9 @@ __DATA__
 
   <%== mkdatatable('gradebrowser') %>
 
-  <% if (defined($all)) { %>
+  <% if (defined($allgrades)) { %>
   <table class="table" style="width: auto !important; margin:2em;" id="gradebrowser">
-     <%== showmygrades($all) %>
+     <%== showmygrades($allgrades) %>
   </table>
   <% } else { %>
       <p> No grade data posted just yet </p>
@@ -51,23 +51,23 @@ __DATA__
 
   <%
   sub showmygrades {
-    my $all= shift;
+    my $allgrades= shift;
     my $rs= "";
-    $rs.= "<caption> Student ".$all->{uemail}->[0]." </caption>
+    $rs.= "<caption> Student ".$allgrades->{uemail}->[0]." </caption>
            <thead> <tr> <th>Task</th> <th>Grade</th> </tr> </thead>\n";
 
     $rs .= "<tbody>\n";
-    foreach my $hw (@{$all->{hw}}) {
-      foreach my $st (@{$all->{uemail}}) {
+    foreach my $hw (@{$allgrades->{hw}}) {
+      foreach my $st (@{$allgrades->{uemail}}) {
 	$rs.= "<tr> <th> $hw </th> \n";
-	$rs.= "<td style=\"text-align:center\">".($all->{grade}->{$st}->{$hw}||"-")."</td>";
+	$rs.= "<td style=\"text-align:center\">".($allgrades->{grade}->{$st}->{$hw}||"-")."</td>";
       }
       $rs.= "</tr>\n";
     }
     $rs .= "</tbody>\n";
 
     #my $rr="<select name=\"task\" class=\"form-control\">";
-    #foreach (@{$all->{hw}}) { $rr .= qq(<option value="$_">$_</option>); }
+    #foreach (@{$allgrades->{hw}}) { $rr .= qq(<option value="$_">$_</option>); }
     ##$$rr .= "</select>\n";
     return $rs;
   }

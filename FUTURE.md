@@ -10,7 +10,6 @@ MEDIUM IMPORTANT
 
 * add more automatic tests, esp with respect to web controller
 
-* add last taken and score into the student equiz center
 
 LESS IMPORTANT
 
