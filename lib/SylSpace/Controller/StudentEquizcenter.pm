@@ -69,8 +69,8 @@ sub equizfilehash2string {
 
     my $uemail=$self->session->{uemail};
 
-    my $lastgrade= $allgrades->{ grade }->{ $uemail } ->{ $_->[0] } || "no grade yet";
-    my $lastdate= $allgrades->{ epoch }->{ $uemail }->{ $_->[0] } || "no date";
+    my $lastgrade= $allgrades->{ grade }->{ $uemail } ->{ $_->[0] } || "none yet";
+    my $lastdate= $allgrades->{ epoch }->{ $uemail }->{ $_->[0] } || "never";
 
     $filestring .= btnblock("/equizrender?f=".($_->[0]),
 			    '<h4><i class="fa fa-pencil"></i> '.$shortname.'</h4>',
