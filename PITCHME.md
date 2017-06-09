@@ -7,6 +7,7 @@
 
 - Look at Me
 
+---
 
 ## A Slide With Many Points
 
@@ -24,15 +25,13 @@
   * what now
   * what now
 
-
+---
 
 ## Math Notation Slides
 <span style="font-size:0.6em; color:gray">Press Down key for examples.</span> |
 <span style="font-size:0.6em; color:gray">See <a href="https://github.com/gitpitch/gitpitch/wiki/Math-Notation-Slides" target="_blank">GitPitch Wiki</a> for details.</span>
 
 +++
-
-
 
 ## Some Math
 
@@ -55,8 +54,6 @@ Use *TeX*, *LaTeX* and *MathML* markup powered by <a target="_blank" href="https
 \end{align}`
 
 +++
-
-
 
 ## A Table
 
@@ -95,7 +92,7 @@ Use *TeX*, *LaTeX* and *MathML* markup powered by <a target="_blank" href="https
 </tr>
 </table>
 
-
+---
 
 ## GO FOR IT.
 ## JUST ADD <span style="color:#e49436; text-transform: none">PITCHME.md</span> ;)
