@@ -67,7 +67,7 @@ __DATA__
 
   <div class="form-group" id="narrow">
     <div class="row" style="text-align:center;color:black">
-       <div class="col-xs-4"><a href="/instructor/rmtemplates" class="btn btn-default btn-block">remove all unchanged unpublished template files</a></div>
+       <div class="col-xs-6"><a href="/instructor/rmtemplates" class="btn btn-default btn-block">remove all unchanged unpublished template files</a></div>
     </div> <!--row-->
   </div> <!--formgroup-->
 

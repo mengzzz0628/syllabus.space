@@ -120,7 +120,7 @@ sub coursebuttonsentry {
   foreach (sort @courselist) {
     $rs .= btnblock( "http://$_.$curdomainport/enter?e=".obscure( time().':'.$email.':'.$self->session->{expiration} ),
 		     '<i class="fa fa-circle"></i> '.$displaylist{$_},
-		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll on $_ '$curdomainport'</a>",     ### $group{$_}." ".$freq{$_}||"N",
+		     "<a href=\"/auth/userdisroll?c=$_\"><i class=\"fa fa-trash\"></i> unenroll $_.$curdomainport</a>",     ### $group{$_}." ".$freq{$_}||"N",
 		     'btn-default',
 		     'w' )."\n";
   }
@@ -169,7 +169,7 @@ sub coursebuttonsenroll {
 
     if (scalar(@displaylist) == 1) {
       my $course= $displaylist[0];
-      $rs .= imbtn( $course, "singleton", \%displaylist, $courselist->{x} )."\n";
+      $rs .= imbtn( $course, 'singleton', \%displaylist, $courselist->{$course} )."\n";
     } else {
       my $mb= "<i class=\"fa fa-briefcase\"></i>";  ## or use 'plus-circle'
       $rs .= qq(\n<div class="col-xs-12 col-md-6"><button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#$g"> <h3> $mb $g </h3></button><p>Multiple</p></div>\n);

@@ -1330,8 +1330,9 @@ sub equizanswerrender( $decodedarray ) {
            <p><b>Overall Result:</b> $ans correct responses for $numq questions</p>";
   $rv .= '
 
-  <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
-    <script type="text/javascript"       src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM-CHTML"></script>
+    <script type="text/javascript"       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML-full"></script>
+
     <script type="text/javascript" src="/js/eqbackend.js"></script>
     <link href="/css/eqbackend.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="/css/input.css" media="screen" rel="stylesheet" type="text/css" />

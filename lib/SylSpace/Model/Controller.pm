@@ -335,9 +335,9 @@ sub mkdatatable {
 
 sub fileuploadform {
 return '
-   <form action="/upload" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
+   <form action="/uploadsave" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
      <label for="idupload">Upload A New File: </label>
-     <input type="file" name="uploadfile" id="idupload" style="display:inline"  >
+     <input type="file" name="file" id="idupload" style="display:inline"  >
    </form>
   <ul style="margin-left:5em;font-size:smaller">
   <li> any file starting with <tt>hw</tt> is considered to be a <a href="/instructor/hwcenter">homework</a>,</li>

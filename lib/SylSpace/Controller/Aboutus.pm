@@ -39,7 +39,7 @@ __DATA__
 
 <h2>License</h2>
 
-  <p>The SylSpace software is free under the <a href="https://choosealicense.com/licenses/agpl-3.0/">GNU AGPLv3</a> license.</p>
+  <p>The SylSpace software is free under dual licenses: first, an <a href="https://choosealicense.com/licenses/agpl-3.0/">GNU AGPLv3</a> license.  AGPL is a stringent open-source license, requiring making all modifications and changes available to others.  Alternatively, SylSpace is also available for sale under a non-exclusive commercial license for $100,000/year, which allows proprietary modification that are permitted not to have to flow back into the GPL.</p>
 
 <h2>Legal</h2>
 

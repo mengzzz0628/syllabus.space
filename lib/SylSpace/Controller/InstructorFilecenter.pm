@@ -36,9 +36,8 @@ __DATA__
 %title 'file center';
 %layout 'instructor';
 
-<script src="/js/dropzone.js"></script>
-
 <main>
+  
 
   <%== ifilehash2table($filelist, [ 'view', 'download', 'edit' ], 'file', $tzi) %>
 
@@ -50,10 +49,19 @@ __DATA__
 
   <p> Not yet working. </p>
 
-  <form action="uploadfile" method="POST" class="dropzone"  id="my-awesome-dropzone" enctype="multipart/form-data">
-
+  <form action="/uploadsave" method="post" class="dropzone"  id="dropzoneform" enctype="multipart/form-data">
+	
   <img src="/images/mickey.png" />
 
   </form>
-
+  <script src="/js/dropzone.js"></script>
+  <script type="text/javascript">
+    	Dropzone.options.dropzoneform = {
+		init: function() {
+			this.on("success", function(file, response) {
+				window.location.reload(true);
+			});
+		}
+	};	
+  </script>
 </main>

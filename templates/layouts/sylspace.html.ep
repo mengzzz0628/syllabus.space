@@ -25,7 +25,7 @@
 
     <link rel="stylesheet" href="/css/input.css"  />
     <link rel="stylesheet" href="/css/equiz.css" />
-
+    <link rel="stylesheet" href="/css/dropzone.css" />
   </head>
 
 

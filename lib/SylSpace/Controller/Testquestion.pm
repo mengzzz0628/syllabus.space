@@ -77,11 +77,14 @@ __DATA__
 %title 'test your equiz question';
 %layout 'instructor';
 
-  <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
-  <script type="text/javascript"       src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
-  <script type="text/javascript" src="/js/eqbackend.js"></script>
-  <link href="/css/eqbackend.css" media="screen" rel="stylesheet" type="text/css" />
-  <link href="/css/input.css" media="screen" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM-CHTML"></script>
+    <script type="text/javascript"       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML-full"></script>
+
+    <script type="text/javascript" src="/js/eqbackend.js"></script>
+    <link href="/css/eqbackend.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="/css/input.css" media="screen" rel="stylesheet" type="text/css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ns-autogrow/1.1.6/jquery.ns-autogrow.js"> </script>
 
   <style>
     div.unhide { color: blue;  border: 1px solid red; }
@@ -100,23 +103,14 @@ __DATA__
 
 <form method="GET" action="/testquestion" />
 
-  <b>bug: why is the textarea not auto-growth, as tried in eqbackend.css</b><br />
+  <textarea name="ecode" id="ecode" cols="90"><%= $ecode %></textarea>
 
-  <!-- script $('#ecode').css('overflow', 'hidden').autogrow() /script -->
+  <br />
 
-  <script>
-    $("textarea").keyup(function(e) {
-       while($(this).outerHeight() < this.scrollHeight + parseFloat($(this).css("borderTopWidth")) + parseFloat($(this).css("borderBottomWidth"))) {
-          $(this).height($(this).height()+1);
-       };
-   });
- </script>
-
-  <textarea name="ecode" rows="15" id="ecode" cols="60"><%= $ecode %></textarea>
-
-<br />
   <button class="btn btn-default" type="submit" value="submit">Test Now</button>
+
 </form>
+
 
 <h1>Evaluated</h1>
 
@@ -124,5 +118,14 @@ __DATA__
 
 <p> You can bookmark this page to save your question and the answer.</p>
 
+ <script type="text/javascript">
+                var options = {
+                        horizontal:false,
+                        vertical:true,
+                        flickering:false
+                };
+
+                $('#ecode').autogrow(options);
+        </script>
 </main>
 
