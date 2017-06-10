@@ -43,25 +43,4 @@ __DATA__
 
   <%== fileuploadform() %>
 
-  <hr />
-
-  <h2> Big Drop Zone Test </h2>
-
-  <p> Not yet working. </p>
-
-  <form action="/uploadsave" method="post" class="dropzone"  id="dropzoneform" enctype="multipart/form-data">
-	
-  <img src="/images/mickey.png" />
-
-  </form>
-  <script src="/js/dropzone.js"></script>
-  <script type="text/javascript">
-    	Dropzone.options.dropzoneform = {
-		init: function() {
-			this.on("success", function(file, response) {
-				window.location.reload(true);
-			});
-		}
-	};	
-  </script>
 </main>

@@ -1,6 +1,8 @@
 
 MORE IMPORTANT
 
+- fix up drag-and-drop to be for file area
+
 * https rather than http (joel berger, mojolicious hypnotoad)
 
 * use Paypal micropayments as 2FA for instructors and/or special sites (e.g., book.ivo-welch.info/instructor)
@@ -26,3 +28,5 @@ LESS IMPORTANT
 * maybe bulk registration of students, with limits to authentication to local method
 
 * make market for instructors and students: 1c/quiz?
+
+* in drag-drop return to where we uploaded

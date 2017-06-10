@@ -339,17 +339,23 @@ return '
      <label for="idupload">Upload A New File: </label>
      <input type="file" name="file" id="idupload" style="display:inline"  >
    </form>
-  <ul style="margin-left:5em;font-size:smaller">
-  <li> any file starting with <tt>hw</tt> is considered to be a <a href="/instructor/hwcenter">homework</a>,</li>
-  <li> any file ending with <tt>.equiz</tt> is considered to be an <a href="/instructor/equizcenter">equiz</a>,</li>
-  <li> and any other file (e.g., <tt>syllabus.html</tt>) is considered just a <a href="/instructor/filecenter">file</a>.</li>
-  </ul>
 
    <script>
       document.getElementById("idupload").onchange = function() {
          document.getElementById("uploadform").submit();
       }
    </script>
+
+  <table>
+  <tr> <td>
+  <ul style="margin-left:5em;font-size:smaller">
+  <li> any file starting with <tt>hw</tt> is considered to be a <a href="/instructor/hwcenter">homework</a>,</li>
+  <li> any file ending with <tt>.equiz</tt> is considered to be an <a href="/instructor/equizcenter">equiz</a>,</li>
+  <li> and any other file (e.g., <tt>syllabus.html</tt>) is considered just a <a href="/instructor/filecenter">file</a>.</li>
+  </ul> </td>
+  <td> <ul style="margin-left:5em;font-size:smaller">
+  <li> note that you may have to switch center to see your uploaded file(s).<br>for example, if you upload an .equiz file into the hwcenter,<br />it will not appear in the (hwcenter) filelist, but in the equizcenter list!</li> 
+  </ul> </td> </tr> </table>
  ';
 }
 
@@ -519,6 +525,7 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
 
   return mkdatatable('taskbrowser').<<EOT;
 
+  <form action="/uploadsave" method="post" class="dropzone"  id="dropzoneform" enctype="multipart/form-data">
   <table id="taskbrowser" class="table">
     <thead>
       <tr>
@@ -530,6 +537,19 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
        $filestring
     </tbody>
   </table>
+  </form>
+
+  <script src="/js/dropzone.js"></script>
+  <script type="text/javascript">
+    	Dropzone.options.dropzoneform = {
+		init: function() {
+			this.on("success", function(file, response) {
+				window.location.reload(true);
+			});
+		}
+	};
+  </script>
+
 EOT
 }
 
