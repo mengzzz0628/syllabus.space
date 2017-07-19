@@ -8,7 +8,8 @@ use feature ':5.20';
 use feature 'signatures';
 no warnings qw(experimental::signatures);
 
-use SylSpace::Model::Model qw(sfilelistall isenrolled);
+use SylSpace::Model::Model qw(isenrolled);
+use SylSpace::Model::Files qw(filelists);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -19,7 +20,7 @@ get '/student/filecenter' => sub {
 
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  $c->stash( filelist => sfilelistall($course, $c->session->{uemail}, "X") );
+  $c->stash( filelist => filelists($course) );
 };
 
 1;
@@ -55,12 +56,10 @@ __DATA__
        use Data::Dumper;
 
        foreach (@$filehashptr) {
-         ($_->[1]<time()) and next;
          ++$counter;
-
-         (my $shortname = $_->[0]) =~ s/\.file$//;
-         my $duein= timedelta($_->[1] , time());
-         $filestring .= btnblock("/student/fileview?f=".($_->[0]), '<i class="fa fa-pencil"></i> '.($_->[0]), "", "btn-default", "w");
+         my $shortname = $_->{sfilename};
+         my $duein= timedelta($_->{duetime} , time());
+         $filestring .= btnblock("/student/fileview?f=".($_->{sfilename}), '<i class="fa fa-pencil"></i> '.($_->{sfilename}), "", "btn-default", "w");
        }
        ($counter) or return "<p>no publicly posted files at the moment</p>";
 

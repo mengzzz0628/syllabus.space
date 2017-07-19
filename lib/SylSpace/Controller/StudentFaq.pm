@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(fileread);
+use SylSpace::Model::Files qw(filereads fileexistss);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -13,7 +13,7 @@ get '/student/faq' => sub {
   my $c = shift;
   (my $course = standard( $c )) or return global_redirect($c);
 
-  my $isfaq= fileread( $course, $c->session->{uemail}, 'faq' ) || "<p>the instructor has not added her own faq</p>\n" ;
+  my $isfaq= fileexistss($course, 'faq') ? filereads( $course, 'faq' ) : "<p>Theis instructor has not added a course-specific FAQ.</p>\n" ;
 
   use Perl6::Slurp;
   my $body= slurp("$ENV{'SYLSPACE_sitepath'}/public/html/faq.html");

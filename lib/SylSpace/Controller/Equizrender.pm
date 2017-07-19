@@ -48,9 +48,16 @@ __DATA__
   <link href="/css/eqbackend.css" media="screen" rel="stylesheet" type="text/css" />
   <link href="/css/input.css" media="screen" rel="stylesheet" type="text/css" />
 
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+    MathJax.InputJax.TeX.Definitions.number =
+      /^(?:[0-9]+(?:\,[0-9]{3})*(?:\{\.\}[0-9]*)*|\{\.\}[0-9]+)/
+    });
+  </script>
+
 <main>
 
- Quiz: <%= $quizname %>
+ <!-- Quiz: <%= $quizname %> -->
 
 <%== $content %>
 

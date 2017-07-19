@@ -1,7 +1,11 @@
 
 MORE IMPORTANT
 
-- fix up drag-and-drop to be for file area
+- appropriate expiration of email link
+
+- fix up drag-and-drop to be for file area with multiple upload.
+
+- fix up .sh startup files
 
 * https rather than http (joel berger, mojolicious hypnotoad)
 
@@ -11,6 +15,8 @@ MORE IMPORTANT
 MEDIUM IMPORTANT
 
 * add more automatic tests, esp with respect to web controller
+
+* autoforwarding of errors in quizzes
 
 
 LESS IMPORTANT

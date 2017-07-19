@@ -80,6 +80,13 @@ __DATA__
     <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM-CHTML"></script>
     <script type="text/javascript"       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+    MathJax.InputJax.TeX.Definitions.number =
+      /^(?:[0-9]+(?:\,[0-9]{3})*(?:\{\.\}[0-9]*)*|\{\.\}[0-9]+)/
+    });
+  </script>
+
     <script type="text/javascript" src="/js/eqbackend.js"></script>
     <link href="/css/eqbackend.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="/css/input.css" media="screen" rel="stylesheet" type="text/css" />

@@ -42,7 +42,7 @@ __DATA__
 
 
 %title 'security log';
-%layout 'sylspace';
+%layout 'both';
 
 <main>
 

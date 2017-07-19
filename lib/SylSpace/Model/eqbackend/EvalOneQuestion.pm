@@ -58,26 +58,26 @@ use Math::Round; # qw(:all);  ## may not be used
 
 ## one time
 my $predefinedfunctions = do { local $/=undef; <EvalOneQuestion::DATA> };
-($predefinedfunctions) or die "perl $0: data problem!\n";
+($predefinedfunctions) or die "perl $0: ERROR: data problem!\n";
 
 ################################################################
 
 sub evaloneqstn {
 
-  (defined($_[0])) or die "perl $0: evaloneqstn is lucid.\n";
+  (defined($_[0])) or die "perl $0: ERROR: evaloneqstn is lucid.\n";
 
   my %qstn = %{$_[0]};
   my $linenum= $_[1] || "'$qstn{N}'" || "unknown";
 
-  (defined($qstn{N})) or die "perl $0: you have a qstn without a name: ".Dumper($_[0]);
-  (($qstn{N})) or die "perl $0: you have a qstn without a meaningful name".Dumper($_[0]);
+  (defined($qstn{N})) or die "perl $0: ERROR: you have a qstn without a name: ".Dumper($_[0]);
+  (($qstn{N})) or die "perl $0: ERROR: you have a qstn without a meaningful name".Dumper($_[0]);
 
 
   foreach my $danger (qw/use exec system eval open env path/) {
-    ($qstn{I} =~ /$danger/i) and die "perl $0: Keyword '$danger' is not allowed in equiz init.\n";
+    ($qstn{I} =~ /\b$danger\b/i) and die "perl $0: ERROR: Keyword '$danger' is not allowed in equiz init.\n";
   }
-  ($qstn{I} =~ /\#\@/) and die "perl $0: no hash or at key allowed.\n";
-  ($qstn{I} =~ /[\"\`\']/) and die "perl $0: no strings and backquotes allowed.\n";
+  ($qstn{I} =~ /\#\@/) and die "perl $0: ERROR: no hash or at key allowed.\n";
+  ($qstn{I} =~ /[\"\`\']/) and die "perl $0: ERROR: no strings and backquotes allowed.\n";
 
 
   ## First, we need to calculate all our variables in the init (:I:)
@@ -95,10 +95,10 @@ sub evaloneqstn {
     $qstn{I} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\,\s*\$([a-zA-Z0-9\_]+)\,\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2,\$$3,\$$4)=\@_ ;/g;
 
     use Data::Dumper;
-    local $SIG{__WARN__} = sub { die "perl $0: ".$_[0]; };
+    local $SIG{__WARN__} = sub { die "perl $0: ERROR: ".$_[0]; };
     $compartment->reval("$predefinedfunctions ; $qstn{I}");
     ($@ eq "")
-      or die "perl $0: Your init :I: evaluation algebraic expression string '<tt>$qstn{I}</tt>' for $qstn{N} ending on line $linenum failed with $@.  Please fix and try again.\n\n<pre>".Dumper(\%qstn)."</pre>";
+      or die "perl $0: ERROR: Your init :I: evaluation algebraic expression string '<tt>$qstn{I}</tt>' for $qstn{N} ending on line $linenum failed with $@.  Please fix and try again.\n\n<pre>".Dumper(\%qstn)."</pre>";
   }
 
   ## collect all variables that appeared in the init
@@ -109,23 +109,25 @@ sub evaloneqstn {
   }
 
   $qstn{'S'} = $variables{'ANS'};
-  (defined($qstn{'S'})) or die "perl $0: You must define an '\$ANS' variable in your :I: init segment for $qstn{'N'}\n";
+  (defined($qstn{'S'})) or die "perl $0: ERROR: You must define an '\$ANS' variable in your :I: init segment for $qstn{'N'}\n";
 
 
-  # now we fill calculated variables into the questio (:Q:) and answer (:A:)
+  # now we fill calculated variables into the question (:Q:) and answer (:A:)
   # longest first, so $x1 and $x1d will resolve in favor of $x1, but we still allow $x1e
   foreach my $vn (sort { length $b <=> length $a } keys %variables) {
-    (defined($qstn{'Q'})) or die "perl $0: Question $qstn{'N'} has no :Q: (question) key\n";
+    (defined($qstn{'Q'})) or die "perl $0: ERROR: Question $qstn{'N'} has no :Q: (question) key\n";
 
     sub replonevar {
       my ($qtext, $vnm, $val)= @_;
       use Scalar::Util qw(looks_like_number);
       (looks_like_number($val)) or return $qtext;
-      ## or die "perl $.: Sorry, but the input to replonevar of '$val' is not a number.\n";
-      my $posval= abs($val);
-      $qtext =~ s/\{\$$vnm:([0-9])\}/sprintf("%.${1}f",$val)/ge;
-      sub imakeroundexpr { return nearest(0.001, $_[0]); }
+      ## or die "perl $.: ERROR: Sorry, but the input to replonevar of '$val' is not a number.\n";
+      ## my $posval= abs($val);
+      $qtext =~ s/\{\$$vnm:([0-9])\}/sprintf("%.${1}f",$val)/ge; ## if we have ${x:4}, replace with 4-digit actual value
+
+      sub imakeroundexpr { my $rnd= nearest(0.001, $_[0]); return commify($rnd); }  ## typicall, we round to nearest 0.001
       $qtext =~ s/\$$vnm/imakeroundexpr($val)/ge;
+
       return $qtext;
       ## better {$x:3}  -3.141592 = -3.142; ## $x = -3.1415; ## $$x = -$3.1415; ## ${$x:3} = -$3.142
     }
@@ -137,6 +139,13 @@ sub evaloneqstn {
   }
 
   return \%qstn;
+}
+
+sub commify {
+  my $input = shift;
+  $input = reverse $input;
+  $input =~ s<(\d\d\d)(?=\d)(?!\d*\.)><$1,>g;
+  return reverse $input;
 }
 
 ################################################################################################################################
@@ -186,7 +195,7 @@ sub nearest {
 ## arg1= start, arg2=end, arg3=add-every-time
 sub rseq {
   (defined($_[2])) or $_[2]=1;  ## the default is increment by 1
-  ($#_ > 3) and die "perl $0: wrong rseq usage with too many arguments: $_\n";
+  ($#_ > 3) and die "perl $0: ERROR: wrong rseq usage with too many arguments: $_\n";
   ($_[0] == $_[1]) and return $_[0];
   (($_[2])*($_[1]-$_[0])>0) or return(undef); ## we have to go the right direction
   my @v=();
@@ -346,11 +355,11 @@ sub irr {
 
 sub BlackScholes {
   my ($S, $K, $T, $logrf, $plainsd) = @_;
-  (defined($S)) or die "perl $0: BS: no S\n";  ($S>0) or die "BS: bad S0 of $S";
-  (defined($K)) or die "perl $0: BS: no K\n";  ($K>0) or die "BS: bad K0 of $K";
-  (defined($T)) or die "perl $0: BS: no T\n";  ($T>0) or die "BS: bad T0 of $T";
-  (defined($logrf)) or die "perl $0: BS: no logrf\n";  ($logrf>0) or die "BS: bad logrf of $logrf";
-  (defined($plainsd)) or die "perl $0: BS: no plainsd\n";  ($plainsd>0) or die "BS: bad plainsd of $plainsd";
+  (defined($S)) or die "perl $0: ERROR: BS: no S\n";  ($S>0) or die "BS: ERROR: bad S0 of $S";
+  (defined($K)) or die "perl $0: ERROR: BS: no K\n";  ($K>0) or die "BS: ERROR: bad K0 of $K";
+  (defined($T)) or die "perl $0: ERROR: BS: no T\n";  ($T>0) or die "BS: ERROR: bad T0 of $T";
+  (defined($logrf)) or die "perl $0: ERROR: BS: no logrf\n";  ($logrf>0) or die "BS: ERROR: bad logrf of $logrf";
+  (defined($plainsd)) or die "perl $0: ERROR: BS: no plainsd\n";  ($plainsd>0) or die "BS: ERROR: bad plainsd of $plainsd";
 
   my $pvx= $K*exp(-$logrf*$T);
   my $sd2exp= $plainsd*sqrt($T);

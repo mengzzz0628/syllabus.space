@@ -21,17 +21,16 @@ use lib "$Bin";
 
 =head1 MODES
 
-  $ eqbackend.pl inputfile.equiz cli
-
   $ eqbackend.pl inputfile.equiz ask encryptionsecret callbackhtml
 
   $ eqbackend.pl inputfile.equiz answers
 
+	---the following is the main debug mode: fullsyntax comes after the equiz
+  $ eqbackend.pl inputfile.equiz fullsyntax   ## one question, only syntax check; does require ::EQVERSION::
+
   $ eqbackend.pl inputfile.equiz solo     ## one question, useful in designer;  does not require ::EQVERSION:: etc
 
   $ eqbackend.pl inputfile.equiz solosyntax   ## one question, syntax check, but does not require ::EQVERSION::
-
-  $ eqbackend.pl inputfile.equiz fullsyntax   ## one question, only syntax check; does require ::EQVERSION::
 
 =head1 DOCS
 
@@ -51,7 +50,7 @@ use lib "$Bin";
 
 ################################################################################################################################
 
-my $usage= "usage: eqbackend.pl equizname mode=[cli|ask=normal|answers|solo|fullsyntax|solosyntax] secret callbackurl user";
+my $usage= "usage: eqbackend.pl equizname-first.equiz mode=[ask=normal|answers|fullsyntax|solosyntax] secret callbackurl user";
 
 (defined(my $equizfilename= shift(@ARGV))) or die $usage;
 
@@ -70,7 +69,7 @@ if ($equizfilename =~ /solo/) {
   exit 0;
 }
 
-($equizfilename =~ /\.equiz$/i) or die "sorry, your file must end with extension 'equiz'.";
+($equizfilename =~ /\.equiz$/i) or die "sorry, your file must end with extension 'equiz', not $equizfilename.";
 
 (-e $equizfilename) or die "sorry, no file $equizfilename to be seen. ".`ls`;
 (-r $equizfilename) or die "sorry, file $equizfilename exists but is not readable";
@@ -81,7 +80,7 @@ my $equizcontent= slurp($equizfilename);
 
 my $mode= $ARGV[0];  ## leave on stack
 (defined($mode)) or die "need an operating mode.\n$usage";
-($mode =~ /^cli|ask|normal|answers|solo|fullsyntax|solosyntax$/) or die "unknown mode '$mode'";
+($mode =~ /^ask|normal|answers|solo|fullsyntax|solosyntax$/) or die "unknown mode '$mode'";
 ($mode eq "normal") and $mode="ask";
 
 if ($mode !~ /solo/) {

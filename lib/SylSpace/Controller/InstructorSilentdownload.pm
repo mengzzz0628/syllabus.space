@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo fullfilename);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(longfilename);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -18,14 +19,14 @@ get 'instructor/silentdownload' => sub {
   plugin 'RenderFile';  ## ask viktor why $c->render_file is not seen
 
   my $fname = $c->req->query_params->param('f');
-  my $fullfilename;
+  my $longfilename;
   if (($fname =~ /.zip$/) && ($fname =~ m{/tmp/})) {
-    $fullfilename = $fname;
+    $longfilename = $fname;
   } else {
     $fname =~ s{.*/}{};
-    $fullfilename= fullfilename( $course, $c->session->{uemail}, $fname);
-    (-e $fullfilename) or die "file $fullfilename is not retrievable: $!\n";
+    $longfilename= longfilename( $course, $fname);
+    (-e $longfilename) or die "file $longfilename is not retrievable: $!\n";
   }
 
-  return $c->render_file('filepath' => $fullfilename);
+  return $c->render_file('filepath' => $longfilename);
 };

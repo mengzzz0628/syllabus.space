@@ -4,7 +4,9 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(ifilelist1 sudo filelistsfiles gradesfortask2table tzi);
+use SylSpace::Model::Model qw(sudo tzi);
+use SylSpace::Model::Files qw(eqlisti eqlists);
+use SylSpace::Model::Grades qw(gradesfortask2table);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -18,8 +20,13 @@ get '/instructor/equizmore' => sub {
   my $fname=  $c->req->query_params->param('f');
   (defined($fname)) or die "need a filename for equizmore.\n";
 
-  $c->stash( detail => ifilelist1($course, $c->session->{uemail}, $fname),
-	     studentuploaded => filelistsfiles($course, $fname),
+  my $detail = eqlisti($course);
+  my $studentuploaded = eqlists($course);
+  my $ofname = $fname;
+  my $grds4tsk =  gradesfortask2table($course, $fname);
+  my $tzii = tzi( $c->session->{uemail} );
+
+  $c->stash( detail => eqlisti($course),
 	     fname => $fname,
 	     grds4tsk =>  gradesfortask2table($course, $fname),
 	     tzi => tzi( $c->session->{uemail} ) );
@@ -33,7 +40,7 @@ __DATA__
 
 @@ instructorequizmore.html.ep
 
-<% use SylSpace::Model::Controller qw(drawmore epochtwo mkdatatable browser); %>
+<% use SylSpace::Model::Controller qw(drawmore epochtwo mkdatatable webbrowser); %>
 
 %title 'more equiz information';
 %layout 'instructor';
@@ -42,33 +49,19 @@ __DATA__
 
 <main>
 
-  <%== drawmore('equiz', [ 'equizrun', 'view', 'download', 'edit' ], $detail, $tzi, browser($self)); %>
+  <%== drawmore($fname, 'equiz', [ 'equizrun', 'view', 'download', 'edit' ], $detail, $tzi, webbrowser($self)); %>
 
   <hr />
 
- <%== studentresponses($studentuploaded) %>
-
-<table class="table" id="eqabrowser">
-<thead> <tr> <th> # </th> <th> Student </th> <th> Score </th> <th> Date </th> </tr> </thead>
-<tbody>
-  <%== mktbl($grds4tsk) %>
-</tbody>
-</table>
+  <h2> Student Performance </h2>
+  <table class="table" id="eqabrowser">
+    <thead> <tr> <th> # </th> <th> Student </th> <th> Score </th> <th> Date </th> </tr> </thead>
+    <tbody>
+      <%== mktbl($grds4tsk) %>
+    </tbody>
+  </table>
 
 </main>
-
-<%
-  sub studentresponses {
-    my $rs=""; my $c=0;
-    my @fl= @{$_[0]};
-    foreach (@fl) {
-      m{.*/([0-9a-z\_\.\-]+@[0-9a-z\_\.\-]+)/files/(eq.*)};
-      (/\.old$/) and next;
-      $rs .= "<li> $1 </li>"; ++$c;
-    }
-    return "<h2> Student Responses </h2>\n\n<ol> $rs </ol>\n";
-  }
-%>
 
     <%
     sub mktbl {

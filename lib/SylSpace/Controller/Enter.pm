@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(seclog student2instructor);
+use SylSpace::Model::Model qw(seclog unmorphstudent2instructor);
 use SylSpace::Model::Controller qw(global_redirect standard global_redirectmsg unobscure);
 
 ################################################################
@@ -44,7 +44,7 @@ get '/enter' => sub {
   ## return $c->flash(message => 'auth likes only index')->redirect_to('/auth/index');  ## we cannot enter the auth course site
 
   ## unmorph if needed
-  student2instructor( $course, $c->session->{uemail} );  ## just make sure that we morph back if we were a morphed instructor
+  unmorphstudent2instructor( $course, $c->session->{uemail} );  ## just make sure that we morph back if we were a morphed instructor
   seclog($c->tx->remote_address, $course, $c->session->{uemail}||"no one", "entering course site $course" );
 
   return $c->flash( message => "hello $c->session->{uemail}" )->redirect_to('/index');

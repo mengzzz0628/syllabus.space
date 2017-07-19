@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo studentlist gradesashash);
+use SylSpace::Model::Model qw(sudo studentlist);
+use SylSpace::Model::Grades qw(gradesashash);
 use SylSpace::Model::Controller qw(standard global_redirect);
 
 ################################################################

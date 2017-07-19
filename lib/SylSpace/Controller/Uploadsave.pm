@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(filewrite isinstructor tweet seclog);
+use SylSpace::Model::Model qw(isinstructor tweet seclog);
+use SylSpace::Model::Files qw(filewrite answerwrite);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -16,9 +17,10 @@ post '/uploadsave' => sub {
 
   return $c->render(text => 'File is too big for M', status => 200) if $c->req->is_limit_exceeded;
 
+  my $hwmatch = $c->param('hwtask') || "nothing yet";
+
   my $uploadfile = $c->param('file');
-  (defined($uploadfile)) or die "confusing not to see an upload file.";
-  my $hwmatch = $c->param('hwtask');
+  (defined($uploadfile)) or die "confusing not to see an upload file.  please alert webauthor.\n";
 
   my $filesize = $uploadfile->size;
   my $filename = $uploadfile->filename;
@@ -32,7 +34,7 @@ post '/uploadsave' => sub {
   my $referto;
   if (isinstructor( $course, $c->session->{uemail})) {
     ## an instructor can upload anything
-    filewrite($course, $c->session->{uemail}, $filename, $filecontents);
+    filewrite($course, $filename, $filecontents);
     seclog( $c->tx->remote_address, $course, 'instructor ', $c->session->{uemail}." uploaded ". $filename );  ## student uploads are public
     $referto= "/instructor/${infiletype}center";
 
@@ -40,7 +42,7 @@ post '/uploadsave' => sub {
     ($filename =~ /^faq\./i) and filesetdue( $course, $filename, time()+60*60*24*365 );  ## special rule: make syllabus available for 1 year
 
   } else {
-    (eval { filewrite($course, $c->session->{uemail}, $filename, $filecontents, $hwmatch) }) or die "Problem : $@";
+    (eval { answerwrite($course, $c->session->{uemail}, $hwmatch, $filename, $filecontents) }) or die "Problem : $@";
     tweet($c->tx->remote_address, $course, $c->session->{uemail}, " uploaded ".$filename." in response to $hwmatch" );  ## student uploads are public
     $referto= "/student/hwcenter";
   }

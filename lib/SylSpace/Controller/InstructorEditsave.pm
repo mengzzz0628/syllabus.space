@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo filewrite);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(eqwrite);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -26,7 +27,7 @@ post 'instructor/editsave' => sub {
   if (md5_hex($content) eq $c->req->params->param('fingerprint')) {
     $c->flash( message=> "file $fname was unchanged and thus not updated" );
   } else {
-    filewrite( $course, $c->session->{uemail}, $fname, $content );
+    eqwrite( $course, $fname, $content );
     $c->flash( message=> "file $fname was changed and thus updated" );
   }
   $c->redirect_to("/instructor/equizmore?f=$fname");

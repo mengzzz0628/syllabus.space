@@ -17,11 +17,12 @@ use Crypt::DES;
 use Crypt::Blowfish;
 use Data::Dumper;
 use Digest::MD5;
+use Digest::MD5::File;
 use Email::Valid;
 use Encode;
 use File::Copy;
 use File::Glob;
-use File::Path;
+use File::Path qw(make_path);
 use File::Touch;
 use FindBin;
 use HTML::Entities;
@@ -30,6 +31,7 @@ use Math::Round;
 use Perl6::Slurp;
 use Safe;
 use Scalar::Util;
+use Scalar::Util::Numeric;
 use Test2::Bundle::Extended;
 use Test2::Plugin::DieOnFail;
 use YAML::Tiny;
@@ -66,12 +68,24 @@ use Mojolicious::Plugin::Web::Auth;
 
 =cut
 
+use File::Grep;
+
+my $var="/var/sylspace";
+
+($> eq 0) or die "the initsylspace script requires su privileges to add to $var to /var\n";
+
+(@ARGV) or die "without -f to erase the old $var, this script refuses to run!\n";
+($ARGV[0] eq '-f') or die "without -f to erase the old $var, this script refuses to run!\n";
+system("rm -rf $var");
+
+my $samplesites="syllabus.test poster.syllabus.test auth.syllabus.test mfe.welch.syllabus.test mba.welch.syllabus.test ugrad.welch.syllabus.test hs.welch.syllabus.test  mba.daniel.syllabus.test year.course.instructor.university.syllabus.test corpfin.test.syllabus.test syllabus.test.syllabus.test";
+
+(grep { 'auth.test' } "/etc/hosts")  or die "please extend /etc/hosts to contain 'auth.syllabus.test', etc.\n$samplesites\n";
+
 (-e "templates/equiz/starters") or die "internal error: you don't seem to have any starter templates";
 (-e "Model/Model.pm") or die "internal error: you don't seem to have the Model";
 (-e "Model/eqbackend/eqbackend.pl") or die "internal error: you don't seem to have the eqbackend";
 (-e "Controller/InstructorIndex.pm") or die "internal error: you don't seem to have the frontend (Controller/instructorindex.pm";
-
-my $var="/var/sylspace";
 
 (-w $var) and die "[$var exists and is writeable, aborting for safety]\n";
 
@@ -96,10 +110,7 @@ if (!(-e "$var/secrets.txt")) {
   open(my $FO, ">", "$var/secrets.txt"); for (my $i=0; $i<30; ++$i) { print $FO mkrandomstring(32)."\n"; } close($FO);
 }
 
-say STDERR "please extend /etc/hosts to contain 'auth.localhost.test', 'localhost.test' etc.\n";
-
 say STDERR "now create a samplewebsite, e.g., (1) mksite.pl mfe.ucla instructor\@gmail.com or (2) run Model/Model.t or (3) run Model/MkTestSite.t";
-
 
 sub mkrandomword {
   my $len= $_[0] || 32;

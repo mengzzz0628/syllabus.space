@@ -8,7 +8,9 @@ use feature ':5.20';
 use feature 'signatures';
 no warnings qw(experimental::signatures);
 
-use SylSpace::Model::Model qw(sfilelistall isenrolled gradesashash);
+use SylSpace::Model::Model qw(isenrolled);
+use SylSpace::Model::Files qw(eqlists);
+use SylSpace::Model::Grades qw(gradesashash);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -21,7 +23,7 @@ get '/student/equizcenter' => sub {
 
   my $allgrades= gradesashash( $course, $c->session->{uemail} );  ## just my own grades!
 
-  $c->stash( filelist => sfilelistall($course, $c->session->{uemail}, "*equiz"), allgrades => $allgrades );
+  $c->stash( filelist => eqlists($course), allgrades => $allgrades );
 };
 
 1;

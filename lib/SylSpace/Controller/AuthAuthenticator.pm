@@ -78,23 +78,11 @@ __DATA__
 <p style="margin:1em"> To learn more about this site, please visit the <a href="/aboutus">about us</a> page.</p>
 
   <%== msghash2string( [{ msgid => 0, priority => 5, time => 1495672668, subject => 'Test Play Site',
-			body => '<p>This is our basic SylSpace test site.  The code is on github.  The site and VM are destroyed and rebuilt regularly, so please do not store anything valuable here.  <p>It is safe to register yourself, which then allows you to try out our sample course, innovatively named <span style="color:blue;font-family:mono;">test&gt;corpfin</span>. If you are an instructor, please <a href="mailto:ivo.welch@gmail.com">email</a> to ask me for an instructor site.  <p>if you stumble upon little or not-so-little bugs, please let me know. '}] ) %>
-
-  <%== msghash2string( [{ msgid => 1, priority => 5, time => 1495672668, subject => 'Course Quizzes Wanted',
-			body => 'We are looking for equiz-suitable questions from finance and economics courses.  If you are an instructor who has written a non-copyright-ed set of suitable (short-form) questions and answers that you would like to share with students and colleagues, please contact <a href="mailto:ivo.welch@gmail.com?subject=share+quiz">ivo welch</a>.  If the material is suitable, we will take over the coding of your questions into syllabus.space equiz form and post them online for everyone to use (with attribution, of course).  The questions will have different inputs and answers each time a student refreshes the quiz, and thus will be more useful.'}] ) %>
+			body => '<p>This is our syllabus.space (SylSpace) test site, with code on github. It is safe to authenticate and register yourself.  The site is run by Ivo Welch, UCLA.  For more information, please click on <b>About Us</b> below, and then read the linked FAQ.   <p>Registration allows you to try out the student perspective for our sample course&mdash;innovatively named <span style="color:blue;font-family:mono;">corpfin : intro</span>.  It is a great self-test resource for introductory corporate finance students in its own right.<p>If you are an instructor, you can also obtain access to allow you to administer your own site.  This allows you to post and change quizzes, see what your students are answering, distribute homeworks and collect student answers, etc.  The instructor interface is far simpler and more pleasing than the alternatives.  It has practically no learning curve.  If interested, please <a href="mailto:ivo.welch@gmail.com">email</a> to ask me for your own instructor site.  <p>In summer 2017, the site and VM will be destroyed and rebuilt regularly, so please do not store anything valuable here.  If you stumble upon little or not-so-little bugs, please let me know. '}] ) %>
 
 <hr />
 
 <nav>
-
-  <!--
-  <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
-     <p> Direct Authentication does not work on localhost. </p>
-     <div style="background-color:black">
-  <% } else { %>
-     <p> We are on syllabus.space, not syllabus.test </p>
-  <% } %>
-  -->
 
   <p style="font-size:small;"><b>Direct Authentication</b> is the fastest and most reliable method to authenticate.  It works with your google or facebook id.</p>
 
@@ -109,13 +97,7 @@ __DATA__
 
   <hr />
 
-  <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
-     </div>
-  <% } %>
-
-  <hr />
-
-  <p style="font-size:small;padding-top:1em;">Alternatively, use sendmail.  It is slow, throttled per server (to avoid bot DDOS attacks on other servers), may take up to 10 minutes to arrive, and is only valid for 15 minutes&mdash;if you are lucky and no spam filter blocks it, in which case you will have to debug where your IT department or you have blocked the email.  If possible, avoid it.</p>
+  <p style="font-size:small;padding-top:1em;">Alternatively, use sendmail.  It is slow, throttled per server (to avoid bot DDOS attacks on other servers), may take up to 10 minutes to arrive, and is only valid for 15 minutes&mdash;if you are lucky and no spam filter blocks it, in which case you will have to debug where your IT department or you have blocked the email.  If possible, avoid direct sendmail authentication.  Nevertheless, here it is: </p>
 
   <form name="registration" method="post" action="/auth/sendmail/authenticate">
        <input style="display:none" class="form-control" value="no name" name="name" />
@@ -138,8 +120,9 @@ __DATA__
 
      <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
         <hr />
-        <div class="row top-buffer text-center">
-           <%== btnblock('/auth/test', '<i class="fa fa-users"></i> Local Users', 'Listed Users -- Only on Localhost', 'btn-default btn-md', 'w') %>
+        <hr />
+        <div class="row top-buffer text-center; border-style:solid;"> <!-- completely ignored afaik -->
+           <%== btnblock('/auth/testsetuser', '<i class="fa fa-users"></i> Hello, syllabus.test Sudo:<br />Choose Local Users', 'Listed Users -- Only on Localhost', 'btn-warning btn-md', 'w') %>
         </div>
       <% } %>
 

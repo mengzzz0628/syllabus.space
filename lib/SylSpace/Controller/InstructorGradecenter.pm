@@ -6,7 +6,8 @@ use strict;
 
 use lib '../..';
 
-use SylSpace::Model::Model qw(sudo gradesashash);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Grades qw(gradesashash);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################

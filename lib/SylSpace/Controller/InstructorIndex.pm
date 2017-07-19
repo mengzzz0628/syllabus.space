@@ -4,7 +4,7 @@ use Mojolicious::Lite;  ## implied strict, warnings, utf8, 5.10
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo ciobuttons msgshownotread bioiscomplete cioiscomplete showlasttweet _suundo);
+use SylSpace::Model::Model qw(sudo ciobuttons msgshownotread bioiscomplete cioiscomplete showlasttweet);
 use SylSpace::Model::Controller qw(global_redirect standard msghash2string global_redirect);
 
 ################################################################
@@ -13,8 +13,6 @@ my $ihm= sub {
   my $c = shift;
   (my $course = standard( $c )) or return global_redirect($c);
 
-  _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
-
   sudo( $course, $c->session->{uemail} );
 
   my $curdomainport= $c->req->url->to_abs->domainport;
@@ -22,7 +20,7 @@ my $ihm= sub {
   (bioiscomplete($c->session->{uemail}))
     or $c->flash( message => 'You first need to complete your bio!' )->redirect_to("http://auth.$curdomainport/usettings");
 
-  (cioiscomplete($course)) or $c->flash( message => 'You first need to complete the course settings!' )->redirect_to('/instructor/csettings');
+  (cioiscomplete($course)) or $c->flash( message => 'You first need to complete the course settings!' )->redirect_to('/instructor/cioform');
 
   $c->stash(
 	    msgstring => msghash2string(msgshownotread( $course, $c->session->{uemail} ), "/msgmarkasread"),

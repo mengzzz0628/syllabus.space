@@ -8,7 +8,8 @@ use feature ':5.20';
 use feature 'signatures';
 no warnings qw(experimental::signatures);
 
-use SylSpace::Model::Model qw(ifilelistall sudo tzi);
+use SylSpace::Model::Model qw(sudo tzi);
+use SylSpace::Model::Files qw(filelisti);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 
@@ -18,7 +19,7 @@ get '/instructor/filecenter' => sub {
 
   sudo( $course, $c->session->{uemail} );
 
-  $c->stash( filelist => ifilelistall($course, $c->session->{uemail}, "X" ),
+  $c->stash( filelist => filelisti($course),
 	   tzi => tzi( $c->session->{uemail} )  ); ## X means not hw and not equiz
 };
 

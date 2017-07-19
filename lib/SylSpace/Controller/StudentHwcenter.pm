@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sfilelistall isenrolled sownfilelist);
+use SylSpace::Model::Model qw( isenrolled );
+use SylSpace::Model::Files qw(hwlists answerlists answerhashs);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -15,8 +16,8 @@ get '/student/hwcenter' => sub {
 
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
-  $c->stash( filelist => sfilelistall($course, $c->session->{uemail}, "hw*"),
-	     sownfilelist => scalar sownfilelist( $course, $c->session->{uemail} ),
+  $c->stash( filelist => hwlists($course),
+	     answerhashs => answerhashs( $course, $c->session->{uemail} ),
 	   );
 };
 
@@ -43,7 +44,7 @@ __DATA__
       <thead>  <tr> <th> Assignment </th> <th>Due</th> <th> Upload </th> <th> Uploaded </th> </tr> </thead>
 
       <tbody>
-          <%== filehash2string( $filelist, $sownfilelist ) %>
+          <%== filehash2string( $filelist, $answerhashs ) %>
       </tbody>
 
      </table>
@@ -52,45 +53,41 @@ __DATA__
   <p>You should name your answer file to start with the homework file name, too.  For example, if the homework is named 'hwa1.txt', name your answer file something like 'hwa1-answer.pdf' (no spaces or weird characters, please).</p>
 </main>
 
+  <%
+  sub filehash2string {
+    my ($filehashptr, $answerhashs)= @_;
+    (defined($filehashptr)) or return "";
 
-<% sub filehash2string {
-  my $filehashptr= shift;
-  defined($filehashptr) or return "";
-  my $sownfilelist= shift;
+    my $counter=0;
+    my $filestring= '';
 
-  my %sownfilelist;
-  foreach (@$sownfilelist) {
-    /^(.*)\.response\.(.*)$/ or next;
-    (/\.old$/) and next;
-    $sownfilelist{ $1 } = "<a href=\"/student/ownfileview?f=$_\">$2</a>";
-  }
+    foreach (@$filehashptr) {
+      my $duetime= $_->{duetime};  my $fname= $_->{sfilename};
 
-  my $counter=0;
-  my $filestring= '';
-  foreach (@$filehashptr) {
-    my $duetime= $_->[1];  my $fname= $_->[0];
-    ($duetime<time()) and next;
-    ++$counter;
-    my $duein= timedelta($duetime , time());
-    my $pencil= '<i class="fa fa-pencil"></i>';
+      ($duetime<time()) and next;
+      ++$counter;
+      my $duein= timedelta($duetime , time());
+      my $pencil= '<i class="fa fa-pencil"></i>';
 
-    my $uploadform=
-      qq(<form action="/uploadsave" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
+      my $uploadform=
+	qq(<form action="/uploadsave" id="uploadform" method="post" enctype="multipart/form-data" style="display:block">
           <label for="idupload">Upload: </label>
-         <input type="file" name="uploadfile" id="idupload" style="display:inline"  >
-          <input type="hidden" name="hwtask" value="$_->[0]"  ><br />
+          <input type="file" name="file" id="idupload" style="display:inline"  >
+
+          <input type="hidden" name="hwtask" value="$_->{sfilename}"  ><br />
           <button class="btn btn-default btn-block" type="submit" value="submit">Go</button>
       </form>);
 
-    $filestring .= "<tr>"
-      . "<td> ". btn("/student/fileview?f=$fname", "$pencil $fname") . "</td>"
-      . "<td style=\"text-align:left\"> due $duein (<span class=\"epoch0\">$duetime</span>)<br />due GMT ". localtime($_->[1])."<br />now GMT ".localtime()."</td>"
-      . "<td> $uploadform </td>"
-      . '<td> '.($sownfilelist{$fname}||"no upload yet").' </td>'
-      ."</tr>";
-  }
-  ($counter) or return "<tr colspan=\"3\"><td>$counter publicly posted homeworks at the moment</td> </tr>";
+      my $answer= $answerhashs->{$fname};
+      $filestring .= "<tr>"
+	. "<td> ". btn("/student/fileview?f=$fname", "$pencil $fname") . "</td>"
+	. "<td style=\"text-align:left\"> due $duein (<span class=\"epoch0\">$duetime</span>)<br />due GMT ". localtime($_->{duetime})."<br />now GMT ".localtime()."</td>"
+	. "<td> $uploadform </td>"
+	. '<td>'.((defined($answer))?"<a href=\"/student/ownfileview?f=$answer\">$answer</a>" : "no upload for $fname yet").' </td>'
+	."</tr>";
+    }
+    ($counter) or return "<tr colspan=\"3\"><td>$counter publicly posted homeworks at the moment</td> </tr>";
 
-  return $filestring;
-}
-%>
+    return $filestring;
+  }
+  %>

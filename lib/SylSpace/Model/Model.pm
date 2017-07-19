@@ -2,39 +2,37 @@
 package SylSpace::Model::Model;
 
 use base 'Exporter';
-## @ISA = qw(Exporter);
+@ISA = qw(Exporter);
 
-our @EXPORT_OK=qw(
- sudo tzi tokenmagic
+@EXPORT_OK=qw(
+	       sudo tzi tokenmagic
 
- isinstructor ismorphed
- instructorlist instructoradd instructordel
+	       isinstructor ismorphed
+	       instructorlist instructoradd instructordel
 
- sitebackup isvalidsitebackupfile courselistenrolled courselistnotenrolled
- usernew userenroll userdisroll isenrolled instructor2student student2instructor userexists getcoursesecret throttle 
+		instructornewenroll
 
- readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
+	       usernew userenroll userdisroll isenrolled morphinstructor2student unmorphstudent2instructor userexists getcoursesecret throttle
+	       _listallusers
 
- ciobuttonsave ciobuttons hassyllabus
- studentlist studentdetailedlist
+	       sitebackup isvalidsitebackupfile courselistenrolled courselistnotenrolled
 
- msgsave msgdelete msgread msgmarkasread msglistread msgshownotread
+	       readschema bioread biosave bioiscomplete cioread ciosave cioiscomplete
 
- ifilelistall ifilelist1
- sfilelistall sfileread sownfilelist sownfileread
- filelistsfiles filesetdue collectstudentanswers filewrite fileread fullfilename filedelete
- cptemplate rmtemplates listtemplates
+	       ciobuttonsave ciobuttons hassyllabus
+	       studentlist studentdetailedlist
 
- gradetaskadd gradesave gradesashash gradesasraw gradesfortask2table
+	       msgsave msgdelete msgread msgmarkasread msglistread msgshownotread
 
- tweet showtweets showlasttweet seclog showseclog superseclog
+	       tweet showtweets showlasttweet seclog showseclog superseclog
 
- equizrender equizgrade equizanswerrender
-);
+	       equizrender equizgrade equizanswerrender   	       equizrate
 
-our @EXPORT_DEBUG= qw(_msglistnotread _suundo _websitemake _websiteshow _webcourseremove _storegradeequiz _listallusers _checkvalidagainstschema);
+	       _msglistnotread
+	    );
 
-@EXPORT_OK = ( @EXPORT_OK, @EXPORT_DEBUG );
+use lib '../..';
+use SylSpace::Model::Files qw(eqreadi longfilename);
 
 ################
 use strict;
@@ -50,8 +48,10 @@ no warnings qw(experimental::signatures);
 
 ################
 
-my $var="/var/sylspace";  ## this should be hardcoded and unchanging
-(-e "$var") or die "$0: please create the $var directory for the site first.  then run mksite.pl, Model.t, or Test.t\n";
+use lib '../..';
+use SylSpace::Model::Utils qw( _getvar _checkemailvalid _checkcname _saferead _safewrite _confirmsudoset _setsudo _confirmnotdangerous _glob2lastnoyaml  _glob2last _burpapp _burpnew);
+
+my $var= _getvar();
 
 ################
 
@@ -110,70 +110,8 @@ use YAML::Tiny;
 use File::Glob qw(bsd_glob);
 use Archive::Zip;
 
-
-################################################################
-
-=pod
-
-=head2 website-related, course, and user-related functionality
-
-=cut
-
-################################################################
-
-sub _websitemake($course, $instructoremail) {
-  (-e "$var") or die "[wbm:1a] please create the $var directory for the site first\n";
-  (-w "$var") or die "[wbm:1b] please make $var writable\n";
-  (-e "$var/users") or die "[wbm:2a] please create the $var/users directory for everyone first\n";
-  (-w "$var/users") or die "[wbm:2b] please make $var/users writable\n";
-  (-e "$var/templates") or die "[wbm:3a]please create the $var/templates directory\n";
-  (-e "$var/templates/starters") or die "[wbm:3b]please create the $var/templates/starters directory (templates are copied by hand)\n\tusually, ln -s .../templates/equiz/* $var/templates/";
-
-  ($course =~ /^[\w][\w\.\-]*[\w]$/) or die "bad website name '$course'!\n"; ## need to check without triggering existence check
-  (-e "$var/courses/$course") and die "website $course already exists\n";
-  _checkemail($instructoremail);
-  (-e "$var/users/$instructoremail") or usernew($instructoremail);
-
-  mkdir("$var/courses/$course") or die "cannot make $course course website: $!\n";
-  $course= _checkcname($course); ## we are not yet the instructor, so checking makes no sense
-
-  mkdir("$var/courses/$course/msgs") or die "cannot make website messages: $!\n";
-  mkdir("$var/courses/$course/public") or die "cannot make website published: $!\n";  ## will contain links
-  mkdir("$var/courses/$course/instructor") or die "cannot make website instructor: $!\n";  ## will contain links
-  mkdir("$var/courses/$course/instructor/files") or die "cannot make website instructor files: $!\n";  ## will contain links
-
-  userenroll($course, $instructoremail, 1);
-  touch("$var/courses/$course/$instructoremail/instructor=1");
-  ##$instructoremail= _checkemail($instructoremail, $course);
-}
-
-
-## used for debugging in .t files
-sub _websiteshow($course) {
-  (-e "$var") or die "please create the $var directory for the site first\n";
-  (-e "$var/users") or die "please create the $var/users directory for everyone first\n";
-  (-e "$var/courses/$course") or die "please create the $var/courses/$course directory for everyone first\n";
-
-  _confirmnotdangerous($course, "subdomain in wss");
-  return `find $var/users $var/courses/$course`;
-}
-
-
-## for drastic debugging, this removes all websites!  it should never be called from the web.
-sub _webcourseremove($course) {
-  ## can we add a test whether we are running under Mojolicious and abort if we are?
-  ($course =~ m{/}) and die "ok, wcremove is not safe, but '$course' is ridiculous";
-  (($course eq "*") || ($course =~ m{\w[\w\.\-]*/})) or die "ok, wcrm is not safe, but '$course' is ridiculous";
-  my $nremoved=0;
-  foreach (bsd_glob("$var/courses/$course")) {
-    $_= lc($_);
-    (-e $_) or next;
-    system("rm -rf $_");
-    (-e $_) and die "wth?  $_ could not be removed!\n";
-    ++$nremoved;
-  }
-  return $nremoved;
-}
+use Scalar::Util qw(looks_like_number);
+use Scalar::Util::Numeric qw(isint);
 
 ## user email information should not leak, either, so please use it only during debugging.
 sub _listallusers() {
@@ -195,7 +133,7 @@ sub sitebackup( $course ) {
   (-r "$var/courses/$course") or die "unreadable course";
   ((-d "$var/tmp") && (-w "$var/tmp")) or die "tmp was not created";
 
-  ($course =~ /test/) and die "sorry, no websitebackup for testsite allowed";
+  ($course =~ /test/) and die "sorry, no webcoursebackup for testsite allowed";
 
   my $zip= Archive::Zip->new();
   _confirmnotdangerous($course, "subdomain in wss");
@@ -275,23 +213,38 @@ sub throttle( $seconds=5 ) {
 ## creates a new user.  users can register themselves
 
 sub usernew( $uemail ) {
-  $uemail= _checkemail($uemail);
+  $uemail= _checkemailvalid($uemail);
   (-e "$var/users/$uemail") and return (-1);  ## this is a forgivable mistake, but signaled
   mkdir("$var/users/$uemail") or die "cannot create user name $uemail";
 
-  my $randomcode= join'', map +(0..9,'a'..'z','A'..'Z')[rand(10+26*2)], 1..32;
-  touch("$var/users/$uemail/code.$randomcode") or die "cannot create a unique randomcode for $uemail";
+  # my $randomcode= join'', map +(0..9,'a'..'z','A'..'Z')[rand(10+26*2)], 1..15;
+  # touch("$var/users/$uemail/code.$randomcode") or die "cannot create a unique randomcode for $uemail";
   return 1;
 }
 
 sub userexists( $uemail ) { return (-e "$var/users/$uemail"); }
 
+sub _checkemailexists( $uemail ) {
+  _checkemailvalid( $uemail );
+  (userexists($uemail)) or die "sorry, email $uemail is valid, but user is not registered!\n";  ## basically, this function is userexists
+  return $uemail;
+}
+
+sub _checkemailenrolled( $uemail, $course ) {
+  _checkemailexists( $uemail );
+  ## ($course eq 'auth') and return 1;  ## always ok;
+  $course= _checkcname($course);
+  (-e "$var/courses/$course/$uemail") or die "user $uemail is not enrolled in course $course\n";
+  return $uemail;
+}
+
+
 ################
 ## users cannot enroll themselves unless they know the course secret
-sub userenroll( $course, $uemail, $iswebsitecreator=0 ) {
+sub userenroll( $course, $uemail, $iswebcoursecreator=0 ) {
   (-e "$var/courses/$course") or die "no such course $course.\n";
   (-e "$var/users/$uemail") or die "no such user $uemail yet.  please register bio info first\n";
-  if (!$iswebsitecreator) {
+  if (!$iswebcoursecreator) {
     (-e "$var/users/$uemail/bio.yml") or die "cannot enroll user who has no bio info (except for instructor)";
     (-e "$var/courses/$course/instructor") or die "why is there no instructor for $course yet?";
     (-e "$var/courses/$course/instructor/files") or die "why does instructor for $course not have any files?";
@@ -299,18 +252,29 @@ sub userenroll( $course, $uemail, $iswebsitecreator=0 ) {
 
   if (-e "$var/courses/$course/$uemail") {
     unlink("$var/courses/$course/disabled=1"); ## in case...
-    return _checkemail($uemail, $course);  ## mild error-- we already exist
+    return _checkemailenrolled($uemail, $course);  ## mild error-- we already exist
   }
 
   mkdir("$var/courses/$course/$uemail") or die "could not make $course/$uemail: $!\n";
   mkdir("$var/courses/$course/$uemail/msgs") or die "could not make $course/$uemail/msgs: $!\n";
   mkdir("$var/courses/$course/$uemail/files") or die "could not make $course/$uemail/files: $!\n";
-  ## we want to keep user information when we do websitebackup, so don't symlink:
+  ## we want to keep user information when we do webcoursebackup, so don't symlink:
   symlink("$var/users/$uemail/bio.yml", "$var/courses/$course/$uemail/bio.yml")
     or die "cannot store bio info for $uemail in class $course";
   copy("$var/users/$uemail/bio.yml", "$var/courses/$course/$uemail/static-bio.yml");  ## one time copy from auth.  will not be updated.
-  return _checkemail($uemail, $course);
+  return _checkemailenrolled($uemail, $course);
 }
+
+
+sub instructornewenroll( $course, $instructoremail ) {
+  _checkemailvalid($instructoremail);
+  (-e "$var/users/$instructoremail") or usernew($instructoremail);
+  userenroll($course, $instructoremail, 1);
+  touch("$var/courses/$course/$instructoremail/instructor=1");
+}
+
+
+
 
 sub isenrolled( $course, $uemail ) {
   ## if you were enrolled but are now disabled, we still call you enrolled
@@ -331,12 +295,12 @@ sub userdisroll( $course, $uemail ) {
 ################################################################
 
 sub bioread( $uemail ) {
-  $uemail=_checkemail($uemail);
+  $uemail=_checkemailexists($uemail);
   return _saferead("$var/users/$uemail/bio.yml");
 }
 
 sub biosave( $uemail, $biodataptr ) {
-  $uemail=_checkemail($uemail);
+  $uemail=_checkemailexists($uemail);
   _checkvalidagainstschema( $biodataptr, 'u' );
   ($biodataptr->{email} eq $uemail) or die "you better have the same primary email in biowrite, not $uemail and $biodataptr->{email}";
 
@@ -357,7 +321,7 @@ sub tzi( $uemail ) {
 }
 
 sub bioiscomplete( $uemail ) {
-  $uemail=_checkemail($uemail);
+  $uemail=_checkemailexists($uemail);
   (-e "$var/users/$uemail/bio.yml") or return 0;
   return ((-s "$var/users/$uemail/bio.yml")>10);  ## ok, not a full check, I admit.
 }
@@ -430,7 +394,7 @@ sub studentlist( $course ) {
 
 =pod
 
-=head2 SODO (Instructor)-related functionality
+=head2 SUDO (Instructor)-related functionality
 
 =cut
 
@@ -442,20 +406,20 @@ sub tokenmagic( $uemail ) {
   $lines[0] =~ s{^now\:\s*}{}; chomp($lines[0]); # =~ s{\s*[\r\n]*}{}ms;
   $lines[1] =~ s{^then\:\s*}{}; chomp($lines[1]); # =~ s{\s*[\r\n]*}{}ms;
   (lc($lines[0]) eq lc($uemail)) or die "bad token magic file email.  you are '$uemail', not '$lines[0]'";
-  (_checkemail($lines[1])) or die "you cannot possibly turn yourself into an invalid email of $lines[1]";
+  (_checkemailexists($lines[1])) or die "you cannot possibly turn yourself into an invalid email of $lines[1]";
   unlink("$var/tmp/magictoken");
   return $lines[1];
 }
 
 
-sub instructor2student( $course, $uemail) {
+sub morphinstructor2student( $course, $uemail) {
   $course= _confirmsudoset( $course );  ## ok, we are the instructor!
-  $uemail= _checkemail($uemail, $course);
+  $uemail= _checkemailenrolled($uemail, $course);
   return touch("$var/courses/$course/$uemail/morphed=1");
 }
 
-sub student2instructor( $course, $uemail) {
-  $uemail= _checkemail($uemail, $course);
+sub unmorphstudent2instructor( $course, $uemail) {
+  $uemail= _checkemailenrolled($uemail, $course);
   # (ismorphed($course,$uemail)) or die "you cannot unmorph $uemail in $course";
   (-e "$var/courses/$course/$uemail/morphed=1") and unlink("$var/courses/$course/$uemail/morphed=1");
 }
@@ -467,29 +431,19 @@ sub ismorphed($course, $uemail) {
 }
 
 
-my $amsudo=0;  ## after setting it to 1, you no longer have to give the email to check capabilities
-
 sub sudo( $course, $uemail ) {
-  ##  ($amsudo) and return 1;  ## it was already set (by me!)  this is probably no longer necessary
   (defined($course)) or die "Model sudo: need a class name";
   (defined($uemail)) or die "Model sudo: need some uemail --- who are you?";
   (-e "$var/users/$uemail") or die "Model sudo: '$uemail' is not even enrolled in $course";
 
   (isinstructor($course, $uemail)) or die "Model sudo: you $uemail are not among valid instructors for $course\n";
-  $amsudo=1; ## ok, we are set for confirmsudoset and isinstructor
+  _setsudo();
+
   return $course;
 }
 
-# sub utype( $course, $uemail ) { return (isinstructor($course, $uemail)) ? 'i' : 's'; }
 
-## a local helper,  works only after an sudo() has been called, because email has been checked; also does _checkcname
-sub _confirmsudoset( $course ) {
-  $course= _checkcname($course);
-  ($amsudo) or die "insufficient privileges: you are not a confirmed instructor for $course!\n";
-  return $course;
-}
 
-sub _suundo { $amsudo=0; }  ## needed for debug and testing only
 
 sub isinstructor( $course, $uemail, $ignoremorph=0 ) {
    $course= _checkcname($course);
@@ -595,7 +549,7 @@ sub _checkvalidagainstschema( $dataptr, $metaschemafletter, $verbose =0 ) {
       ($verbose) and print STDERR "testing $fieldname data $d against htmltype $htmltype  ";
       if (($d)&&($d ne '')) {
 	if ($htmltype eq "number") { ($d+0 == $d) or die "Sorry, but $htmltype is not a number\n"; }
-	if ($htmltype eq "email") { _checkemail($d) or die "Sorry, but $htmltype is not an email\n"; }
+	if ($htmltype eq "email") { _checkemailvalid($d) or die "Sorry, but $htmltype is not an email\n"; }
 	if ($htmltype eq "url") { ($d=~/^http/) or die "Sorry, but $htmltype is not a url\n"; }
       }
     }
@@ -673,7 +627,7 @@ sub msgread( $course, @msgid ) {
 ## iterate messages
 sub msgmarkasread( $course, $uemail, $msgid ) {
   $course= _checkcname( $course );
-  $uemail= _checkemail($uemail,$course);
+  $uemail= _checkemailenrolled($uemail,$course);
   $msgid =~ s/^msgid=//;
   ($msgid =~ /^[0-9]+$/) or die "need reasonable message id to mark read, not '$msgid'!\n";
   touch("$var/courses/$course/$uemail/msgs/$msgid.yml");
@@ -687,7 +641,7 @@ sub _msglist( $course ) {
 }
 
 sub msglistread( $course, $uemail ) {
-  $uemail= _checkemail($uemail,$course);
+  $uemail= _checkemailenrolled($uemail,$course);
   return _glob2lastnoyaml("$var/courses/$course/$uemail/msgs/*.yml");
 }
 
@@ -703,430 +657,6 @@ sub _msglistnotread( $course, $uemail ) {
 ## iterate all unread messages and put it into a full structure
 sub msgshownotread( $course, $uemail ) {
   return msgread( $course, _msglistnotread( $course, $uemail ) ); } ## ->[0] dereferences
-
-
-
-
-################################################################
-
-=pod
-
-=head2 Grading interface, allowing setting and reading grades
-
-=cut
-
-################################################################
-
-## can be done repeatedly without harm
-sub gradetaskadd( $course, @hwname ) {
-  my $tasklistfile="$var/courses/$course/tasklist";
-  _confirmsudoset($course);
-
-  my %existing;
-  if (-e $tasklistfile) { foreach (slurp($tasklistfile)) { $existing{$_}= 1; } }
-
-  my @addhw;
-  foreach ( @hwname ) {
-    chomp;
-    ($existing{$_}) and next;  ## just ignore the task if it already is in file
-    push(@addhw, $_);
-  }
-
-  if (@addhw) {
-    open(my $FOUT, ">>", $tasklistfile) or die "cannot open file $tasklistfile to store new hw category: $!";
-    foreach (@addhw) { print $FOUT $_."\n"; }
-    close($FOUT);
-  }
-
-  return $#addhw+1;
-}
-
-sub gradesasraw( $course ) {
-  (-e "$var/courses/$course/grades") or return "no grades yet";
-  return slurp("$var/courses/$course/grades");
-}
-
-
-## no uemail means that 
-sub gradesashash( $course, $uemail=undef ) {
-  ## as instructor, just leave uemail blank and you get all grades;
-  ## otherwise, with an email, you only get your own grades
-
-  $course= _checkcname( $course );
-
-  (-e "$var/courses/$course/grades") or return;
-  my @gradelist= slurp("$var/courses/$course/grades");
-  if (defined($uemail)) {
-    @gradelist= grep(/$uemail/, @gradelist);  ## faster...we just do it for 1 student
-  } else {
-    $course= _confirmsudoset($course);  ## make sure
-  }
-  ## hw stays in order!
-  my (%hw,@hw);  foreach (slurp("$var/courses/$course/tasklist")) { chomp; $hw{$_}=1; push(@hw, $_); }
-
-  my (%col, %row, $gradecell, $timestamp);
-  foreach (@gradelist) {
-    s/[\r\n]//;
-    my ($uem, $tskn, $grd, $tma)=split(/\t/, $_);
-    ($tma >= 1493749426) or die "corrupted homework file!\n";
-
-    $col{$uem}= $uem; ## unregistered students can have homeworks, so no check against registered list
-    $row{$tskn}= $tskn;
-    $hw{$tskn} or die "unknown homework '$tskn'\n".slurp("$var/courses/$course/tasklist")."\n";
-    $gradecell->{$uem}->{$tskn}= $grd;  ## use the last time we got a grade for this task;  ignore earlier grades
-    $timestamp->{$uem}->{$tskn}= $tma;
-  }
-  my @col= sort keys %col;
-  # my @row= sort keys %row;
-  ($#col == (-1)) and return;
-
-  return { hw => \@hw,
-	   uemail => (defined($uemail) ? [ $uemail ] : studentlist( $course )),
-	   grade => $gradecell, epoch => $timestamp };
-}
-
-
-## entering is easy: just append to a file.  the only complex aspect is that we do not want
-## to repeat ourselves; if the grade has not changed, keep the old entry.  note that we may
-## have multiple grades on the same homework in the file.  the reader has to be smart enough
-## to know that it is the last one that counts;
-sub gradesave( $course, $semail, $hwname, $newgrade ) {
-  $course= _confirmsudoset( $course );
-
-  my (@semail, @hwname, @newgrade);
-
-  if (ref $semail eq 'ARRAY') {
-    (ref $hwname eq 'ARRAY') or die 'gradeadd: either all or none are arrays!';
-    (ref $newgrade eq 'ARRAY') or die 'gradeadd: either all or none are arrays!';
-    ((scalar @{ $semail }) == (scalar @{ $hwname })) or die "gradeadd: must be the same number of obs";
-    ((scalar @{ $semail }) == (scalar @{ $newgrade })) or die "gradeadd: must be the same number of obs";
-    @semail= @$semail;
-    @hwname= @$hwname;
-    @newgrade= @$newgrade;
-  } else {
-    push(@semail, $semail ); push(@hwname, $hwname); push(@newgrade, $newgrade);
-  }
-
-  my %recorded;
-  if (-e "$var/courses/$course/grades") {
-    foreach (slurp("$var/courses/$course/grades")) {
-      my @k= split(/\t/, $_); pop(@k);
-      $recorded{join("\t", @k)}=1;
-    }
-  }
-
-  my %hw;
-  if (-e "$var/courses/$course/tasklist") {
-    foreach (slurp("$var/courses/$course/tasklist")) { chomp; $hw{$_}=1; }
-  }
-
-  my @todo;
-  while ($#semail >= 0) {
-    my $e= pop(@semail); $e=_checkemail($e,$course);  ## we could permit recording non-registered students
-    my $h= pop(@hwname); ($hw{$h}) or die "cannot add grade for non-existing homework '$h', course $course.";
-    my $g= pop(@newgrade); ## grades can be anything
-    my $ehg= "$e\t$h\t$g";
-    ($recorded{$ehg}) and next;
-    $recorded{$ehg}= 1;
-    push(@todo, $ehg."\t".time()."\n");
-  }
-  if (@todo) {
-    open(my $FOUT, ">>", "$var/courses/$course/grades") or die "cannot open gradefile for course $course for w: $!";
-    foreach (@todo) { print $FOUT $_; }
-    close($FOUT);
-  }
-
-  return $#todo+1;
-}
-
-##
-sub gradesfortask2table($course, $task) {
-  my @r;
-  open(my $FIN, "<", "$var/courses/$course/grades") or return;
-  while (<$FIN>) {
-    my @c= split(/\t/, $_);
-    ($c[1] eq $task) or next;
-    push(@r, [ $c[0], $c[2], $c[3] ]);
-  }
-  return \@r;
-}
-
-################################################################
-
-=pod
-
-=head2 File interface. 
-
-instructors can store and read all files.  students can only read
-published instructor files, plus own files that they have uploaded.
-
-=cut
-
-################################################################
-
-### could be split into instructor and studentwrites
-sub filewrite( $course, $uemail, $filename, $filecontents, $inresponseto=undef ) {
-  $uemail= _checkemail($uemail,$course);
-  $filename= _checkfilename($filename);
-
-  if (isinstructor($course, $uemail)) {
-    $course= _checkcname( $course );
-    $uemail= 'instructor';
-    return _safewrite( $filecontents, "$var/courses/$course/$uemail/files/$filename" );
-  }
-
-  ## we are a student
-  (defined($inresponseto)) or die "students can only answer, but not post, so '$filename' cannot be accepted\n";
-  (_ispublic($course, $inresponseto))
-    or die "sorry, we are not collecting for $inresponseto.  did you use the correct hw filename in your own response filename $filename?";
-  $filename="$inresponseto.response.$filename";
-  (_safewrite( $filecontents, "$var/courses/$course/$uemail/files/$filename" )) or return 0;  ## fail
-  foreach (bsd_glob("$var/courses/$course/$uemail/files/inresponseto.response.*")) {
-    ($_ eq $filename) and next;
-    unlink($_);  # delete any earlier files that answered the same homework (should be only 1)
-  }
-  return 1;
-}
-
-sub fileread( $course, $uemail, $filename ) {
-  return _saferead( fullfilename( $course, $uemail, $filename) );
-}
-
-## a full path to a file
-sub fullfilename( $course, $uemail, $filename ) {
-  ($uemail eq 'instructor') or $uemail= _checkemail($uemail,$course);
-  $filename= _checkfilename($filename);
-  (isinstructor($course,$uemail)) and $uemail='instructor';
-  return "$var/courses/$course/$uemail/files/$filename";
-}
-
-
-## a student reading files from the instructor
-sub sfileread( $course, $filename ) {
-  ## check enrollment?
-  $filename =~ s{.*/}{};
-  my $t= _ispublic( $course, $filename );
-  ($t < time()) and die "no public file $filename!  choices=".join(" ", bsd_glob( "$var/courses/$course/public/*" ));  ## expired!
-  return _saferead( fullfilename( $course, 'instructor', $filename) )
-}
-
-## a student reading an own submitted homework answer
-sub sownfileread( $course, $uemail, $filename ) {
-  my $pattern= "$var/courses/$course/$uemail/files/$filename*";  # any that meets the pattern
-  $_= ((_glob2last($pattern))[0]);
-  (defined($_)) or die "no file '$filename' was earlier uploaded by you (a student, $uemail)";
-
-  my $rv= _saferead( fullfilename( $course, $uemail, $_) );
-  return _saferead( fullfilename( $course, $uemail, $_) );
-}
-
-
-## could be instructor only if we do not allow students to remove their own files
-sub filedelete( $course, $uemail, $filename ) {
-  $uemail= _checkemail($uemail,$course);
-  $filename= _checkfilename($filename);
-  (isinstructor($course, $uemail)) and $uemail='instructor';
-  (-e "$var/courses/$course/$uemail/files/$filename") or die "cannot delete non-existing file $filename";
-  unlink( "$var/courses/$course/$uemail/files/$filename" ) or die "failed to delete $filename: $!\n";
-  _cleandeadlines($course);
-  ## keep the student responseto submissions
-  return 1;
-}
-
-
-## build a detailed file structure for extended display
-sub ifilelist1( $course, $uemail, $basename ) {
-  $course= _confirmsudoset( $course );
-  $uemail= _checkemail($uemail,$course);
-  $basename= _checkfilename($basename);
-
-  $course= _confirmsudoset( $course );
-
-  my $fullfnm="$var/courses/$course/instructor/files/$basename";
-  (-e $fullfnm) or die "internal error: $fullfnm does not exist.";
-
-  return { filename => $basename, fullfilename => $fullfnm, filelength => (-s $fullfnm),
-	   duetime => _ispublic($course, $basename), mtime => ((stat($fullfnm))[9]) };
-}
-
-
-## instructor can list all files
-sub ifilelistall( $course, $uemail, $mask="*" ) {
-  $course= _confirmsudoset( $course );
-  $uemail= _checkemail($uemail, $course);
-
-  my @ufl;
-  if ($mask eq "X") {  ## special!!!  this means files that are not homeworks or equizzes
-    my @l= _glob2last( "$var/courses/$course/instructor/files/*" );
-    @l = grep { $_ !~ /^hw/i } @l;
-    @l = grep { $_ !~ /\.equiz$/i } @l;
-    @ufl= @l;
-  } else {
-    @ufl= _glob2last( "$var/courses/$course/instructor/files/$mask" );
-  }
-
-  my $xlist;
-  foreach (@ufl) { push( @$xlist, ifilelist1($course, $uemail, $_ ) ); }
-  return $xlist;
-}
-
-## student can list only instructor's published files
-sub sfilelistall( $course, $uemail, $mask="*" ) {
-  my $files= publicfiles($course, $uemail, $mask);
-
-  my @sfiles;
-  foreach (@$files) {
-    my $tt= _ispublic($course, $_);
-    push( @sfiles, [ $_, _ispublic($course, $_) ] );
-  }
-  return \@sfiles;
-}
-
-## student can list all own files
-sub sownfilelist( $course, $uemail, $mask="*" ) {
-  my @list= bsd_glob( "$var/courses/$course/$uemail/files/$mask" );
-  (@list) or return ;
-  foreach (@list) { s{$var/courses/$course/$uemail/files/}{}g; }
-  return \@list;
-}
-
-## instructor can list all student files
-sub filelistsfiles( $course, $inresponseto="*" ) {
-  $course= _checkcname( $course );
-  my @a= bsd_glob( "$var/courses/$course/*/files/$inresponseto.response.*" );
-  return \@a; ## needs student id, so not _glob2last
-}
-
-
-## instructor can collect all student homework submissions
-sub collectstudentanswers( $course, $filename ) {
-  $course= _confirmsudoset( $course );
-  $filename= _checkfilename($filename);
-
-  my $retrievepattern= "$var/courses/$course/*\@*/files/$filename.response.*";
-  my @filelist= bsd_glob( $retrievepattern );
-
-  (@filelist) or return "";  ## no files yet;
-
-  my $zip= Archive::Zip->new();
-
-  _confirmnotdangerous($retrievepattern, "retrievepattern in fstudentcollect");
-  my $ls=`ls -lt $retrievepattern`;
-  $zip->addString( $ls, '_MANIFEST_' ); ## contains date info
-
-  my $archivednames="";
-  foreach (@filelist) {
-    my $fname= $_; $fname=~ s{$var/courses/$course/}{};  $fname=~ s{/files/}{-};
-    $zip->addFile( $_, $fname );  $archivednames.= " $fname ";
-  }
-
-  my $ofname="$var/courses/$course/instructor/files/$filename-".time().".zip";
-  $zip->writeToFileNamed( $ofname );
-
-  return $ofname;
-}
-
-################################################################
-
-sub listtemplates( ) {
-  my @list= bsd_glob("$var/templates/*");
-  foreach (@list) { s{$var/templates/}{}; }
-  return \@list;
-}
-
-
-sub cptemplate( $course, $templatename ) {
-  $course= _confirmsudoset( $course );
-
-  (-e "$var/templates/") or die "templates not yet installed.";
-  (-e "$var/templates/$templatename") or die "no template $templatename";
-
-  my $count=0;
-  foreach (bsd_glob("$var/templates/$templatename/*")) {
-    (my $sname= $_) =~ s{.*/}{};
-    (-e "$var/courses/$course/instructor/files/$sname") and next;  ## skip if already existing
-    symlink($_, "$var/courses/$course/instructor/files/$sname") or die "cannot symlink $_ to $var/courses/$course/instructor/files/$sname: $!\n";
-    ++$count;
-  }
-  return $count;
-}
-
-sub rmtemplates( $course ) {
-  $course= _confirmsudoset( $course );
-
-  my $count=0;
-  foreach (bsd_glob("$var/courses/$course/instructor/files/*")) {
-    (-l $_) or next;
-    my $pointsto = readlink($_);
-    if ($pointsto =~ m{$var/templates/}) { unlink($_) or die "cannot remove template link: $!\n"; ++$count; }
-  }
-  _cleandeadlines($course);
-  return $count;
-}
-
-
-
-
-################################################################
-
-=pod
-
-=head2 Deadline interface.
-
-deadlines are (empty) filenames in the filesystem
-
-=cut
-
-################################################################
-
-sub filesetdue( $course, $filename, $when ) {
-  $course= _confirmsudoset( $course );
-  $filename= _checkfilename($filename);  # lowercase the filename and check against mischief
-
-  my $srcfile= "$var/courses/$course/instructor/files/$filename";
-  (-e $srcfile) or die "$srcfile does not exist";
-
-  my $olddeadline= _ispublic($course, $filename);  ## can expire and remove dead deadlines, if any
-  ($olddeadline) and unlink("$var/courses/$course/public/$filename.DEADLINE.$olddeadline");  ## we are updating, so wipe earlier prevailing (not necessarily expired) deadlines
-  (bsd_glob("$var/courses/$course/public/$filename.DEADLINE.*")) and die "internal error---there was yet another deadline!\n";
-
-  ($when =~ /^[0-9]+$/) or die "need reasonable deadline, not '$when'!\n";  ## expired could be 0 or earlier
-  touch( "$var/courses/$course/public/$filename.DEADLINE.$when" );
-  return $when;
-}
-
-sub _ispublic( $course, $filename ) {
-  _cleandeadlines( $course, $filename );
-  my @gf= bsd_glob("$var/courses/$course/public/$filename.DEADLINE.*");
-  (@gf) or return 0;
-  ($#gf<=0) or die "ispublic is written for one file only";
-  (-e $gf[0]) or die "internal error: $gf[0] does not exist!";
-  $gf[0] =~ s{.*DEADLINE\.([0-9]+)}{$1};
-  return $gf[0];
-}
-
-sub publicfiles( $course, $uemail, $mask ) {
-  _cleandeadlines($course);
-
-  my @files= _glob2last( "$var/courses/$course/public/".(($mask eq "X") ? "*" : "$mask").".DEADLINE.*" );
-  if ($mask eq "X") {  ## special!!!
-    @files = grep { $_ !~ /^hw/i } @files;
-    @files = grep { $_ !~ /\.equiz\.DEADLINE/i } @files;
-  }
-  foreach (@files) { s{\.DEADLINE\.[0-9]+$}{}; }
-  return \@files;
-}
-
-## remove expired files
-sub _cleandeadlines( $course, $basename="*" ) {
-  foreach ( bsd_glob("$var/courses/$course/public/$basename.DEADLINE.*") ) {
-    (-e $_) or next;  ## weird race condition; the link had already disappeared
-    (my $deadtime=$_) =~ s{.*DEADLINE\.([0-9]+)}{$1};  # wipe everything before the deadline
-    ($deadtime+0 == $deadtime) or die "internal error: deadline is not a number\n";
-    if ($deadtime <= time()) { unlink($_); next; }  ## we had just expired
-  }
-}
-
 
 
 
@@ -1146,7 +676,7 @@ sub _logany( $ip, $course, $who, $msg, $file, $destdir=undef ) {
   # let's keep the full email address  $who =~ s/\@.*\b//;
   $msg =~ s{\t}{ }g;  $msg=~ s/[\n\r]//g;
   (defined($destdir)) or $destdir="$var/courses/$course";
-  open(my $FLOG, ">>", "$destdir/$file"); print $FLOG $ip."\t".time()."\t".gmtime()."\t".$who."\t$msg\n"; close($FLOG);
+  _burpapp("$destdir/$file", $ip."\t".time()."\t".gmtime()."\t".$who."\t$msg\n");
 }
 
 sub superseclog( $ip, $who, $msg ) {
@@ -1167,7 +697,7 @@ sub tweet( $ip, $course, $who, $msg ) {
   (-e $tweetfile) or touch($tweetfile);
   $tweetfile =~ s{.*/}{};
   _logany($ip, $course, $who, $msg, $tweetfile);
-  open(my $FLT, ">", "$var/courses/$course/lasttweet"); print $FLT "GMT ".gmtime()." $who $msg"; close($FLT);
+  _burpnew("$var/courses/$course/lasttweet", "GMT ".gmtime()." $who $msg");
 }
 
 sub showlasttweet( $course ) {
@@ -1183,7 +713,7 @@ sub showtweets( $course ) {
 
 sub showseclog( $course ) {
   my $seclogfile= "$var/courses/$course/security.log";
-  (-e $seclogfile) or return time()."\t".gmtime()."\tsystem\tno security log just yet\n";
+  (-e $seclogfile) or return join("\t", ('noip',time(),scalar gmtime(),'system', 'no security log just yet'))."\n";
   return scalar slurp($seclogfile);
 }
 
@@ -1199,9 +729,14 @@ sub showseclog( $course ) {
 ################################################################
 
 sub equizrender( $course, $email, $equizname, $callbackurl ) {
+  _checkemailenrolled($email, $course);
+  (_confirmnotdangerous($equizname, "equizrender")) or die "sorry, but user $email cannot post $equizname, because it is bloody";
+
   (defined($equizname)) or die "need a filename for equizmore.\n";
-  my $equizcontent= fileread( $course, 'instructor', $equizname );  ## quizzes always belong to the instructor
-  my $fullequizname= fullfilename( $course, 'instructor', $equizname );
+
+  my $equizcontent= (isinstructor($course, $email)) ? eqreadi( $course, $equizname ) : eqreads( $course, $equizname );  ## quizzes always belong to the instructor
+
+  my $fullequizname= longfilename( $course, $equizname );
   my $equizlength= length($equizcontent);
 
   my $executable= sub {
@@ -1214,7 +749,7 @@ sub equizrender( $course, $email, $equizname, $callbackurl ) {
   ## instead of this secret, we could use a line from /var/sylgrade/secrets.txt
 
   my $fullcommandline= "$executable $fullequizname ask $secret $callbackurl $email";
-  _confirmnotdangerous($fullcommandline, "executable to render equiz");
+  ## _confirmnotdangerous($fullcommandline, "executable to render equiz");  ## maybe uncomment
 
   my $r= `$fullcommandline`;
   return $r;
@@ -1263,8 +798,6 @@ sub equizgrade( $course, $uemail, $posttextashash ) {
 
   my $i=0; my $score=0; my @qlist;
   while (++$i) {
-    use Scalar::Util qw(looks_like_number);
-
     my $ia= $posttextashash->{"S-$i"};
     (defined($ia)) or last;
     (looks_like_number($ia)) or
@@ -1305,7 +838,7 @@ sub _storegradeequiz( $course, $semail, $gradename, $eqlongname, $time, $grade, 
   ## $course= _confirmsudoset( $course );  ## sudo must have been called!
 
   $course= _checkcname( $course );  ## sudo must have been called!
-  $semail= _checkemail($semail,$course);
+  $semail= _checkemailenrolled($semail,$course);
   ($time > 0) or die "wtf is your quiz time?";
   ($time <= time()) or die "back to the future?!";
 
@@ -1313,11 +846,12 @@ sub _storegradeequiz( $course, $semail, $gradename, $eqlongname, $time, $grade, 
   (-w "$var/courses/$course/$semail/files") or die "non-writeable directory:\n";
 
   ## temporarily allow su privileges to add to grades, too
-  my $psudo= $amsudo;
-  $amsudo=1;
+  _savesudo();
+  _setsudo();
   gradetaskadd( $course, $gradename );
   my $rv=gradesave( $course, $semail, $gradename, $grade );
-  $amsudo=$psudo;
+  _restoresudo();
+
   return $rv;
 }
 
@@ -1337,6 +871,13 @@ sub equizanswerrender( $decodedarray ) {
     <link href="/css/eqbackend.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="/css/input.css" media="screen" rel="stylesheet" type="text/css" />
 
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+    MathJax.InputJax.TeX.Definitions.number =
+      /^(?:[0-9]+(?:\,[0-9]{3})*(?:\{\.\}[0-9]*)*|\{\.\}[0-9]+)/
+  });
+</script>
+
     <style>
       p.qstntext::before {  content: "Question: "; font-weight: bold;  }
       p.qstntext::before {  content: "Question: "; font-weight: bold;  }
@@ -1349,142 +890,71 @@ sub equizanswerrender( $decodedarray ) {
 
   foreach (@{$detail}) {
     my $precision= $_[5] || "0.01";
+    my $youranswer = $_->[4];
+    ($youranswer < 0) and $youranswer =~ s/^\s*\-/ &ndash;/;
+    my $correctanswer = $_->[3];
+    ($correctanswer < 0) and $correctanswer =~ s/^\s*\-/ &ndash;/;
     $rv .= qq(
        <div class="subpage">
           <div class="qname">$_->[0]</div>
           <div class="qstn">
            <p class="qstntext"> $_->[1] </p>
            <p class="qstnlong"> $_->[2] </p>
-           <p class="qstnshort"> $_->[3] (+/- $precision)</p>
-           <p class="qstnstudentsays"> $_->[4] </p>
+           <p class="qstnshort"> $correctanswer (&plusmn; $precision)</p>
+           <p class="qstnstudentsays"> $youranswer </p>
            <p class="qstnscore"> $_->[6] </p>
        </div>
      </div>
 );
   }
+
+  $rv .= '
+<p>The numeric solutions above are typically approximations.  The correct answer carries the full interim precision, and is shown with many significant digits.  After you have examined both the correct and your own answers, please help us improve this quiz for the future by giving us your opinion.  You will then be redirected to the equiz center after you click on <em>Opine</em>.
+
+<form method="GET" action="equizrate" class="form-inline">
+    <input type="hidden" name="equizrate" value="'.$fname.'" />
+    <input type="hidden" name="equizgradename" value="'.$gradename.'" />
+    <input type="hidden" name="equizuemail" value="'.$uemail.'" />
+
+	<div class="form-group">
+		<label for="difficulty">Difficult:</label>
+		<select name="difficulty" class="form-control" id="difficulty">
+		<option value="none" selected="selected"></option>
+		<option value="hard">Too Hard</option>
+		<option value="right">Just Right</option>
+		<option value="easy">Too Easy</option>
+		</select>
+	</div>
+
+	<div class="form-group">
+		<label for="clarity">Clarity:</label>
+		<select name="clarity" class="form-control" id="clarity">
+		<option value="none" selected="selected"></option>
+		<option value="very">Answers Clear Now</option>
+		<option value="somewhat">Answers Stil Not Clear</option>
+		<option value="wrong">Answers Seem Wrong</option>
+		</select>
+	</div>
+
+	<div class="form-group">
+		<label for="comments">Comments:</label>
+                <input type="text" size="80" maxsize="80" name="comments" />
+        </div>
+
+      <button class="btn btn-default" type="submit" value="submit">Opine</button>
+
+   </form>
+';
+
   return $rv;
 }
 
 
-################################################################
-
-=pod
-
-=head2 Utility Routines: 
-
-* safe writing into the filesystem (with backup and yaml understanding)
-
-* globbing
-
-* checking filenames and filepaths
-
-* checking email / enrollment
-
-=cut
-
-################################################################
-
-## safewrite will first write a temporary file with the new content,
-## then rename any old file to a backup first (including useless
-## symlinks), and finally rename the two files appropriately.  if the
-## file ends with yml, the content is written and read through
-## yaml::tiny.  otherwise, it is just a plain file
-
-sub _safewrite( $contentinfo, $filename ) {
-  $filename= _checkfilepath($filename);
-
-  (defined($contentinfo)) or die "need contentinfo to write!\n";
-
-  if ($filename =~ /\.yml$/) {
-    my $yamlofinfo= YAML::Tiny->new($contentinfo);
-    $yamlofinfo->write($filename.".new") or die "cannot write replacement: $! --- aborted update/write\n";
-  } else {
-    open(my $FOUT, ">", $filename.".new") or die "cannot write replacement: $! --- aborted update/date\n"; print $FOUT $contentinfo; close($FOUT);
-  }
-  if (-e $filename) {
-    if ($filename =~ /\.equiz$/) {
-      (my $newfilename= $filename) =~ s{(.*)/(.*)}{$1/old-$2};
-      rename($filename, $newfilename) or die "cannot rename existing file $filename to $newfilename: $!";
-    } else {
-      rename($filename, $filename.".old") or die "cannot rename existing file $filename to $filename.old: $!";
-    }
-  }
-  return rename($filename.".new", $filename); ## this better work
-}
-
-sub _saferead( $filename ) {
-  ## problem: the below will change Model/filename to model/filename, which
-  ## works under osx, but not under linux;
-
-  $filename= ($filename =~ m{^Model/[ubc]settings-schema\.yml}) ? $filename : _checkfilepath($filename);  ## do not uppercase
-
-  ## the .yml extension is hardcoded
-  if ($filename =~ /\.ya?ml$/) {
-    (-e $filename) or return;
-    return (YAML::Tiny->read($filename))->[0];
-  }
-
-  ## we will try to see if any of the following work, in order
-  foreach my $ext ("", ".html", ".htm", ".pdf", ".txt", ".text", ".csv", ".doc") {
-    (-e "$filename$ext") and return slurp("$filename$ext");
-  }
-
-  return (-e $filename);  ## not found
-}
-
-
-sub _glob2last( $globstring ) {
-  return map { (my $foo = $_) =~ s{.*/}{}; $foo; } bsd_glob($globstring);
-}
-
-sub _glob2lastnoyaml( $globstring ) {
-  return map { (my $foo = $_) =~ s{.*/}{}; $foo =~ s{\.ya?ml$}{}; $foo; } bsd_glob($globstring);
-}
-
-sub _checkfilename( $filename ) {
-  defined($filename) or die "please provide a filename";
-  ($filename eq "") and die "please provide a filename";
-  ($filename =~ /^[\w\-\ ][\@\w\.\-\ ]*$/) or die "filename $filename contains bad characters; use only words, dashes, dots";
-  return lc($filename);
-}
-
-sub _checkfilepath( $filepath ) {
-  $filepath =~ s{/+}{/};
-  ($filepath =~ m{[^\w]\.\.}) and die "filepath $filepath can have double dots only after a word character\n";
-  return lc($filepath);
-}
-
-
-##
-## validation of names and sites
-##
-
-sub _checkemail( $uemail, $course=undef ) {
-  (defined($uemail)) or die "I have no idea who you are!\n";
-  (length($uemail)<128) or die "email $uemail too long\n";
-  (Email::Valid->address($uemail)) or die "email address '$uemail' could not possibly be valid\n";
-  ($uemail =~ m{/}) and die "email $uemail cannot have slash in it!\n";
-  ($uemail =~ m{\.\.}) and die "email $uemail cannot have consecutive dots!\n";
-  $uemail= lc($uemail);
-
-  if ((defined($course))&&($course ne "auth")) {
-    $course= _checkcname($course);
-    (-e "$var/courses/$course/$uemail") or die "user $uemail is not enrolled in course $course\n";
-  }
-  return $uemail;
-}
-
-sub _checkcname( $course ) {
-  ($course =~ /^[\w][\w\.\-]*[\w]$/) or die "bad website name '$course'!\n";
-  (-e "$var/courses/$course") or ($course eq "auth") or die "subdomain $course is unknown.\n";
-  return lc($course);
-}
-
-
-## stuff we may pass into a system or backquote call
-sub _confirmnotdangerous( $string, $warning ) {
-  ($string =~ /\;\&\|\>\<\?\`\$\(\)\{\}\[\]\!\#\'/) and die "too dangerous: $warning fails!";  ## we allow '*'
-  return $string;
+sub equizrate( $ip, $course, $hash ) {
+  (my $comments= $hash->{comments}) =~ s/[:\n]/;/g;
+  my $errmsg= "$hash->{equizrate} : $hash->{equizgradename} : $hash->{clarity} : $hash->{difficulty} : $comments ";
+  _logany( $ip, $course, $hash->{equizuemail}, $errmsg, 'equizratings.txt', $var );
 }
 
 1;
+

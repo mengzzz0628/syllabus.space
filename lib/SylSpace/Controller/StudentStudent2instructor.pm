@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(student2instructor isenrolled ismorphed);
+use SylSpace::Model::Model qw(unmorphstudent2instructor isenrolled ismorphed);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -17,7 +17,7 @@ get '/student/student2instructor' => sub {
 
   ismorphed($course, $c->session->{uemail}) or die "you are not a morphed instructor for $course?!";
 
-  student2instructor($course, $c->session->{uemail});
+  unmorphstudent2instructor($course, $c->session->{uemail});
 
   return $c->flash( message => "student unmorphed back to instructor" )->redirect_to('/instructor');
 };

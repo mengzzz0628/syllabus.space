@@ -1,5 +1,3 @@
 #!/bin/sh
-CDSP=/home/ivo/bitsyllabus/syllabus.space/
-echo "Stopping hypnotoad from $CDSP"
-cd $CDSP
-/usr/local/bin/hypnotoad -s $CDSP/SylSpace
+cd /home/ivo/bitsyllabus/syllabus.space
+/usr/local/bin/hypnotoad -s ./SylSpace

@@ -4,12 +4,14 @@ use Mojolicious::Lite;  ## implied strict, warnings, utf8, 5.10
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(isenrolled isinstructor _suundo);
+use SylSpace::Model::Model qw(isenrolled isinstructor);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
 ## a redirector for instructors and students (not for auth!!)
 ################################################################
+
+SylSpace::Model::Utils::_unsetsudo();
 
 my $torealhome = sub {
   my $c = shift;
@@ -23,7 +25,7 @@ my $torealhome = sub {
   (isenrolled( $course, $c->session->{uemail} ))
     or return $c->flash(message => 'who are you?  please authenticate')->redirect_to("http://auth.$curdomainport/index");
 
-  _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
+  ## _suundo();  ## sometimes after a direct redirect, this is oddly still set.  grrr
 
   my $desturl= isinstructor( $course, $c->session->{uemail} ) ? '/instructor' : '/student';
 

@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo rmtemplates);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(rmtemplates);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################

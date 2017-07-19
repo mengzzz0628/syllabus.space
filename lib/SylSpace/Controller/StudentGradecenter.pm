@@ -6,7 +6,8 @@ use strict;
 
 use lib '../..';
 
-use SylSpace::Model::Model qw(gradesashash isenrolled);
+use SylSpace::Model::Model qw(isenrolled);
+use SylSpace::Model::Grades qw(gradesashash);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################

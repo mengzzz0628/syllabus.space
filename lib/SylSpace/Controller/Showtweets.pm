@@ -36,7 +36,7 @@ __DATA__
 <% use SylSpace::Model::Controller qw(displaylog); %>
 
 %title 'course activity';
-%layout 'sylspace';
+%layout 'both';
 
 <main>
 

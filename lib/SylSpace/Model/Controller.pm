@@ -9,7 +9,7 @@ our @EXPORT_OK =qw(  standard global_redirect global_redirectmsg
 		     btn btnsubmit btnblock btnxs
 		     msghash2string ifilehash2table
 		     drawform drawmore fileuploadform displaylog mkdatatable
-		     browser
+		     webbrowser
 		     obscure unobscure
 );
 
@@ -444,8 +444,15 @@ sub drawform {
 ################
 ## this draws the "more" screens for homeworks, equizzes, and files
 
-sub drawmore($centertype, $actionchoices, $detail, $tzi, $browser="") {
-  my $fname= $detail->{filename};
+sub drawmore($sfilename, $centertype, $actionchoices, $allfiledetails, $tzi, $webbrowser="") {
+
+  my $detail;
+  foreach (@{$allfiledetails}) {
+    ## we need to ferret the creation and due times
+    if ($_ -> {sfilename} eq $sfilename) { $detail= $_; last; }
+  }
+
+  my $fname= $detail->{sfilename};
 
   my $achoices= actionchoices( $actionchoices, $fname );
 
@@ -461,7 +468,7 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi, $browser="") {
   }
   my $duetimefour= _epochfour( $detail->{duetime}||0, $tzi );
 
-  $browser = ($browser eq 'safari') ? qq(<br />safari's date selector is broken.  please complain to apple and use chrome<br />until then, use mm/dd/yyyy) : '';
+  $webbrowser = ($webbrowser eq 'safari') ? qq(<br />safari's date selector is broken.  please complain to apple and use chrome<br />until then, use mm/dd/yyyy) : '';
 
   my $sixmobutton= "<p style=\"padding:1em\"> or <span style=\"padding:2ex\">".btn("filesetdue?f=$fname&amp;dueepoch=".(time()+24*3600*180), "publish for 6 Months", 'btn-default')."</span>".
      " or <span style=\"padding:2ex\">".btn("filesetdue?f=$fname&amp;dueepoch=".(time()-2), "unpublish", 'btn-default')."</span></p>";
@@ -481,7 +488,7 @@ sub drawmore($centertype, $actionchoices, $detail, $tzi, $browser="") {
 			User Time: <input type="date" id="duedate" name="duedate" value="$dueyyyymmdd" onblur="submit();" />
 			<input type="time" id="duetime" name="duetime" value="$duehhmm" />
 			<input type="submit" id="submit" value="change or tab out to set" class="btn btn-xs btn-default" />
-                   $browser
+                   $webbrowser
 			</form>
 		$sixmobutton
 	   </td> </tr>
@@ -501,21 +508,23 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
   my $counter=0;
   foreach (@$filehashptr) {
     ++$counter;
-    my $fq= "f=$_->{filename}";
+
+    my $fq= "f=$_->{sfilename}";
 
     my $publish=($_->{duetime}) ?
       qq(<a href="${type}more?$fq"> ).epochtwo($_->{duetime}).'</a> '. btn("filesetdue?$fq&amp;dueepoch=".(time()-2), "unpub", 'btn-info btn-xs')
       :
       btn("filesetdue?$fq&amp;dueepoch=".(time()+24*3600*180), "publish", 'btn-primary btn-xs');
 
-    my $achoices= actionchoices( $actionchoices, $_->{filename} );
+    my $achoices= actionchoices( $actionchoices, $_->{sfilename} );
 
     my $thismdfddate= epochtwo($_->{mtime}||1);
     $filestring .= qq(
     <tr class="published">
 	<td class="c">$counter</td>
 	<td class="c"> $publish </td>
-	<td> <a href="${type}more?$fq">$_->{filename}</a> </td>
+	<td> <a href="${type}more?$fq">$_->{sfilename}</a> </td>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<td class="int" style="text-align:right"> $_->{filelength} </td>
 	<td class="c"> $thismdfddate </td>
         <td class="c"> $achoices </td>
@@ -525,7 +534,6 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
 
   return mkdatatable('taskbrowser').<<EOT;
 
-  <form action="/uploadsave" method="post" class="dropzone"  id="dropzoneform" enctype="multipart/form-data">
   <table id="taskbrowser" class="table">
     <thead>
       <tr>
@@ -537,14 +545,24 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
        $filestring
     </tbody>
   </table>
+  <form action="/uploadsave" method="post" class="dropzone" id="dropzoneform" enctype="multipart/form-data">
   </form>
 
-  <script src="/js/dropzone.js"></script>
   <script type="text/javascript">
-    	Dropzone.options.dropzoneform = {
+    	Dropzone.options.dropzoneform = {				                
 		init: function() {
-			this.on("success", function(file, response) {
+			uploadMultiple: true,
+			this.on("queuecomplete", function() {				
+				console.log("queue completed.");
 				window.location.reload(true);
+		     	 });
+			
+			this.on("success", function(file, response) {
+				console.log(file.name + " files successfully uploaded.");
+			});
+
+			this.on("error", function(file, errorMessage) {
+				console.log(errorMessage);
 			});
 		}
 	};
@@ -612,7 +630,7 @@ sub unobscure {
 }
 
 ################################################################
-sub browser {
+sub webbrowser {
   my $self= shift;
   return $self->browser->{browser};
   # use HTTP::BrowserDetect;

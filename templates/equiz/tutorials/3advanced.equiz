@@ -130,15 +130,7 @@
 <pre class="code">
   :N: Multiple Variables, Math, and Formatting Control in Questions
 
-  :Q: This is the second question.  It shows a calculation that involves two
-  (random) variables, and it shows how you can control the rounding of displayed
-  numbers.  (The default number of digits attempts to be smart at formatting
-  numbers.)  X={$x:8} &lt;i&gt;(see the 8 digits? It was accomplished using
-  &#123;&#36;x:8&#125; instead of &#123;&#36;x&#125;)&lt;/i&gt; is a random integer
-  number between 1 and 100.  Y={$y:4} &lt;i&gt;(see the 4 digits?...made by
-  &#123;&#36;y:4&#125;)&lt;/i&gt; is another random integer number, this one between
-  10 and 20. What is \[ \frac{ {$x:2} }{ {$y:1} } \] &lt;p&gt;&lt;i&gt;(PS: see the 2 and 1
-  digits?)&lt;/i&gt;?
+  :Q: This is the second question.  It shows a calculation that involves two (random) variables, and it shows how you can control the rounding of displayed numbers.  (The default number of digits attempts to be smart at formatting numbers.)  X={$x:8} &lt;i&gt;(see the 8 digits? It was accomplished using &#123;&#36;x:8&#125; instead of &#123;&#36;x&#125;)&lt;/i&gt; is a random integer number between 1 and 100.  Y={$y:4} &lt;i&gt;(see the 4 digits?...made by &#123;&#36;y:4&#125;)&lt;/i&gt; is another random integer number, this one between 10 and 20. What is \[ \frac{ {$x:2} }{ {$y:1} } \] &lt;p&gt;&lt;i&gt;(PS: see the 2 and 1 digits?)&lt;/i&gt;?
 
   :I: $x= rseq(1,100); $y= rseq(10,20); $ANS= ($x+$y)
   :A: Your second correct answer should be \[ \frac{$x}{$y} = $ANS \].

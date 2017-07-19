@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo ifilelist1 filelistsfiles tzi);
+use SylSpace::Model::Model qw(sudo tzi);
+use SylSpace::Model::Files qw(hwlisti hwlists);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -18,8 +19,8 @@ get '/instructor/hwmore' => sub {
   my $fname=  $c->req->query_params->param('f');
   (defined($fname)) or die "need a filename for hwmore.\n";
 
-  $c->stash( detail => ifilelist1($course, $c->session->{uemail}, $fname),
-	     studentuploaded => filelistsfiles($course, $fname),
+  $c->stash( detail => hwlisti($course, $fname),
+	     studentuploaded => hwlists($course),  ## please search for f=fname here below
 	     fname => $fname,
 	     tzi => tzi( $c->session->{uemail} ) );
 };

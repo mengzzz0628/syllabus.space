@@ -26,19 +26,19 @@
     <link rel="stylesheet" href="/css/input.css"  />
     <link rel="stylesheet" href="/css/equiz.css" />
     <link rel="stylesheet" href="/css/dropzone.css" />
+    <script src="/js/dropzone.js"></script>
   </head>
 
 
   <body style="background-color:<%= stash('bgcolor') || 'white' %>">
-
-    <%== ($ENV{SYLSPACE_onlocalhost}) ?
-         '<style>  #background { position:absolute; z-index:0;  display:block;  min-height:50%; min-width:50%; color:gray; font-size:60px; padding-top:80px; padding-left:170px; }</style> <div id="background">localhost http://syllabus.<u>test</u></div>' : '' %>
 
     <div class="container-fluid" id="headbardraw">
 
       <nav id="w0" class="navbar-inverse navbar-fixed-top navbar">
 	<div class="container-fluid" id="nbh">
 	  <div class="navbar-header">
+      <%== ($ENV{SYLSPACE_onlocalhost}) ? '<span style="background-color:yellow">LOCALHOST</a>' : ''; %>
+
 	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w0-collapse"><span class="icon-bar"></span></button>
 	    <a class="navbar-brand" href="/"><b><%= $ENV{SYLSPACE_sitename} %>: <%= $self->session->{uemail}||"no email yet" %> </b></a>
 	  </div> <!-- navbar-header -->

@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo fileread);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(filereadi fileexistsi);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -15,7 +16,7 @@ get '/instructor/faq' => sub {
 
   sudo( $course, $c->session->{uemail} );
 
-  my $isfaq= fileread( $course, $c->session->{uemail}, 'faq' ) || "<p>the instructor has not added her own faq</p>\n" ;
+  my $isfaq= (fileexistsi($course, 'faq')) ? filereadi( $course, 'faq' ) : "<p>This instructor has not added an own student FAQ.</p>\n" ;
 
   use Perl6::Slurp;
   my $body= slurp("public/html/faq.html");
@@ -99,7 +100,7 @@ __DATA__
   
   <dt>What is my "course-secret"?</dt>
   
-  <dd>You can set it yourself in the <a href="/instructor/csettings">course settings</a>.  It allows an instructor to limit access to students who know the course secret.  Usually, the instructor tells students in the first class.</dd>
+  <dd>You can set it yourself in the <a href="/instructor/cioform">course settings</a>.  It allows an instructor to limit access to students who know the course secret.  Usually, the instructor tells students in the first class.</dd>
   
   
   <dt>Why does SylSpace not require or store passwords?</dt>

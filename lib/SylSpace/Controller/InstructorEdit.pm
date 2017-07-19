@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo fileread);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(filereadi);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -16,7 +17,7 @@ get 'instructor/edit' => sub {
   sudo( $course, $c->session->{uemail} );
 
   my $filename= $c->req->query_params->param('f');
-  my $filecontent= fileread( $course, $c->session->{uemail}, $filename );
+  my $filecontent= filereadi( $course, $filename );
   my $filelength= length($filecontent);
 
   $filecontent =~ s/\r\n/\r/g;

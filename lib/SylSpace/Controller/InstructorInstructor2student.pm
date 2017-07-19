@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo instructor2student ismorphed);
+use SylSpace::Model::Model qw(sudo morphinstructor2student ismorphed);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -17,7 +17,7 @@ get '/instructor/instructor2student' => sub {
 
   sudo( $course, $c->session->{uemail} );
 
-  instructor2student($course, $c->session->{uemail});
+  morphinstructor2student($course, $c->session->{uemail});
 
   return $c->flash( message => "instructor morphed into student" )->redirect_to('/student');
 };

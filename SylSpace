@@ -9,9 +9,7 @@ plugin 'browser_detect';
 use Data::Dumper;
 
 ## MOJO_REUSE = syllabus.test:3000:5
-if (($ENV{HYPNOTOAD_STOP})||($ENV{HYPNOTOAD_FOREGROUND})) {
-  ## only defined in foreground (defined($ENV{HOSTNAME})) or die "very weird running environment without HOSTNAME: ".(Dumper \%ENV);
-  ## ($ENV{HOSTNAME} eq 'syllabus-space') or die "please run hypnotoad only on the main server, syllabus-space\n";
+if ($ENV{HYPNOTOAD_APP}) {
   $ENV{MOJO_REUSE}= 'syllabus.space';
 }
 

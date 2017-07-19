@@ -53,7 +53,7 @@ sub parsepreamble {
   my %qzhdr;
 
   ## allowed ::START:: fields with default values
-  my @validkeys= qw/name* instructor* gradename area subarea license created version render comment introduction ps comment eqversion sharing paging email shuffle finish_page/;
+  my @validkeys= qw/name* instructor* gradename area subarea license created version render comment intro ps comment eqversion sharing paging email shuffle finish_page/;
 
   foreach my $v (@validkeys) {
     my $VKF= lc($v);

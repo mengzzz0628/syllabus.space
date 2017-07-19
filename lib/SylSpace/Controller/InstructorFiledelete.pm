@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo filedelete);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(filedelete);
 use SylSpace::Model::Controller qw(standard global_redirect);
 
 ################################################################

@@ -58,6 +58,8 @@ sub renderequiz {
     $unhide=1;
   }
 
+# name* instructor* gradename area subarea license created version render comment intro ps comment eqversion sharing paging email shuffle finish_page
+
   $qz->{h}->{confidential} = encryptedhidden( "confidential", "confidential|".join('|', @_).'|'.$time.'|'.hostname().'|'.($qz->{h}->{gradename}).'|'.($qz->{h}->{name}).'|'.rand());
   $qz->{h}->{ntime}= $time;
   $qz->{h}->{callbackurl}= $callbackurl;
@@ -100,6 +102,7 @@ sub renderequiz {
 	.(($q->{T}) ? qq(\t\t<p class="qstntime" id="T$qcnt">$q->{T}</p>\n) : "")
 	.(($q->{P}) ? qq(\t\t<p class="qstnprec" id="P$qcnt">$q->{P}</p>\n) : "")
 	  # now come all the input elements
+	.(($q->{C}) ? (hidden("C", $qcnt, $q->{C})) : "")
 	.(hidden("N", $qcnt, $q->{N}))
 	.(hidden("Q", $qcnt, $q->{Q}))
 	.(encryptedhidden("A", $qcnt, $q->{A}))
@@ -134,13 +137,23 @@ sub renderequiz {
 
   use Sys::Hostname;
 
+  use Data::Dumper;
+my $xcc= "<b>DUMPER: ".(Dumper $qz->{h});
+
   my $template= q(
 
     <!-- created by eqbackend.pl:RenderEquiz.pm -->
 
-    <p class="eqauthor"> [+ $instructor +] </p>
+    <div class="eqheader">
+      <div class="eqauthor"> [+ $instructor +] </div>
+      <div class="eqname"> [+ $name +] </div>
+      <div class="eqversion"> [+ $version +] </div>
+      <div class="eqgenerated"> [+ $randgenerated +] </div>
+      <div class="eqintro"> [+ $intro +]
+      <p style="font-size:small">(Always quote percents as decimal [unless specifically requested otherwise].  That is, for 5%, please answer 0.05 and not 5.)</p> </div> <!-- eqintro -->
+    </div> <!--eqheader-->
 
-    <h2 class="eqname"> [+ $name +] </h2>
+    <!-- now come the equiz questions -->
 
     <div class="equiz">
 
@@ -163,10 +176,13 @@ sub renderequiz {
 
     <hr />
 
+    [+ $ps +]
+
     </div><!--class="equiz"-->
 );
 
-  foreach my $subout (qw/name title author HTMLQALL callbackurl confidential ntime instructor secret/) {
+  $qz->{h}->{ps}= ($qz->{h}->{ps} =~ /\w/) ? '<div class="eqps"> '.($qz->{h}->{ps}).'</div>' : '';
+  foreach my $subout (qw/name title author intro ps HTMLQALL callbackurl confidential ntime instructor secret randgenerated version/) {
     (defined($qz->{h}->{$subout})) and $template =~ s/\[\+\s*\$$subout\s*\+\]/$qz->{h}->{$subout}/gms;
   }
 

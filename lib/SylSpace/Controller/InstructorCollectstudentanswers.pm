@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(sudo collectstudentanswers);
+use SylSpace::Model::Model qw(sudo);
+use SylSpace::Model::Files qw(answercollect);
 use SylSpace::Model::Controller qw(standard global_redirect);
 
 ################################################################
@@ -15,7 +16,7 @@ get '/instructor/collectstudentanswers' => sub {
 
   sudo( $course, $c->session->{uemail} );
 
-  my $filename= collectstudentanswer( $course, $c->req->query_params->param('f') );
+  my $filename= answercollect( $course, $c->req->query_params->param('f') );
   $filename =~ s{.*/}{};
   $c->stash( filename => $filename );
 };

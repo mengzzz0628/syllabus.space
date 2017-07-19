@@ -4,7 +4,8 @@ use Mojolicious::Lite;
 use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
-use SylSpace::Model::Model qw(isenrolled sfileread);
+use SylSpace::Model::Model qw(isenrolled);
+use SylSpace::Model::Files qw(filereads);
 use SylSpace::Model::Controller qw(global_redirect standard);
 
 ################################################################
@@ -20,7 +21,7 @@ get '/student/fileview' => sub {
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
   my $fname= $c->req->query_params->param('f');
-  my $filecontent= sfileread( $course, $fname );
+  my $filecontent= filereads( $course, $fname );
 
   (defined($filecontent)) or return $c->flash(message => "file $fname cannot be found")->redirect_to($c->req->headers->referrer);
   (length($filecontent)>0) or return $c->flash(message => "file $fname was empty")->redirect_to($c->req->headers->referrer);

@@ -32,6 +32,8 @@ __DATA__
 
 <main>
 
+  <p>If you want to restrict enrollment, then use the 'coursesecret'.  (For open enrollment, just leave blank.)  Only the uniname (your institution) is required.  The other fields merely make it easier for your students to find you, your class, your room, or TAs, but they are not required.  You can also add them later on your class page.</p>
+
   <form class="form-horizontal" method="POST" action="/instructor/ciosave">
 
     <%== $udrawform %>
@@ -41,6 +43,7 @@ __DATA__
     </div>
 
   </form>
+
 
   <p> <b>*</b> means required (red if not yet provided).</p>
 

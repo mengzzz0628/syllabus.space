@@ -8,12 +8,11 @@ use feature ':5.20';
 use feature 'signatures';
 no warnings qw(experimental::signatures);
 
-use SylSpace::Model::Model qw(ifilelistall sudo tzi listtemplates);
+use SylSpace::Model::Model qw(sudo tzi);
+use SylSpace::Model::Files qw(eqlisti listtemplates);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
-
 ################################################################
-
 
 get '/instructor/equizcenter' => sub {
   my $c = shift;
@@ -22,7 +21,7 @@ get '/instructor/equizcenter' => sub {
   sudo( $course, $c->session->{uemail} );
 
   $c->stash(
-	    filelist => ifilelistall($course, $c->session->{uemail}, "*equiz"),
+	    filelist => eqlisti($course),
 	    templatelist => listtemplates(),
 	    tzi => tzi( $c->session->{uemail} ) );
 };
