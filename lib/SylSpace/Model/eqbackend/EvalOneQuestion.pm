@@ -67,17 +67,17 @@ sub evaloneqstn {
   (defined($_[0])) or die "perl $0: ERROR: evaloneqstn is lucid.\n";
 
   my %qstn = %{$_[0]};
-  my $linenum= $_[1] || "'$qstn{N}'" || "unknown";
+  my $linenum= $_[1] || "'$qstn{'N'}'" || "unknown";
 
-  (defined($qstn{N})) or die "perl $0: ERROR: you have a qstn without a name: ".Dumper($_[0]);
-  (($qstn{N})) or die "perl $0: ERROR: you have a qstn without a meaningful name".Dumper($_[0]);
+  (defined($qstn{'N'})) or die "perl $0: ERROR: you have a qstn without a name: ".Dumper($_[0]);
+  (($qstn{'N'})) or die "perl $0: ERROR: you have a qstn without a meaningful name".Dumper($_[0]);
 
 
   foreach my $danger (qw/use exec system eval open env path/) {
-    ($qstn{I} =~ /\b$danger\b/i) and die "perl $0: ERROR: Keyword '$danger' is not allowed in equiz init.\n";
+    ($qstn{'I'} =~ /\b$danger\b/i) and die "perl $0: ERROR: Keyword '$danger' is not allowed in equiz init.\n";
   }
-  ($qstn{I} =~ /\#\@/) and die "perl $0: ERROR: no hash or at key allowed.\n";
-  ($qstn{I} =~ /[\"\`\']/) and die "perl $0: ERROR: no strings and backquotes allowed.\n";
+  ($qstn{'I'} =~ /\#\@/) and die "perl $0: ERROR: no hash or at key allowed.\n";
+  ($qstn{'I'} =~ /[\"\`\']/) and die "perl $0: ERROR: no strings and backquotes allowed.\n";
 
 
   ## First, we need to calculate all our variables in the init (:I:)
@@ -86,31 +86,31 @@ sub evaloneqstn {
     $compartment->permit(qw/ :base_math  /);
 
     ## change some of perl math into better and more intuitive math
-    $qstn{I} =~ s/\^/**/g; ##  perl does not think '^' is exponentiation; we do.
+    $qstn{'I'} =~ s/\^/**/g; ##  perl does not think '^' is exponentiation; we do.
 
     ## allow syntax to define a function like 'function sqr($x) { return ($x*$x); }'
-    $qstn{I} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2)=\@_ ;/g;
+    $qstn{'I'} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2)=\@_ ;/g;
     ## same for more arguments
-    $qstn{I} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\,\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2,\$$3)=\@_ ;/g;
-    $qstn{I} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\,\s*\$([a-zA-Z0-9\_]+)\,\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2,\$$3,\$$4)=\@_ ;/g;
+    $qstn{'I'} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\,\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2,\$$3)=\@_ ;/g;
+    $qstn{'I'} =~ s/function\s+([a-zA-Z0-9\_]+)\(\s*\$([a-zA-Z0-9\_]+)\s*\,\s*\$([a-zA-Z0-9\_]+)\,\s*\$([a-zA-Z0-9\_]+)\s*\)\s*\{/sub $1 \{ my (\$$2,\$$3,\$$4)=\@_ ;/g;
 
     use Data::Dumper;
     local $SIG{__WARN__} = sub { die "perl $0: ERROR: ".$_[0]; };
-    $compartment->reval("$predefinedfunctions ; $qstn{I}");
+    $compartment->reval("$predefinedfunctions ; $qstn{'I'}");
     ($@ eq "")
-      or die "perl $0: ERROR: Your init :I: evaluation algebraic expression string '<tt>$qstn{I}</tt>' for $qstn{N} ending on line $linenum failed with $@.  Please fix and try again.\n\n<pre>".Dumper(\%qstn)."</pre>";
+      or die "perl $0: ERROR: Your init :I: evaluation algebraic expression string '<tt>$qstn{'I'}</tt>' for $qstn{'N'} ending on line $linenum failed with $@.  Please fix and try again.\n\n<pre>".Dumper(\%qstn)."</pre>";
   }
 
   ## collect all variables that appeared in the init
   my %variables;
-  while ($qstn{I} =~ /\$([a-zA-Z\_][\w]*)/g) {
+  while ($qstn{'I'} =~ /\$([a-zA-Z\_][\w]*)/g) {
     (exists($variables{$1})) and next;
     $variables{$1}= ${$compartment->varglob($1)};  ## with value
   }
 
   $qstn{'S'} = $variables{'ANS'};
   (defined($qstn{'S'})) or die "perl $0: ERROR: You must define an '\$ANS' variable in your :I: init segment for $qstn{'N'}\n";
-
+  $qstn{'S'} = nearest(0.0000001, $qstn{'S'});
 
   # now we fill calculated variables into the question (:Q:) and answer (:A:)
   # longest first, so $x1 and $x1d will resolve in favor of $x1, but we still allow $x1e
@@ -135,7 +135,7 @@ sub evaloneqstn {
     $qstn{'Q'} = replonevar($qstn{'Q'}, $vn, $variables{$vn});
     $qstn{'A'} = (defined($qstn{'A'})) ? replonevar($qstn{'A'}, $vn, $variables{$vn}) : "no further detail available\n";
 
-    $qstn{'A'} =~ s/\$-([0-9])/-\$$1/g;  ## note: we do this only in the answer text, because it is less foreseeable
+    $qstn{'A'} =~ s/\$-([0-9])/&ndash;\$$1/g;  ## note: we do this only in the answer text, because it is less foreseeable
   }
 
   return \%qstn;
@@ -341,6 +341,8 @@ sub pv {
   }
   return $sum;
 }
+
+sub annuity { my ($cf, $T, $r) = @_; return ($cf/$r)*( (1- 1/(1+$r)**$T) ); }
 
 sub irr {
   my ($left,$right)= (-1.00+1e-8,1); # start with an IRR between -100% and +100%

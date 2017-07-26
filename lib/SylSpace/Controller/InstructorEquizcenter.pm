@@ -42,6 +42,8 @@ __DATA__
 
 <main>
 
+<p>Please note: We are rewriting to improve the content of all corporate finance equizzes.  Expect completion in mid August 2017.</p>
+
   <%== ifilehash2table($filelist, [ 'equizrun', 'view', 'download', 'edit' ], 'equiz', $tzi) %>
 
   <%== fileuploadform() %>

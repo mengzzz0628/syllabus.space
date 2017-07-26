@@ -78,41 +78,43 @@ sub renderequiz {
   my $qcnt=0; my $spcnt=0;
 
   foreach my $q (@{$qz->{q}}) {
-    ++$spcnt; $q->{SPCNT}= $spcnt;
-    $subpagelist .= qq( "$spcnt" : ($q->{N}||"no page title"), );
+    ++$spcnt; $q->{'SPCNT'}= $spcnt;
+    $subpagelist .= qq( "$spcnt" : ($q->{'N'}||"no page title"), );
 
-    if ($q->{M}) {
-      $q->{M} = qq(
+    if ($q->{'M'}) {
+      $q->{'M'} = qq(
 	     <div class="qmsg">
-                $q->{M}
+                $q->{'M'}
               </div><!--qmsg-->
             );
       next;
     } else {
-      (defined($q->{S})) or die "perl $0: error: question $q->{N} must have an S field!: \n";
+      (defined($q->{'S'})) or die "perl $0: error: question $q->{'N'} must have an S field!: \n";
       ++$qcnt;
-      $q->{QCNT}= $qcnt;
+      $q->{'QCNT'}= $qcnt;
 
-      $q->{M} = qq(
+      my $mC= (defined($q->{'C'})) ? "<p><b> Choices: </b>".$q->{'C'}."</p>" : "";
+
+      $q->{'M'} = qq(
               <div class="qstn" id="C$qcnt">
-                <p class="qstnid" id="I$qcnt" style="hidden">$q->{QCNT}</p>
-                <p class="qstnname" id="N$qcnt">$q->{N}</p>
-                <p class="qstntext" id="TXT$qcnt">$q->{Q}</p>\n)
-	.(($q->{D}) ? qq(\t\t<p class="qstndiff" id="D$qcnt">$q->{D}</p>\n) : "")
-	.(($q->{T}) ? qq(\t\t<p class="qstntime" id="T$qcnt">$q->{T}</p>\n) : "")
-	.(($q->{P}) ? qq(\t\t<p class="qstnprec" id="P$qcnt">$q->{P}</p>\n) : "")
+                <p class="qstnid" id="I$qcnt" style="hidden">$q->{'QCNT'}</p>
+                <p class="qstnname" id="N$qcnt">$q->{'N'}</p>
+                <p class="qstntext" id="TXT$qcnt">$q->{'Q'}</p>\n)
+	.(($q->{'D'}) ? qq(\t\t<p class="qstndiff" id="D$qcnt">$q->{'D'}</p>\n) : "")
+	.(($q->{'T'}) ? qq(\t\t<p class="qstntime" id="T$qcnt">$q->{'T'}</p>\n) : "")
+	.(($q->{'P'}) ? qq(\t\t<p class="qstnprec" id="P$qcnt">$q->{'P'}</p>\n) : "")
 	  # now come all the input elements
-	.(($q->{C}) ? (hidden("C", $qcnt, $q->{C})) : "")
-	.(hidden("N", $qcnt, $q->{N}))
-	.(hidden("Q", $qcnt, $q->{Q}))
-	.(encryptedhidden("A", $qcnt, $q->{A}))
-	.(encryptedhidden("S", $qcnt, $q->{S}))
-	.(($q->{P}) ? encryptedhidden("P", $qcnt, $q->{P}) : "")
-	.(defined($q->{C}) ? drawinputmultchoice($qcnt, $q->{C}) : drawinputtextfield($qcnt))
+	.(($q->{'C'}) ? (hidden('C', $qcnt, $q->{'C'})) : "")
+	.(hidden('N', $qcnt, $q->{'N'}))
+	.(hidden('Q', $qcnt, $q->{'Q'}))
+	.(encryptedhidden('A', $qcnt, $mC.$q->{'A'}))
+	.(encryptedhidden('S', $qcnt, $q->{'S'}))
+	.(($q->{'P'}) ? encryptedhidden('P', $qcnt, $q->{'P'}) : '')
+	.(defined($q->{'C'}) ? drawinputmultchoice($qcnt, $q->{'C'}) : drawinputtextfield($qcnt))
 
 	.qq(\t\t</div> <!-- qstn $qcnt -->);
 
-      ## $subpagelist .= qq(\t\t<option value="$qcnt"> Choose page $qcnt : $q->{N} </option>\n);
+      ## $subpagelist .= qq(\t\t<option value="$qcnt"> Choose page $qcnt : $q->{'N'} </option>\n);
     }
   }
 
