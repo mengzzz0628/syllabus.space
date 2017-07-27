@@ -136,6 +136,7 @@ sub evaloneqstn {
     $qstn{'A'} = (defined($qstn{'A'})) ? replonevar($qstn{'A'}, $vn, $variables{$vn}) : "no further detail available\n";
 
     $qstn{'A'} =~ s/\$-([0-9])/&ndash;\$$1/g;  ## note: we do this only in the answer text, because it is less foreseeable
+    $qstn{'Q'} =~ s/\$-([0-9])/&ndash;\$$1/g;
   }
 
   return \%qstn;
