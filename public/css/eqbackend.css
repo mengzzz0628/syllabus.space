@@ -97,8 +97,8 @@ p.qstntext::before {}
 p.qstnprec { background-color:red; }
 
 p.qstnprec::before {
-    content: "EQ Required Answer Precision: ";
-    font-weight:bold;
+    content: "Required Answer Precision: ";
+    font-size:small;
 }
 
 
@@ -111,16 +111,16 @@ div.qmsg {
 }
 
 p.qstntime::before {
-    content: "EQ Time: ";
-    font-weight:bold;
+    content: "Suggested Time: ";
+    font-size:small;
 }
 p.qstntime::after {
     content: " min. ";
 }
 
 p.qstndiff::before {
-    content: "EQ Difficulty: ";
-    font-weight:bold;
+    content: "Difficulty: ";
+    font-size:small;
 }
 
 

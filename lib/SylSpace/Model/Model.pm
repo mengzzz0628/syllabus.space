@@ -874,7 +874,7 @@ sub equizanswerrender( $decodedarray ) {
 <script type="text/x-mathjax-config">
   MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
     MathJax.InputJax.TeX.Definitions.number =
-      /^(?:[0-9]+(?:\,[0-9]{3})*(?:\{\.\}[0-9]*)*|\{\.\}[0-9]+)/
+      /^(?:[0-9]+(?:,[0-9]{3})*(?:\.[0-9]*)*|\.[0-9]+)/
   });
 </script>
 
@@ -889,7 +889,7 @@ sub equizanswerrender( $decodedarray ) {
     ';
 
   foreach (@{$detail}) {
-    my $precision= $_[5] || "0.01";
+    my $precision= $_->[5] || "0.01";
     my $youranswer = $_->[4];
     ($youranswer < 0) and $youranswer =~ s/^\s*\-/ &ndash;/;
     my $correctanswer = $_->[3];
@@ -900,7 +900,7 @@ sub equizanswerrender( $decodedarray ) {
           <div class="qstn">
            <p class="qstntext"> $_->[1] </p>
            <p class="qstnlong"> $_->[2] </p>
-           <p class="qstnshort"> $correctanswer (&plusmn; $precision)</p>
+           <p class="qstnshort"> $correctanswer (&plusmn;$precision)</p>
            <p class="qstnstudentsays"> $youranswer </p>
            <p class="qstnscore"> $_->[6] </p>
        </div>

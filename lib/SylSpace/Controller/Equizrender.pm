@@ -51,7 +51,7 @@ __DATA__
   <script type="text/x-mathjax-config">
   MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
     MathJax.InputJax.TeX.Definitions.number =
-      /^(?:[0-9]+(?:\,[0-9]{3})*(?:\{\.\}[0-9]*)*|\{\.\}[0-9]+)/
+      /^(?:[0-9]+(?:,[0-9]{3})*(?:\.[0-9]*)*|\.[0-9]+)/
     });
   </script>
 

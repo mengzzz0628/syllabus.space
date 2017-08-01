@@ -36,3 +36,8 @@ LESS IMPORTANT
 * make market for instructors and students: 1c/quiz?
 
 * in drag-drop return to where we uploaded
+
+----------------------------------------------------------------
+
+backend.  autonumbering of questions.  autoprovision of % as in $%x means $x*100.  maybe write a "lint" for the guidelines.
+

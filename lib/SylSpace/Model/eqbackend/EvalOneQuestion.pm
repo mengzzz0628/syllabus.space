@@ -123,7 +123,9 @@ sub evaloneqstn {
       (looks_like_number($val)) or return $qtext;
       ## or die "perl $.: ERROR: Sorry, but the input to replonevar of '$val' is not a number.\n";
       ## my $posval= abs($val);
-      $qtext =~ s/\{\$$vnm:([0-9])\}/sprintf("%.${1}f",$val)/ge; ## if we have ${x:4}, replace with 4-digit actual value
+      $qtext =~ s/\{\$$vnm:([0-9])\}/sprintf("%.${1}f",$val)/ge; ## if we have {$x:4}, replace with 4-digit actual value
+      $qtext =~ s/\{\$\%$vnm:([0-9])\}/sprintf("%.${1}f",$val*100)/ge; ## if we have {$%x:4}, replace with 4-digit actual value
+      $qtext =~ s/\$\%$vnm/(100*$val)/ge; ## if we have $%x, replace with $x*100 actual value
 
       sub imakeroundexpr { my $rnd= nearest(0.001, $_[0]); return commify($rnd); }  ## typicall, we round to nearest 0.001
       $qtext =~ s/\$$vnm/imakeroundexpr($val)/ge;
@@ -136,7 +138,7 @@ sub evaloneqstn {
     $qstn{'A'} = (defined($qstn{'A'})) ? replonevar($qstn{'A'}, $vn, $variables{$vn}) : "no further detail available\n";
 
     $qstn{'A'} =~ s/\$-([0-9])/&ndash;\$$1/g;  ## note: we do this only in the answer text, because it is less foreseeable
-    $qstn{'Q'} =~ s/\$-([0-9])/&ndash;\$$1/g;
+    $qstn{'Q'} =~ s/\$-([0-9])/&ndash;\$$1/g;  ## it may screw up inside mathjax; leave a space
   }
 
   return \%qstn;
