@@ -13,7 +13,7 @@ if ($ENV{HYPNOTOAD_APP}) {
   $ENV{MOJO_REUSE}= 'syllabus.space';
 }
 
-(defined($ENV{MOJO_REUSE})) or die "very weird running environment without MOJO_REUSE: ".(Dumper \%ENV);
+(defined($ENV{MOJO_REUSE})) or die "very weird running environment without MOJO_REUSE.  are you starting SylSpace w/o mojo or direct??\n: ".(Dumper \%ENV);
 ## $0 = MOJO_EXE = /Users/ivo/syllabus.space/syllabus.space/SylSpace
 (defined($ENV{MOJO_EXE})) or die "very weird running environment without MOJO_EXE";
 
