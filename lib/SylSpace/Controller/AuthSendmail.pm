@@ -76,8 +76,8 @@ sub _getTransport {
 
 ################
 sub _jwt {
-#  return Mojo::JWT->new(secret => shift->app->secrets->[0], expires => time()+15*60);  ## 15 minutes
-  return Mojo::JWT->new(secret => shift->app->secrets->[0]);
+  return Mojo::JWT->new(secret => shift->app->secrets->[0], expires => time()+15*60);  ## 15 minutes
+#  return Mojo::JWT->new(secret => shift->app->secrets->[0]);
 }
 
 ################
