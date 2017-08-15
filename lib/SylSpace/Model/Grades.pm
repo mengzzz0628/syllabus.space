@@ -4,7 +4,7 @@ package SylSpace::Model::Grades;
 use base 'Exporter';
 @ISA = qw(Exporter);
 
-@EXPORT_OK=qw( gradetaskadd gradesave gradesashash gradesasraw gradesfortask2table );
+@EXPORT_OK=qw( gradetaskadd gradesave gradesashash gradesasraw gradesfortask2table storegradeequiz );
 
 
 ################
@@ -25,7 +25,7 @@ use lib '../..';
 
 use SylSpace::Model::Model qw(studentlist);
 
-use SylSpace::Model::Utils qw( _getvar _confirmsudoset _burpapp _checkemailvalid _checkcname _glob2last);
+use SylSpace::Model::Utils qw( _getvar _confirmsudoset _burpapp _checkemailvalid _checkcname _glob2last _savesudo _restoresudo _setsudo);
 
 my $var= _getvar();
 
@@ -174,5 +174,30 @@ sub _checkemailenrolled($e,$course) {
   $e= _checkemailvalid($e);
   (-d "$var/courses/$course/$e") or die "Grades.pm:_checkemailenrolled: $e is not enrolled in $course ($var/courses/$course/$e)\n";
 }
+
+
+
+##
+sub storegradeequiz( $course, $semail, $gradename, $eqlongname, $time, $grade, $optcontentptr=undef ) {
+  ## $course= _confirmsudoset( $course );  ## sudo must have been called!
+
+  $course= _checkcname( $course );  ## sudo must have been called!
+  _checkemailenrolled($semail,$course);
+  ($time > 0) or die "wtf is your quiz time?";
+  ($time <= time()) or die "back to the future?!";
+
+  (-d "$var/courses/$course/$semail/files") or die "bad storegradeequiz directory: $var/courses/$course/$semail\n";
+  (-w "$var/courses/$course/$semail/files") or die "non-writeable directory:\n";
+
+  ## temporarily allow su privileges to add to grades, too
+  _savesudo();
+  _setsudo();
+  gradetaskadd( $course, $gradename );
+  my $rv=gradesave( $course, $semail, $gradename, $grade );
+  _restoresudo();
+
+  return $rv;
+}
+
 
 1;

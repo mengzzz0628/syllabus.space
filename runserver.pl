@@ -42,5 +42,10 @@ if ($hostname eq 'syllabus-space') {
 
   my $mode= "development";
   if (@ARGV) { ($ARGV[0] =~ /^p/i) and $mode="production"; }
-  system("/usr/local/bin/morbo -v -m $mode ./SylSpace -l http://syllabus.test:80");
+
+  my $executable= (-x "/usr/local/bin/morbo") ? "/usr/local/bin/morbo" : "/usr/local/ActivePerl-5.24/site/bin/morbo";
+  (-x $executable) or die "cannot find suitable morbo executable.\n";
+  print STDERR "invoking morbo in $executable now.\n";
+
+  system("$executable -v -m $mode ./SylSpace -l http://syllabus.test:80");
 }

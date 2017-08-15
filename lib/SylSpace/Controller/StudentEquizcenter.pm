@@ -62,21 +62,23 @@ sub equizfilehash2string {
   my $filestring= '';
 
   my $counter=0;
+
   foreach (@$filehashptr) {
-    ($_->[1]<time()) and next;
+
+    ($_->{duetime}<time()) and next;
     ++$counter;
 
-    (my $shortname = $_->[0]) =~ s/\.equiz$//;
-    my $duein= timedelta($_->[1] , time());
+    (my $shortname = $_->{sfilename}) =~ s/\.equiz$//;
+    my $duein= timedelta($_->{duetime} , time());
 
     my $uemail=$self->session->{uemail};
 
-    my $lastdate= $allgrades->{ epoch }->{ $uemail }->{ $_->[0] } || "<span style=\"color:gray\">never</span>";
-    my $lastgrade= $allgrades->{ grade }->{ $uemail } ->{ $_->[0] } || "<span style=\"color:gray\">none yet</span>";
+    my $lastdate= $allgrades->{ epoch }->{ $uemail }->{ $_->{sfilename} } || "<span style=\"color:gray\">never</span>";
+    my $lastgrade= $allgrades->{ grade }->{ $uemail } ->{ $_->{sfilename} } || "<span style=\"color:gray\">none yet</span>";
 
-    $filestring .= btnblock("/equizrender?f=".($_->[0]),
+    $filestring .= btnblock("/equizrender?f=".($_->{sfilename}),
 			    '<h4><i class="fa fa-pencil"></i> '.$shortname.'</h4>',
-			    'due '.$duein."<br />".localtime($_->[1])."<br /><span style=\"font-size:x-small\">Last Taken: ".timedelta($lastdate).": Score $lastgrade</span>");
+			    'due '.$duein."<br />".localtime($_->{duetime})."<br /><span style=\"font-size:x-small\">Last Taken: ".timedelta($lastdate).": Score $lastgrade</span>");
   }
   ($counter) or return "<p>no publicly posted equizzes at the moment</p>";
 

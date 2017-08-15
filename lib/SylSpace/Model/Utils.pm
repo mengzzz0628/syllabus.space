@@ -7,7 +7,7 @@ use base 'Exporter';
 @EXPORT_OK= qw( 
 		    _getvar
 		    _checkemailvalid
-		    _unsetsudo _setsudo _confirmsudoset
+		    _unsetsudo _setsudo _confirmsudoset _savesudo _restoresudo
 		    _burpnew _burpapp
 		    _confirmnotdangerous _checkcname
 		    _saferead _safewrite _glob2last _glob2lastnoyaml  _checksfilenamevalid);

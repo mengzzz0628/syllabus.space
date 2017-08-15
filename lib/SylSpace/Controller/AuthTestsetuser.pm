@@ -69,6 +69,8 @@ __DATA__
 <% sub makelist {
   my $l= shift;
   my $rs;
+  (@$l < 1) and die "sorry, but you have not even a single user in the system.  did you run Model.t and Files.t?\n";
+
   my @ulist= ($ENV{'SYLSPACE_onlocalhost'}) ? @$l : qw( ivo.welch@gmail.com instructor@gmail.com student@gmail.com );
   foreach (@ulist) { $rs .="<li style=\"padding:1ex; font-size:large;\"> Make</a> yourself <a href=\"/login?email=$_\">$_</a> </li>\n"; }
   return $rs;

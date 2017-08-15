@@ -34,7 +34,7 @@ use Test2::Plugin::DieOnFail;
 
 my $v= _webcourseremove("*");  ## but not users and templates
 
-my $iemail='instructor@gmail.com';
+my $iemail='instructor@gmail.com'; my $iemail2='ivo.welch@gmail.com';
 my $s1email='student1@gmail.com';
 my $s2email='student2@gmail.com';
 my $s3email='noone@gmail.com';
@@ -51,7 +51,7 @@ foreach ((@course, 'auth', '')) {
 }
 # (@missing) and die "\n\nplease add '".join(".syllabus.test , ", @missing).".localhost.test to /etc/hosts to facilitate testing\n\n";
 
-foreach (@course) {  ok( _webcoursemake($_), "created $_ site" ); instructornewenroll($_, $iemail);  }
+foreach (@course) {  ok( _webcoursemake($_), "created $_ site" ); instructornewenroll($_, $iemail); instructornewenroll($_, $iemail2);  }
 ok( !eval { _webcoursemake($course[0]) }, 'cannot create mfe a second time' );
 
 my @enrolledcourses= keys %{courselistenrolled($iemail)};
@@ -203,3 +203,7 @@ sub tziserver {
 			      ||
 			      $gmt[7] <=> $local[7])*24);
 }
+
+note '
+################ please run Files.t now
+';

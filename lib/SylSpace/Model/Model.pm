@@ -32,7 +32,7 @@ use base 'Exporter';
 	    );
 
 use lib '../..';
-use SylSpace::Model::Files qw(eqreadi longfilename);
+use SylSpace::Model::Files qw(eqreadi eqreads longfilename);
 
 ################
 use strict;
@@ -49,7 +49,8 @@ no warnings qw(experimental::signatures);
 ################
 
 use lib '../..';
-use SylSpace::Model::Utils qw( _getvar _checkemailvalid _checkcname _saferead _safewrite _confirmsudoset _setsudo _confirmnotdangerous _glob2lastnoyaml  _glob2last _burpapp _burpnew);
+use SylSpace::Model::Utils qw(  _getvar _checkemailvalid _checkcname _saferead _safewrite _confirmsudoset _setsudo _confirmnotdangerous _glob2lastnoyaml  _glob2last _burpapp _burpnew);
+
 
 my $var= _getvar();
 
@@ -825,7 +826,6 @@ sub equizgrade( $course, $uemail, $posttextashash ) {
     my $ofname= "$var/courses/$course/$uemail/files/$gradename.$time.eanswer.yml";
 #    (-e $ofname) and die "please do not answer the same equiz twice.  instead go back, refresh the browser to receive fresh questions, and submit then\n";
     _safewrite( $posttextashash, $ofname );  ## the content
-    _storegradeequiz( $course, $uemail, $gradename, $eqlongname, $time, "$score / $i" );
   }
 
   ## to be read by equizanswerrender()
@@ -833,27 +833,6 @@ sub equizgrade( $course, $uemail, $posttextashash ) {
 }
 
 
-##
-sub _storegradeequiz( $course, $semail, $gradename, $eqlongname, $time, $grade, $optcontentptr=undef ) {
-  ## $course= _confirmsudoset( $course );  ## sudo must have been called!
-
-  $course= _checkcname( $course );  ## sudo must have been called!
-  $semail= _checkemailenrolled($semail,$course);
-  ($time > 0) or die "wtf is your quiz time?";
-  ($time <= time()) or die "back to the future?!";
-
-  (-d "$var/courses/$course/$semail/files") or die "bad directory:\n";
-  (-w "$var/courses/$course/$semail/files") or die "non-writeable directory:\n";
-
-  ## temporarily allow su privileges to add to grades, too
-  _savesudo();
-  _setsudo();
-  gradetaskadd( $course, $gradename );
-  my $rv=gradesave( $course, $semail, $gradename, $grade );
-  _restoresudo();
-
-  return $rv;
-}
 
 ##
 sub equizanswerrender( $decodedarray ) {

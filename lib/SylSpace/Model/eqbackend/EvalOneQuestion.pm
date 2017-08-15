@@ -124,8 +124,9 @@ sub evaloneqstn {
       ## or die "perl $.: ERROR: Sorry, but the input to replonevar of '$val' is not a number.\n";
       ## my $posval= abs($val);
       $qtext =~ s/\{\$$vnm:([0-9])\}/sprintf("%.${1}f",$val)/ge; ## if we have {$x:4}, replace with 4-digit actual value
+
       $qtext =~ s/\{\$\%$vnm:([0-9])\}/sprintf("%.${1}f",$val*100)/ge; ## if we have {$%x:4}, replace with 4-digit actual value
-      $qtext =~ s/\$\%$vnm/(100*$val)/ge; ## if we have $%x, replace with $x*100 actual value
+      $qtext =~ s/\$\%$vnm/sprintf("%.1f",$val*100)/ge; ## if we have $%x, replace with $x*100 actual value
 
       sub imakeroundexpr { my $rnd= nearest(0.001, $_[0]); return commify($rnd); }  ## typicall, we round to nearest 0.001
       $qtext =~ s/\$$vnm/imakeroundexpr($val)/ge;

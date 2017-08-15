@@ -5,6 +5,7 @@ use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
 use SylSpace::Model::Model qw(isenrolled equizgrade equizanswerrender);
+use SylSpace::Model::Grades qw(storegradeequiz);
 use SylSpace::Model::Controller qw(standard global_redirect);
 
 ################################################################
@@ -17,6 +18,8 @@ post '/equizgrade' => sub {
   (isenrolled($course, $c->session->{uemail})) or $c->flash( message => "first enroll in $course please" )->redirect_to('/auth/goclass');
 
   my $result= equizgrade($course, $c->session->{uemail}, $c->req->body_params->to_hash);
+  ## _storegradeequiz( $course, $uemail, $gradename, $eqlongname, $time, "$score / $i" );
+  storegradeequiz( $course, $c->session->{uemail}, $result->[4], $result->[5], $result->[3], $result->[1]." / ". $result->[0] );
 
   $c->stash( eqanswer => equizanswerrender($result) );
 };
