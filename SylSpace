@@ -125,6 +125,10 @@ my @pwsecret=slurp('/var/sylspace/secrets.txt');
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
 app->config(hypnotoad => { listen => ['http://'.$ENV{'SYLSPACE_sitename'}.':80'] }); ## hypnotoad is serious and never on localhost
 
+(-e '/var/sylspace/users/instructor@gmail.com') or die "you need a few users in /var/sylspace/users\n";
+(-e '/var/sylspace/courses/intro.corpfin') or die "you need a few courses in /var/sylspace/courses\n";
+
+
 if ($ENV{'SYLSPACE_onlocalhost'}) {
   print STDERR "$0: *** localhost mode only --- logging out may not work correctly\n";
   print STDERR "$0: *** CHROME cannot be used in localhostmode, because it resolves 127.0.0.1 differently\n";

@@ -80,7 +80,11 @@ sub filelists( $course, $mask="*") {
 
   (rlc($ilist)>0) or return $ilist;
 
-  my @slist; foreach (@$ilist) { (time() <= ($_->{duetime})) and push(@slist, $_); }
+  my @slist; foreach (@$ilist) {
+    if ($mask ne '*.equiz') { ($_->{sfilename} =~ /.equiz$/) and next; } ## unless specifically requested, we do not display equizzes in the file list
+    if ($mask ne 'hw*') { ($_->{sfilename} =~ /^hw$/) and next; } ## or homeworks
+    (time() <= ($_->{duetime})) and push(@slist, $_);
+  }
   return \@slist;
 }
 
@@ -94,11 +98,12 @@ sub filereadi( $course, $filename) {
 }
 
 
-sub filereads( $course, $filename) {
+sub filereads( $course, $filename, $equizspecial=0) {
   $course= _checksfilenamevalid($course);
   _checksfilenamevalid($filename);
   my $lfnm="$var/courses/$course/instructor/files/$filename";
-  (time >= _finddue( $lfnm )) and die "sorry, but there is no (longer) $lfnm";
+  (time() >= _finddue( $lfnm )) and die "sorry, but there is no (longer) $lfnm";
+  if (!$equizspecial) { ($filename =~ /\.equiz/) and die "sorry, but we never show off equiz source to students"; }
   (-l $lfnm) and $lfnm= readlink($lfnm);
   return slurp $lfnm;
 }
@@ -137,7 +142,7 @@ sub eqsetdue( $course, $eqsymname, $epoch ) { ($eqsymname=~ /\.equiz[\~]*/) or d
 sub eqlisti( $course ) { return filelisti( $course, "*.equiz" ); }
 sub eqlists( $course ) { return filelists( $course, "*.equiz" ); }
 sub eqreadi( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreadi: $eqsymname must end with .equiz"; return filereadi( $course, $eqsymname );  }
-sub eqreads( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return filereads( $course, $eqsymname ); }
+sub eqreads( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return filereads( $course, $eqsymname, 1 ); }
 sub eqwrite( $course, $eqsymname, $eqsymcontents ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return filewrite( $course, $eqsymname, $eqsymcontents ); }
 sub eqdelete( $course, $eqsymname ) { ($eqsymname =~ /^eqsym/) or die "eqsymdelete: $eqsymname must end with .equiz\n"; return filedelete( $course, $eqsymname ); }
 
