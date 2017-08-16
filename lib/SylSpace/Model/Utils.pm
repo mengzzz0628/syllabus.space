@@ -10,7 +10,9 @@ use base 'Exporter';
 		    _unsetsudo _setsudo _confirmsudoset _savesudo _restoresudo
 		    _burpnew _burpapp
 		    _confirmnotdangerous _checkcname
-		    _saferead _safewrite _glob2last _glob2lastnoyaml  _checksfilenamevalid);
+		    _saferead _safewrite _glob2last _glob2lastnoyaml  _checksfilenamevalid
+		    _decryptdecode _encodeencrypt
+);
 
 ################
 use strict;
@@ -210,5 +212,31 @@ sub _burpapp( $lfilename, $contents ) {
 
 
 ################################################################
+
+use Encode;
+use Crypt::CBC ;
+use MIME::Base64;
+use HTML::Entities;
+use Digest::MD5 qw(md5_base64);
+
+  ## instead of this secret, we could use a line from /var/sylgrade/secrets.txt
+
+sub _decryptdecode {
+  my $secret= md5_base64( (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id" );
+  my $cipherhandle = Crypt::CBC->new( -key => $secret, -cipher => 'Blowfish', -salt => '14151617' );
+
+  my $step1 = decode_entities($_[0]);
+  my $step2 = decode_base64($step1);
+  my $step3= $cipherhandle->decrypt($step2);
+  return $step3;
+}
+
+sub _encodeencrypt {
+  my $secret= md5_base64( (-e "/usr/local/var/lib/dbus/machine-id") ? "/usr/local/var/lib/dbus/machine-id" : "/etc/machine-id" );
+  my $cipherhandle = Crypt::CBC->new( -key => $secret, -cipher => 'Blowfish', -salt => '14151617' );
+  (defined($cipherhandle)) and return encode_base64($cipherhandle->encrypt($_[0]));
+  die "bad encryptor!\n";
+}
+
 
 1;

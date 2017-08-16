@@ -6,10 +6,9 @@ use strict;
 
 use SylSpace::Model::Model qw(superseclog throttle);
 use SylSpace::Model::Controller qw(global_redirect standard);
+use SylSpace::Model::Utils qw( _decryptdecode _encodeencrypt _checkemailvalid _confirmnotdangerous);
 
 ################################################################
-
-use Mojo::JWT;
 
 use Email::Valid;
 use Email::Sender::Simple 'sendmail';
@@ -48,44 +47,26 @@ post '/auth/sendmail/authenticate' => sub {
 get '/auth/sendmail/callback' => sub {
   my $c = shift;
 
-  my $jwt = $c->param('jwt');
-  my $params = _jwt($c)->decode($jwt);
+  my $string= _decryptdecode( $c->param('jwt') );
+  my ($time, $name, $email) = split(/\|/, $string );
 
-  my $name = $params->{name};
-  my $email = $params->{email};
+  ($time+3600 > time()) or die "sorry, but on '$string' and $time;$name;$email your authorization request ($time) is already expired (".($time+3600 - time())." sec)\n";
+  ($email) or die "internal error: our callback to authenticate you failed because we have no email";
+  (_checkemailvalid($email)) or die "bad email '$email'.";
+  ($name =~ /[a-z]/i) or die "name makes no sense to me\n";
+  # _confirmnotdangerous($name, "bad user name in callback for sendmail");
 
   superseclog( $c->tx->remote_address, $email, "got email callback for $name and $email" );
 
-  ($email) or die "sorry, but our callback to authenticate you failed because we had no or an invalid email";
-
-  if ($name and $email) {
-    $c->session(uemail => $email, name => $name, expiration => time()+60*60, ishuman => time())->redirect_to('/index');
-  } else {
-    $c->stash(error => 'Missing required parameter')->render(template => 'AuthSendmail', $email => $params->{email} );;
-  }
+  $c->session(uemail => $email, name => $name, expiration => time()+60*60, ishuman => time())->redirect_to('/index');
 };
-
-################
-sub _getTransport {
-  my $c = shift;
-
-  return $c->{_transport} ||= Email::Sender::Transport::SMTP::TLS->new(
-    %{ $c->app->plugin('Config')->{email}{transport} }
-  );
-}
-
-################
-sub _jwt {
-  return Mojo::JWT->new(secret => shift->app->secrets->[0], expires => time()+15*60);  ## 15 minutes
-#  return Mojo::JWT->new(secret => shift->app->secrets->[0]);
-}
 
 ################
 sub _send_email {
   my ($c, $email, $name) = @_;
   my $config = $c->app->plugin('Config');
 
-  my $jwt = _jwt($c)->claims({name => $name, email => $email})->encode;
+  my $jwt = _encodeencrypt( time() . "|" . $name . "|" . $email ); 
   my $url = $c->url_for('/auth/sendmail/callback')->to_abs->query(jwt => $jwt);
 
   defined($email) or die "internal error---what is your email??";
@@ -96,12 +77,19 @@ sub _send_email {
       To      => $email,
       Subject => 'Confirm your email',
     ],
-    body => "Follow this link: $url",
+    body => "Follow this link: $url\n\nMake sure your spam filter does not trap the email you will receive.",
   );
 
   superseclog( $c->tx->remote_address, $email, "requesting sending email to ".$email );
 
   throttle();  ## to prevent nasty DDOSs on other sites
+
+  sub _getTransport {
+    my $c = shift;
+    return $c->{_transport} ||= Email::Sender::Transport::SMTP::TLS->new(
+									 %{ $c->app->plugin('Config')->{email}{transport} }
+									);
+  }
 
   return sendmail($message, { transport => _getTransport($c) });
 }
@@ -125,13 +113,13 @@ __DATA__
     <%= $error %>
   </p>
 % } else {
-  <h2>We sent an email to <a href="mailto:<%= $email %>"><%= $email %></a>.</h2>
+  <h2>We sent an email to '<a href="mailto:<%= $email %>"><%= $email %></a>' .</h2>
 % }
 
   <p>
   If you typed your email address (<a href="mailto:<%= $email %>"><%= $email %></a>) correctly, you should be receiving an email from us.</p>
 
-  <p> Please check your mailbox for a confirmation email with link.  If you do not receive an email from us within 5-10 minutes, check for any spam filters along the way.  The email should be sent by  '<%= $ENV{SYLSPACE_sitename} %>@gmail.com'.  It will be valid for 15 minutes.</p>
+  <p> Please check your mailbox for a confirmation email with link.  If you do not receive an email from us within 5-10 minutes, check for any spam filters along the way.  The email should be sent by  '<%= $ENV{SYLSPACE_sitename} %>@gmail.com'.  It will be valid for about 30 minutes.</p>
 
   <p><b>Warning:</b> Some email spam filters may be blocking us.  Make sure to whitelist us.  Here is more information on <a href="http://onlinegroups.net/blog/2014/02/25/how-to-whitelist-an-email-address/">whitelisting</a> us (e.g., <a href="http://smallbusiness.chron.com/whitelist-domain-office-365-74321.html">office365</a> and <a href="https://support.microsoft.com/en-us/kb/2545137">office365</a>)?  If you never receive an email&mdash;even after having whitelisted us&mdash;then please try a gmail account.  We know that gmail can receive our emails.</p>
 
