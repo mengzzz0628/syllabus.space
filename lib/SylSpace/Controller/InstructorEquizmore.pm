@@ -22,7 +22,6 @@ get '/instructor/equizmore' => sub {
 
   my $detail = eqlisti($course);
   my $studentuploaded = eqlists($course);
-  my $ofname = $fname;
   my $grds4tsk =  gradesfortask2table($course, $fname);
   my $tzii = tzi( $c->session->{uemail} );
 

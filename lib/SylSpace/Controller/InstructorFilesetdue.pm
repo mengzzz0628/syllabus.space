@@ -6,7 +6,7 @@ use strict;
 
 use SylSpace::Model::Model qw(sudo tweet tzi);
 use SylSpace::Model::Files qw(filesetdue);
-use SylSpace::Model::Controller qw(global_redirect  standard epochof);
+use SylSpace::Model::Controller qw(global_redirect  standard epochof epochtwo);
 
 ################################################################
 
@@ -27,8 +27,8 @@ get '/instructor/filesetdue' => sub {
 
   tweet($c->tx->remote_address, $course, $c->session->{uemail}, ' published '. $params->param('f'). ", due $whendue (GMT ".gmtime($whendue).')' );
 
-  my $msg=  ($params->param('dueepoch')) ? "set due to 6 months" : 
-    "set due to $whendue [".($params->param('duedate')).' '.($params->param('duetime')).' server time]';
+  my $msg= # ($params->param('dueepoch')) ? "set due to 6 months" : 
+    "set due to ".epochtwo( $whendue || 0);
   $c->flash(message => $msg)->redirect_to($c->req->headers->referrer);
 };
 

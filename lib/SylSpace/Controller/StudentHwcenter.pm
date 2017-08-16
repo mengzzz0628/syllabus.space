@@ -50,7 +50,7 @@ __DATA__
      </table>
   </div>
 
-  <p>You should name your answer file to start with the homework file name, too.  For example, if the homework is named 'hwa1.txt', name your answer file something like 'hwa1-answer.pdf' (no spaces or weird characters, please).</p>
+  <p>You should name your answer file to start with the homework file name, too.  For example, if the homework is named 'hwa1.txt', name your answer file something like 'hwa1-johndoe-answer.pdf' (no spaces or weird characters, please).</p>
 </main>
 
   <%

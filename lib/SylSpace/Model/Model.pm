@@ -252,7 +252,8 @@ sub userenroll( $course, $uemail, $iswebcoursecreator=0 ) {
   }
 
   if (-e "$var/courses/$course/$uemail") {
-    unlink("$var/courses/$course/disabled=1"); ## in case...
+    my $disabled= "$var/courses/$course/disabled=1";
+    (-e $disabled) and unlink($disabled); ## in case...
     return _checkemailenrolled($uemail, $course);  ## mild error-- we already exist
   }
 

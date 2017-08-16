@@ -64,41 +64,79 @@ sub longfilename( $course, $sfilename ) {
   return "$var/courses/$course/instructor/files/$sfilename";
 }
 
+
+
+
+
+################################################################
+sub filelisti( $course ) { return _baselisti($course, '!other'); }
+sub filelists( $course ) { return _baselists($course, '!other'); }
+sub filereadi( $course, $filename ) { return _basereadi( $course, $filename ); }
+sub filereads( $course, $filename ) { return _basereads( $course, $filename ); }
+sub filewritei( $course, $filename ) { return _basewritei( $course, $filename ); }
+sub filedelete( $course, $filename ) { return _basewritei( $course, $filename ); }
+
+
+################################################################
+sub hwsetdue( $course, $hwname, $epoch ) { return filesetdue( $course, $hwname, $epoch ); }
+sub hwlisti( $course ) { return _baselisti( $course, "hw*" ); }
+sub hwlists( $course ) { return _baselists( $course, "hw*" ); }  ## from the students
+sub hwreadi( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwreadi: '$hwname' must start with hw\n"; return _basereadi( $course, $hwname ); }
+sub hwreads( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwreads: '$hwname' must start with hw\n"; return _basereads( $course, $hwname ); }
+sub hwwrite( $course, $hwname, $hwcontents ) { ($hwname =~ /^hw/) or die "hwwrite: '$hwname' must start with hw\n"; return _basewrite( $course, $hwname, $hwcontents ); }
+sub hwdelete( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwdelete: '$hwname' must start with hw\n"; return _basedelete( $course, $hwname ); }
+#sub hwrate( $course, $hwname, $rating ) { ($hwname =~ /^hw/) or die "hwrate: '$hwname' must start with hw\n"; return _baserate( $course, $hwname, $rating ); }
+
+################################################################################################################################
+
+sub eqsetdue( $course, $eqsymname, $epoch ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymsetdue: $eqsymname must end with .equiz"; return filesetdue( $course, $eqsymname, $epoch ); }
+sub eqlisti( $course ) { return _baselisti( $course, "*.equiz" ); }
+sub eqlists( $course ) { return _baselists( $course, "*.equiz" ); }
+sub eqreadi( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreadi: $eqsymname must end with .equiz"; return _basereadi( $course, $eqsymname );  }
+sub eqreads( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return _basereads( $course, $eqsymname, 1 ); }
+sub eqwrite( $course, $eqsymname, $eqsymcontents ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return _basewrite( $course, $eqsymname, $eqsymcontents ); }
+sub eqdelete( $course, $eqsymname ) { ($eqsymname =~ /^eqsym/) or die "eqsymdelete: $eqsymname must end with .equiz\n"; return _basedelete( $course, $eqsymname ); }
+
+################################################################################################################################
+
+
+
 ## note: returns not a list, but a listptr
-sub filelisti( $course, $mask="*") {
+sub _baselisti( $course, $mask="*") {
   $course= _checksfilenamevalid( $course );
-  my $ilist= _deeplisti("$var/courses/$course/instructor/files/$mask");
+  my $ilist= _deeplisti("$var/courses/$course/instructor/files/", $mask);
   (rlc($ilist)>0) or return $ilist;
-  my @slist; foreach (@$ilist) { push(@slist, $_); }  ## always open!
+  my @slist; foreach (@{$ilist}) { push(@slist, $_); }  ## always open!
   return \@slist;
 }
 
+
 ## note: returns not a list, but a listptr
-sub filelists( $course, $mask="*") {
+sub _baselists( $course, $mask="*") {
   $course= _checksfilenamevalid( $course );
-  my $ilist= _deeplisti("$var/courses/$course/instructor/files/$mask");
+  my $ilist= _deeplisti("$var/courses/$course/instructor/files/", $mask);
 
   (rlc($ilist)>0) or return $ilist;
 
-  my @slist; foreach (@$ilist) {
-    if ($mask ne '*.equiz') { ($_->{sfilename} =~ /.equiz$/) and next; } ## unless specifically requested, we do not display equizzes in the file list
+  my @slist; foreach (@{$ilist}) {
+    if ($mask ne '*.equiz') { ($_->{sfilename} =~ /.equiz$/) and next; } ## unless specifically requested, we do not display equizzes in the _base list
     if ($mask ne 'hw*') { ($_->{sfilename} =~ /^hw$/) and next; } ## or homeworks
     (time() <= ($_->{duetime})) and push(@slist, $_);
   }
   return \@slist;
 }
 
-sub filereadi( $course, $filename) {
+sub _basereadi( $course, $filename) {
   $course= _confirmsudoset( $course );  ## lc()
   _checksfilenamevalid($filename);
   my $lfnm="$var/courses/$course/instructor/files/$filename";
 
   (-l $lfnm) and $lfnm= readlink($lfnm);
-  return slurp $lfnm;  ## does not like symlinked files
+  return slurp $lfnm;  ## does not like symlinked _bases
 }
 
 
-sub filereads( $course, $filename, $equizspecial=0) {
+sub _basereads( $course, $filename, $equizspecial=0) {
   $course= _checksfilenamevalid($course);
   _checksfilenamevalid($filename);
   my $lfnm="$var/courses/$course/instructor/files/$filename";
@@ -109,14 +147,14 @@ sub filereads( $course, $filename, $equizspecial=0) {
 }
 
 
-sub filewrite( $course, $filename, $filecontents ) {
+sub _basewrite( $course, $filename, $filecontents ) {
   $course= _confirmsudoset( $course );  ## lc()
   _checksfilenamevalid($filename);
   return _maybeoverwrite( "$var/courses/$course/instructor/files/$filename", $filecontents );
 }
 
 
-sub filedelete( $course, $sfilename ) {
+sub _basedelete( $course, $sfilename ) {
   $course= _confirmsudoset( $course );  ## lc()
   $sfilename =~ s{$var/courses/$course/instructor/files/}{};
   _checksfilenamevalid($sfilename);
@@ -124,27 +162,6 @@ sub filedelete( $course, $sfilename ) {
   (-e $lfilename) or die "cannot delete non-existing $lfilename";
   unlink($lfilename)
 }
-
-
-################################################################
-sub hwsetdue( $course, $hwname, $epoch ) { return filesetdue( $course, $hwname, $epoch ); }
-sub hwlisti( $course ) { return filelisti( $course, "hw*" ); }
-sub hwlists( $course ) { return filelists( $course, "hw*" ); }
-sub hwreadi( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwreadi: '$hwname' must start with hw\n"; return filereadi( $course, $hwname ); }
-sub hwreads( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwreads: '$hwname' must start with hw\n"; return filereads( $course, $hwname ); }
-sub hwwrite( $course, $hwname, $hwcontents ) { ($hwname =~ /^hw/) or die "hwwrite: '$hwname' must start with hw\n"; return filewrite( $course, $hwname, $hwcontents ); }
-sub hwdelete( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwdelete: '$hwname' must start with hw\n"; return filedelete( $course, $hwname ); }
-#sub hwrate( $course, $hwname, $rating ) { ($hwname =~ /^hw/) or die "hwrate: '$hwname' must start with hw\n"; return filerate( $course, $hwname, $rating ); }
-
-################################################################################################################################
-
-sub eqsetdue( $course, $eqsymname, $epoch ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymsetdue: $eqsymname must end with .equiz"; return filesetdue( $course, $eqsymname, $epoch ); }
-sub eqlisti( $course ) { return filelisti( $course, "*.equiz" ); }
-sub eqlists( $course ) { return filelists( $course, "*.equiz" ); }
-sub eqreadi( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreadi: $eqsymname must end with .equiz"; return filereadi( $course, $eqsymname );  }
-sub eqreads( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return filereads( $course, $eqsymname, 1 ); }
-sub eqwrite( $course, $eqsymname, $eqsymcontents ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return filewrite( $course, $eqsymname, $eqsymcontents ); }
-sub eqdelete( $course, $eqsymname ) { ($eqsymname =~ /^eqsym/) or die "eqsymdelete: $eqsymname must end with .equiz\n"; return filedelete( $course, $eqsymname ); }
 
 ################################################################################################################################
 
@@ -163,7 +180,7 @@ sub answerlists( $course, $uemail, $mask="*" ) {
   $course= _checksfilenamevalid( $course );
   $uemail= _checkemailvalid($uemail);
   (-e "$var/courses/$course/$uemail/") or die "answerlists: $uemail is not enrolled in $course";
-  my $ilist= _deeplisti("$var/courses/$course/$uemail/files/$mask");
+  my $ilist= _deeplisti("$var/courses/$course/$uemail/files/", $mask);
 }
 
 sub answerread( $course, $uemail, $ansname ) {
@@ -195,7 +212,7 @@ sub answerlisti( $course, $hwname ) {
 
   my $retrievepattern="$var/courses/$course/*@*/files/*answer=$hwname";
   my @filelist= bsd_glob($retrievepattern);
-  (@filelist) or return "";  ## no files yet;
+  (@filelist) or return undef;  ## no files yet;
   return \@filelist;
 }
 
@@ -332,14 +349,21 @@ sub filesetdue( $course, $filename, $when ) {
 ################################################################################################################################
 ## files utility subroutines
 ################################################################
-sub _deeplisti( $globfilename ) {
+sub _deeplisti( $globdir, $globfilename ) {
   ## does not check whether you are an su.  so don't return carelessly
+  my $nothwequiz= ($globfilename eq '!other');
+  ($nothwequiz) and $globfilename='*';
+
   my @filelist;
-  foreach (bsd_glob("$globfilename")) {
+  foreach (bsd_glob("$globdir/$globfilename")) {
     my %parms;
     ($_ =~ /\~/) and next;  ## these are meta files!
-    ($parms{sfilename}= $_) =~ s{.*/}{};
+    if ($nothwequiz) {
+      ($_ =~ /\.equiz$/) and next;
+      ($_ =~ m{$var\/.*\/hw}i) and next;
+    }
     $parms{lfilename}= $_;
+    ($parms{sfilename}= $_) =~ s{.*/}{};
     $parms{filelength}= -s $_;
     $parms{mtime}= ((stat($_))[9]);
     $parms{duetime}= _finddue($_);

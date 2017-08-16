@@ -487,7 +487,7 @@ sub drawmore($sfilename, $centertype, $actionchoices, $allfiledetails, $tzi, $we
 			<input type="hidden" name="f" value="$fname" />
 			User Time: <input type="date" id="duedate" name="duedate" value="$dueyyyymmdd" onblur="submit();" />
 			<input type="time" id="duetime" name="duetime" value="$duehhmm" />
-			<input type="submit" id="submit" value="change or tab out to set" class="btn btn-xs btn-default" />
+			<input type="submit" id="submit" value="update" class="btn btn-xs btn-default" />
                    $webbrowser
 			</form>
 		$sixmobutton
@@ -497,6 +497,7 @@ sub drawmore($sfilename, $centertype, $actionchoices, $allfiledetails, $tzi, $we
     </tbody>
   </table>
 EOT
+
 }
 
 ################
@@ -506,12 +507,14 @@ sub ifilehash2table( $filehashptr, $actionchoices, $type, $tzi ) {
   defined($filehashptr) or return "";
   my $filestring= '';
   my $counter=0;
+
   foreach (@$filehashptr) {
     ++$counter;
 
+    (defined($_->{filelength})) or next;  ## this is really an error, like a symlink to something undefined
     my $fq= "f=$_->{sfilename}";
 
-    my $publish=($_->{duetime}) ?
+    my $publish= ($_->{duetime}>time()) ?
       qq(<a href="${type}more?$fq"> ).epochtwo($_->{duetime}).'</a> '. btn("filesetdue?$fq&amp;dueepoch=".(time()-2), "unpub", 'btn-info btn-xs')
       :
       btn("filesetdue?$fq&amp;dueepoch=".(time()+24*3600*180), "publish", 'btn-primary btn-xs');

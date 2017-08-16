@@ -20,7 +20,7 @@ get '/instructor/filecenter' => sub {
   sudo( $course, $c->session->{uemail} );
 
   $c->stash( filelist => filelisti($course),
-	   tzi => tzi( $c->session->{uemail} )  ); ## X means not hw and not equiz
+	     tzi => tzi( $c->session->{uemail} )  ); ## X means not hw and not equiz
 };
 
 

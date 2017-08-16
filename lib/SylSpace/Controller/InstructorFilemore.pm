@@ -19,7 +19,7 @@ get '/instructor/filemore' => sub {
   my $fname=  $c->req->query_params->param('f');
   (defined($fname)) or die "need a filename for filemore.\n";
 
-  $c->stash( detail => filelisti($course, $fname),
+  $c->stash( detail => filelisti($course, $fname),  ## fname is a mask
 	     tzi => tzi( $c->session->{uemail} ) );
 };
 
@@ -31,14 +31,14 @@ __DATA__
 
 @@ instructorfilemore.html.ep
 
-<% use SylSpace::Model::Controller qw(drawmore browser); %>
+<% use SylSpace::Model::Controller qw(drawmore webbrowser); %>
 
 %title 'more file information';
 %layout 'instructor';
 
 <main>
 
-  <%== drawmore('file', [ 'view', 'download', 'edit' ], $detail, $tzi, browser($self)); %>
+  <%== drawmore($detail->[0]->{sfilename}, 'file', [ 'view', 'download', 'edit' ], $detail, $tzi, webbrowser($self)); %>
 
 </main>
 
