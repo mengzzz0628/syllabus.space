@@ -77,8 +77,12 @@ sub _send_email {
       To      => $email,
       Subject => 'Confirm your email',
     ],
-    body => "Follow this link: $url\n\nMake sure your spam filter does not trap the email you will receive.",
-  );
+    body => "Follow this link: $url\n\nMake sure that your email spam filter will not trap the email you will receive, something like:
+
+	From: syllabus.space <syllabus.space\@gmail.com>
+	Subject: Confirm your email
+
+" );
 
   superseclog( $c->tx->remote_address, $email, "requesting sending email to ".$email );
 
