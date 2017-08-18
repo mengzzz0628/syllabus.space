@@ -19,5 +19,6 @@ use FindBin;
 use lib '../..';
 use SylSpace::Model::Model qw(:DEFAULT instructornewenroll);
 
+(@ARGV) or die "usage: $0 course email";
 instructornewenroll(@ARGV);
 

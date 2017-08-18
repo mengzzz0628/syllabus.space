@@ -89,6 +89,7 @@ __DATA__
      <div class="col-xs-12 col-md-6 text-center">
 		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
 			<input type="hidden" name="cmd" value="_s-xclick">
+			<input type="hidden" name="sylspacetoken" value="token-test-12345">
 			<input type="hidden" name="hosted_button_id" value="A654PPKTNDSPA">
 			<table>
 				<tr><td><input type="hidden" name="on0" value="Select Price">Select Donation</td></tr>
