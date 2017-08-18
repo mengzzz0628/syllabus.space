@@ -1,8 +1,0 @@
-post '/auth/sendmail/authenticate' => sub {
-: sorry, package name 'authdaniemail' is not 'url' for authsendmailauthenticate
-
-get '/auth/sendmail/callback' => sub {
-: sorry, package name 'authdaniemail' is not 'url' for authsendmailcallback
-
-post '/auth/userenrollsave' => sub {
-: sorry, package name 'Authenrollsave' is not 'url' for authuserenrollsave

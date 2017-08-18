@@ -29,6 +29,8 @@ use base 'Exporter';
 	       equizrender equizgrade equizanswerrender   	       equizrate
 
 	       _msglistnotread
+
+	       paypallog
 	    );
 
 use lib '../..';
@@ -934,6 +936,20 @@ sub equizrate( $ip, $course, $hash ) {
   (my $comments= $hash->{comments}) =~ s/[:\n]/;/g;
   my $errmsg= "$hash->{equizrate} : $hash->{equizgradename} : $hash->{clarity} : $hash->{difficulty} : $comments ";
   _logany( $ip, $course, $hash->{equizuemail}, $errmsg, 'equizratings.txt', $var );
+}
+
+################################################################
+
+sub paypallog( $type, $email, $ip, $referer, $msg ) {
+  $referer= $referer || "noreferer";
+  $ip= $ip || "noip";
+
+  open(my $TMP, ">>", "/tmp/debugpaypal.log");
+  print $TMP time()."\n";
+  print $TMP "hello: ".join(" | ", $ip, 'na', $email, "referer $referer | $msg", 'paypal.log', $var)."\n";
+  close($TMP);
+
+  _logany( $ip, 'na', $email, "referer $referer | $msg", 'paypal.log', $var );
 }
 
 1;

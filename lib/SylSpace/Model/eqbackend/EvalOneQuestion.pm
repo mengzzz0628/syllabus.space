@@ -327,6 +327,7 @@ sub solveinx {
 ## various finance definitions
 ################################################################
 
+## this one starts with the first cash flow at time 0
 sub npv {
   my $r=shift;
   my $sum=0; my $cnt=0;
@@ -337,6 +338,7 @@ sub npv {
 }
 
 
+## this one starts with the first cash flow at time 1
 sub pv {
   my $r=shift;
   my $sum=0; my $cnt=1;
