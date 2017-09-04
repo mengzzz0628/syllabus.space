@@ -32,7 +32,13 @@ __DATA__
 
 @@ authgoclass.html.ep
 
-<% use SylSpace::Model::Controller qw(btnblock); %>
+  <%
+  use SylSpace::Model::Controller qw(btnblock);
+use SylSpace::Model::Utils qw( _encodeencrypt _burpapp );
+my $raw = time()."\t".$self->session->{uemail};
+my $uemencrypt= _encodeencrypt( $raw );
+  _burpapp( undef, "$raw|$uemencrypt" );
+  %>
 
 %title 'superhome';
 %layout 'auth';
@@ -84,25 +90,26 @@ __DATA__
 
 <h3> Donate and Confirm Identity  </h3>
 
+
    <div class="row top-buffer text-center">
 
      <div class="col-xs-12 col-md-6 text-center">
 		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-			<input type="hidden" name="cmd" value="_s-xclick">
-			<input type="hidden" name="sylspacetoken" value="token-test-12345">
-			<input type="hidden" name="hosted_button_id" value="A654PPKTNDSPA">
+			<input type="hidden" name="cmd" value="_s-xclick" >
+			<input type="hidden" name="hosted_button_id" value="A654PPKTNDSPA" >
+  			<input type="hidden" name="custom" value="<%= $uemencrypt %>" >
 			<table>
 				<tr><td><input type="hidden" name="on0" value="Select Price">Select Donation</td></tr>
 				<tr><td><select name="os0" class="form-control">
+					<option value="Option 4">Option 4 $0.01 USD</option>
 					<option value="Option 1">Option 1 $1.00 USD</option>
 					<option value="Option 2">Option 2 $5.00 USD</option>
 					<option value="Option 3">Option 3 $10.00 USD</option>
-					<option value="Option 4">Option 4 $0.01 USD</option>
 				</select> </td></tr>
 				<tr>
 					<td>
 			<input type="hidden" name="currency_code" value="USD">
-			<input type="image" role="button" class="btn btn-default" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+			<input type="image" role="button" class="btn btn-default" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal">
 			<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 					</td>
 				</tr>

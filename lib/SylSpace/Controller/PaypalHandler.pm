@@ -78,24 +78,34 @@ sub _log_paypal_error {
 
 
 ################
+use SylSpace::Model::Utils qw( _burpapp _decryptdecode );
+
 sub _log_paypal_info {
   my ($query, $myemail, $ip, $referer) = @_;
-  my $paypalData;
-  my $pair;
-  my @pairs = split(/&/, $query);
-  foreach $pair (@pairs) {
+  _burpapp( undef, "paypalquery: $query\n" );
+
+  ## we want to do minor rearranging.  we want to push 'payer_email' to the front and decrypt custom (following front);
+
+  my $sessionemail=""; my $payeremail="";
+  foreach my $pair ( split(/&/, $query) ) {
     my ($key, $value) = split("=", $pair);
+    (($key eq 'custom') || ($key eq 'payer_email')) or next;
+
     $value =~ tr/+/ /;
     $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C",hex($1))/eg;
-    $paypalData .= $value."\t";
+
+    ($key eq 'custom') and $sessionemail= _decryptdecode($value);
+    ($key eq 'payer_email') and $payeremail= $value;
   }
 
-  open(my $FD, ">>/var/paypal/paypal_info.txt") or die "Can't find paypal_info.txt : $!";
-  print $FD $paypalData."\n";
-  close($FD);
+  _burpapp( undef, "paypallink: $sessionemail\t$payeremail\n" );
 
-  paypallog( 'ok', $myemail, $ip, $referer, $paypalData );  ## this must work, too.
-  print STDERR "_log_paypal_info exits on $ip $myemail $referer\n";
+  my $logmore="$sessionemail\t$payeremail\t$query\n";
+
+  _burpapp( "/var/paypal/paypal_info.txt", $logmore );
+  paypallog( 'ok', $myemail, $ip, $referer, $logmore );  ## this must work, too.
+
+  print STDERR "_log_paypal_info exits on $ip $myemail $referer $logmore";
 }
 
 

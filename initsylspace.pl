@@ -99,6 +99,8 @@ say STDERR "made $var";
 
 touch("$var/paypal.log")or die "internal error: I could not touch $var/paypal.log: $!";
 chmod(0777, "$var/paypal.log") or die "chmod: failed on opening $var/paypal.log to the public: $!\n";
+touch("$var/general.log")or die "internal error: I could not touch $var/general.log: $!";
+chmod(0777, "$var/general.log") or die "chmod: failed on opening $var/general.log to the public: $!\n";
 
 foreach (qw(users courses tmp templates)) {
   (-e "$var/$_") and next; ## actually should not happen usually
