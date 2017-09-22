@@ -5,7 +5,7 @@ use lib qw(.. ../..); ## make syntax checking easier
 use strict;
 
 use SylSpace::Model::Model qw(isinstructor tweet seclog);
-use SylSpace::Model::Files qw(filewrite answerwrite);
+use SylSpace::Model::Files qw(filewritei answerwrite);
 use SylSpace::Model::Controller qw(global_redirect  standard);
 
 ################################################################
@@ -34,7 +34,7 @@ post '/uploadsave' => sub {
   my $referto;
   if (isinstructor( $course, $c->session->{uemail})) {
     ## an instructor can upload anything
-    filewrite($course, $filename, $filecontents);
+    filewritei($course, $filename, $filecontents);
     seclog( $c->tx->remote_address, $course, 'instructor ', $c->session->{uemail}." uploaded ". $filename );  ## student uploads are public
     $referto= "/instructor/${infiletype}center";
 

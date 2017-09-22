@@ -35,16 +35,16 @@ __DATA__
   <form class="form-horizontal" method="POST" action="/auth/biosave">
 
   <div class="form-group">
-	  <label class="col-sm-2 control-label col-sm-2" for="email">email*</label>
-	  <div class="col-sm-6">[public unchangeable]
-		<input class="form-control foo" id="email" name="email" value="<%= $self->session->{uemail} %>" readonly />
-	  </div>
-        </div>
+    <label class="col-sm-2 control-label" for="email">email*</label>
+       <div class="col-sm-6">[public unchangeable]
+          <input class="form-control foo" id="email" name="email" value="<%= $self->session->{uemail} %>" readonly />
+       </div>
+  </div>
 
   <%== $udrawform %>
 
   <!-- div class="form-group" style="padding-top:2em">
-    <label class="col-sm-2 control-label col-sm-2" for="directlogincode">[c] directlogincode</label>
+    <label class="col-sm-2 control-label" for="directlogincode">[c] directlogincode</label>
     <div class="col-sm-6">[Super-Confidential, Not Changeable, Ever]<br />  <a href="auth/showdirectlogincode">click here to play with knives</a><br /> </div>
   </div -->
 

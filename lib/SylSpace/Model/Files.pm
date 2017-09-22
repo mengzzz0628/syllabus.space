@@ -9,7 +9,7 @@ our @EXPORT_OK=qw(
   collectstudentanswers
 
   eqsetdue eqlisti eqlists eqwrite eqreads eqreadi
-  filesetdue filelisti filelists filereadi filereads filewrite filedelete fileexistsi fileexistss
+  filesetdue filelisti filelists filereadi filereads filewritei filedelete fileexistsi fileexistss
   hwsetdue hwlisti hwlists hwreadi hwreads hwwrite hwdelete
   answerlists answerread answerwrite answerlisti answercollect answerhashs
 
@@ -73,8 +73,8 @@ sub filelisti( $course ) { return _baselisti($course, '!other'); }
 sub filelists( $course ) { return _baselists($course, '!other'); }
 sub filereadi( $course, $filename ) { return _basereadi( $course, $filename ); }
 sub filereads( $course, $filename ) { return _basereads( $course, $filename ); }
-sub filewritei( $course, $filename ) { return _basewritei( $course, $filename ); }
-sub filedelete( $course, $filename ) { return _basewritei( $course, $filename ); }
+sub filewritei( $course, $filename, $filecontents ) { return _basewritei( $course, $filename, $filecontents ); }
+sub filedelete( $course, $filename ) { return _basedelete( $course, $filename ); }
 
 
 ################################################################
@@ -147,7 +147,7 @@ sub _basereads( $course, $filename, $equizspecial=0) {
 }
 
 
-sub _basewrite( $course, $filename, $filecontents ) {
+sub _basewritei( $course, $filename, $filecontents ) {
   $course= _confirmsudoset( $course );  ## lc()
   _checksfilenamevalid($filename);
   return _maybeoverwrite( "$var/courses/$course/instructor/files/$filename", $filecontents );

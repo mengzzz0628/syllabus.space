@@ -18,7 +18,7 @@ get '/instructor/filedelete' => sub {
 
   my $fname= $c->req->query_params->param('f');
 
-  filedelete( $course, $c->session->{uemail}, $fname);
+  filedelete( $course, $fname);
 
   ## we cannot go back, because the page no longer exists! return $c->redirect_to($c->req->headers->referrer);
   return $c->flash( message=> "completely deleted file $fname" )->redirect_to( ''.(($fname =~ /^hw/) ? 'hwcenter' : ($fname =~ /\.equiz$/) ? 'equizcenter' : 'filecenter'));
