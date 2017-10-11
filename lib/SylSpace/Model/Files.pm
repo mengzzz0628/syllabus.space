@@ -83,7 +83,7 @@ sub hwlisti( $course ) { return _baselisti( $course, "hw*" ); }
 sub hwlists( $course ) { return _baselists( $course, "hw*" ); }  ## from the students
 sub hwreadi( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwreadi: '$hwname' must start with hw\n"; return _basereadi( $course, $hwname ); }
 sub hwreads( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwreads: '$hwname' must start with hw\n"; return _basereads( $course, $hwname ); }
-sub hwwrite( $course, $hwname, $hwcontents ) { ($hwname =~ /^hw/) or die "hwwrite: '$hwname' must start with hw\n"; return _basewrite( $course, $hwname, $hwcontents ); }
+sub hwwrite( $course, $hwname, $hwcontents ) { ($hwname =~ /^hw/) or die "hwwrite: '$hwname' must start with hw\n"; return _basewritei( $course, $hwname, $hwcontents ); }
 sub hwdelete( $course, $hwname ) { ($hwname =~ /^hw/) or die "hwdelete: '$hwname' must start with hw\n"; return _basedelete( $course, $hwname ); }
 #sub hwrate( $course, $hwname, $rating ) { ($hwname =~ /^hw/) or die "hwrate: '$hwname' must start with hw\n"; return _baserate( $course, $hwname, $rating ); }
 
@@ -94,7 +94,7 @@ sub eqlisti( $course ) { return _baselisti( $course, "*.equiz" ); }
 sub eqlists( $course ) { return _baselists( $course, "*.equiz" ); }
 sub eqreadi( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreadi: $eqsymname must end with .equiz"; return _basereadi( $course, $eqsymname );  }
 sub eqreads( $course, $eqsymname ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return _basereads( $course, $eqsymname, 1 ); }
-sub eqwrite( $course, $eqsymname, $eqsymcontents ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return _basewrite( $course, $eqsymname, $eqsymcontents ); }
+sub eqwrite( $course, $eqsymname, $eqsymcontents ) { ($eqsymname=~ /\.equiz[\~]*/) or die "eqsymreads: $eqsymname must end with .equiz"; return _basewritei( $course, $eqsymname, $eqsymcontents ); }
 sub eqdelete( $course, $eqsymname ) { ($eqsymname =~ /^eqsym/) or die "eqsymdelete: $eqsymname must end with .equiz\n"; return _basedelete( $course, $eqsymname ); }
 
 ################################################################################################################################
