@@ -21,10 +21,12 @@ Due to the outdated three-year-old 5.18.2 version of perl still running on MacOS
 *   perl MkTestSite.pl
 *   cd ..
 *   updatedb   # runserver.pl can now self-detect location
-*   perl runserver.pl   # smart enough to figure out whether it is running on syllabus.space domain (where it should use hypnotoad).  use 'p' to force production mode
+*   perl runserver.pl   # smart enough to figure out whether it is running on syllabus.space domain (where it should use hypnotoad).
 
 
-now point your firefox browser to `http://syllabus.test`.  (do not use Chrome!).  when done, just ^C out of runserver.pl .  If you want to remove error messages, use 'p' for production mode.
+now point your firefox browser to `http://syllabus.test`.  (do not use Chrome!).  when you are done, ^C out of runserver.pl .
+
+runserver.pl also has a mode that lets it operate similar to hypnotoad, primarily removing informative error messages.  Give runserver.pl a 'p' argument to force this production mode.
 
 
 ### Real Operation
