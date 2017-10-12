@@ -37,7 +37,7 @@ with your private authentication secrets, and link to it in your main SylSpace d
 
     # ln -s <somewhere-else>/SylSpace-Secrets.conf mysylspacedir/SylSpace-Secrets.conf
 
-The contents of this .conf file are illustrated in SylSpace-Secrets.template .  Edit and rename!
+The contents of the SylSpace-Secrets.conf file are illustrated in SylSpace-Secrets.template .  Edit and rename!
 
 
 ## Starting
