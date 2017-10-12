@@ -8,9 +8,12 @@ Due to the outdated three-year-old 5.18.2 version of perl still running on MacOS
 
 ### Basic Steps:
 
+- on ubuntu, sudo apt install git cpanminus make gcc
+
 * mkdir mysylspacedir ; cd mysylspacedir
 * git clone https://github.com/iwelch/syllabus.space
-* cpanm --installdeps .
+* cd syllabus.space
+* sudo cpanm --installdeps .
 * sudo 'echo "127.0.0.1 syllabus.test corpfin.syllabus.test auth.syllabus.test" >> /etc/hosts'
 * sudo perl initsylspace.pl
 * cd Model
