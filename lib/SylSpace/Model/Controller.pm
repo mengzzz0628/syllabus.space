@@ -62,12 +62,15 @@ my $global_message;
 sub standard {
   my $c= shift;
 
-
   my $cururl= $c->req->url;  ## /auth/dosome
   my $domain= $cururl->domainport;  ## mfe.welch.$ENV{'SYLSPACE_sitename'}:3000
   my $course= $cururl->subdomain; ## mfe.welch
 
   $cururl =~ s{\?.*}{}; ## strip any parameters
+
+  #or $c->webbrowser()
+  (($c->browser->{"browser"} =~ /chrome/i) && ($ENV{SYLSPACE_onlocalhost}))
+    and die "Chrome does not work with localhost (syllabus.test), because it handles localhost domains differently.\n\nPlease use firefox or some other browser.";
 
   sub retredirect { $global_redirecturl= $_[0]; $global_message= $_[1] || ""; return; }
 

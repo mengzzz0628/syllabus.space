@@ -35,7 +35,7 @@ if ($ENV{SYLSPACE_onlocalhost}) {
   my $etclines= `grep syllabus.test /etc/hosts`;
   ($etclines =~ /corpfin.syllabus.test/m) or die "\n\nFor local testing, please add at the end of /etc/hosts the following: \n\n127.0.0.1 syllabus.test auth.syllabus.test corpfin.syllabus.test\n\n\n";
 } else {
-  (-e $configfname) or die "you need a $ENV{SYLSPACE_sitepath}/$pgmname.conf config file in non-local operation\n"
+  (-e $configfname) or die "you need a $configfname config file in non-local operation\n"
 }
 
 ################
@@ -52,12 +52,13 @@ $ENV{SYLSPACE_jumboscolor}='darkblue'; $ENV{SYLSPACE_jumboicolor}='darkred';
 if (-e $configfname) {
   (-e $configfname) or die "\nFATAL: no authentication secrets config file '$configfname'\n";
   (-l $configfname) or die "\nFATAL: authentication secrets config file '$configfname' is in the github'ed  directory, not a link.  fix this security risk!\n";
-  print STDERR "\n$0: good: authentication secrets are symlink to ".readlink("$ENV{SYLSPACE_sitepath}/$pgmname.conf")."\n";
 
-  plugin 'Config';
+  print STDERR "\n$0: good: your authentication secrets is $configfname, which is a symlink to ".readlink($configfname)."\n";
 
-  my $credentials = app->plugin('Config')->{oauth};
-  (defined($credentials)) or die "internal error: I cannot read the oauth information from the config file\n";
+  my $credentials= plugin 'Config' => { file => $configfname };
+
+  (defined($credentials)) or die "internal error: I cannot read the credentials information from the config file $configfname\n";
+  (defined($credentials->{oauth})) or die "internal error: I cannot read the oauth field information from the config file $configfname\n";
 
   if (my $google = $credentials->{google}) {
     my ($key, $secret) = @$google;
@@ -96,6 +97,7 @@ if (-e $configfname) {
 
   $ENV{SYLSPACE_haveoauth}= 1;
 }
+
 
 ################################################################################################################################
 ## http://user.course.$ENV{SYLSPACE_sitename} -> $ENV{SYLSPACE_sitename}
@@ -136,8 +138,8 @@ my @pwsecret=slurp("$vardir/secrets.txt");
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
 app->config(hypnotoad => { listen => ['http://'.$ENV{'SYLSPACE_sitename'}.':80'] }); ## hypnotoad is serious and never on localhost
 
-(-e "$vardir/users/instructor\@gmail.com") or die "you need a few users in $vardir/users/users\n";
-(-e "$vardir/courses/intro.corpfin") or die "you need a few courses in $vardir/courses\n";
+(-e "$vardir/users/ivo.welch\@gmail.com") or die "you need at least one known users in $vardir/users\n";
+(-e "$vardir/courses/corpfin.test") or die "you need at least corpfin.test in $vardir/courses\n";
 
 
 if ($ENV{'SYLSPACE_onlocalhost'}) {

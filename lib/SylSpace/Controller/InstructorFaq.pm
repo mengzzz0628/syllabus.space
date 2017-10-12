@@ -274,7 +274,7 @@ __DATA__
   # perl mksite.pl testsite you@emailhost
   # morbo -v Sylspace  ## and now open http://localhost:3000/ on your browser  </pre>
 
-a  <p><tt>/var/sylspace</tt> is hardcoded in 2-3 places.  If you do not want to use this, you need to fix it.  There are a very few hardcodes to syllabus.space (e.g., for OAuth or the systemd SylSpace.conf config file).  I do not believe that <tt>http://*syllabus.space</tt> is hardcoded anywhere, but some of the documentation refers to it as the server on which it runs.</p>
+a  <p><tt>/var/sylspace</tt> is hardcoded in 2-3 places.  If you do not want to use this, you need to fix it.  There are a very few hardcodes to syllabus.space (e.g., the SylSpace-Secrets.conf and the systemd configuration files).  I do not believe that <tt>http://*syllabus.space</tt> is hardcoded anywhere, but some of the documentation refers to it as the server on which it runs.</p>
 
   <p>Because all content is stored in the unix filesystem, it is easy for an instructor to view and interpret all of his/her data, too.  It also makes debugging a lot easier.</p>
 
