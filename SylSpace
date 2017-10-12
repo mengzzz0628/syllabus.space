@@ -138,9 +138,11 @@ my @pwsecret=slurp("$vardir/secrets.txt");
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
 app->config(hypnotoad => { listen => ['http://'.$ENV{'SYLSPACE_sitename'}.':80'] }); ## hypnotoad is serious and never on localhost
 
-(-e "$vardir/users/ivo.welch\@gmail.com") or die "you need at least one known users in $vardir/users\n";
-(-e "$vardir/courses/corpfin.test") or die "you need at least corpfin.test in $vardir/courses\n";
-
+use File::Glob ':bsd_glob';
+my @users= (bsd_glob("$vardir/users/*\@*"));
+((scalar @users) >= 1) or die "you need at least one known users in $vardir/users, not $#users\n";
+my @courses=(scalar glob("$vardir/courses/*"));
+((scalar @courses) >= 1) or die "you need at least one known course in $vardir/courses, not $#courses\n";
 
 if ($ENV{'SYLSPACE_onlocalhost'}) {
   print STDERR "$0: *** localhost mode only --- logging out may not work correctly\n";

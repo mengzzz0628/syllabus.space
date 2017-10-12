@@ -7,49 +7,54 @@ use feature ':5.20';
 use warnings FATAL => qw{ uninitialized };
 use autodie;
 
-my $hostname= `hostname`;
-chomp($hostname);
+($> == 0) or die "you must run this as root, because even for testing, we occupy not localhost but syllabus.test:80\n";
 
-sub dirgive { (-d $_[0]) ? $_[0] : undef; }
+my $isproduction= (`hostname` =~ /syllabus-space/m);
+my $isosx= (-d "/Users/ivo");
 
-my $superhome= (-d "/Users/ivo") ? "/Users" : "/home";
+($isproduction && $isosx) and die "iaw: please do not run the syllabus.space domain on an osx host.\n";
 
-my $whoami= `whoami`; chomp($whoami);
-($whoami eq 'root') or die "you must run this as root and not as $whoami, because even for testing, we occupy not localhost but syllabus.test:80\n";
+(-x "/Users/ivo/syllabus.space/syllabus.space/SylSpace") or die "it's not execable\n";
 
+my @apphome= grep { $_ =~ /SylSpace$/ } `locate syllabus.space/SylSpace`;
+## flunks somehow:
+##  @apphome = grep { (-x $_) } @apphome;
+@apphome = grep { $_ !~ m{\/\.[a-z]}i } @apphome;  ## a hidden directory in path, e.g., .sync or .git
 
-if ($hostname eq 'syllabus-space') {
-  ($superhome eq '/home') or die "$0: please do not run real version on osx!\n";
-  ($> == 0) or die "$0: you can run production only when you are root.\n";
-  ## should not run off syllabus.test!
-  my $workdir="$superhome/ivo/bitsyllabus/syllabus.space/";
-  (-e $workdir) or die "$0: no $workdir!\n";
-  chdir($workdir) or die "failed to change directory: $!\n";
-  print STDERR "$0: Running Full Production Server.
+((scalar @apphome)>1) and die "Ambiguous SylSpace locations:\n\t".join(" ", @apphome).
+  "\nPlease test on non-production servers, not on the same server.\n";
+((scalar @apphome)<1) and die "Cannot locate executable SylSpace.\n";
+
+chomp($apphome[0]);
+(my $workdir= $apphome[0]) =~ s{\/SylSpace$}{};
+
+print STDERR "running $apphome[0] in $workdir\n";
+
+(-e $workdir) or die "$0: internal weird error.  no $workdir!\n";
+(-d $workdir) or die "$0: internal weird error.  no $workdir!\n";
+chdir($workdir) or die "failed to change directory to $workdir: $!\n";
+
+if ($isproduction) {
+
+  print STDERR "$0: Running full production hypnotoad server for syllabus.space.  To stop:
 	kill -QUIT `cat hypnotoad.pid` gracefully (or -TERM), or
 	/usr/local/bin/hypnotoad -s ./SylSpace)\n";
-  system("/usr/local/bin/hypnotoad -f ./SylSpace");  ## do not '&', or it fails in systemd SylSpace.service !
+  echosystem("/usr/local/bin/hypnotoad -f ./SylSpace");  ## do not '&', or it fails in systemd SylSpace.service !
+
 } else {
-  print STDERR "$0: Running Development Test Server\n";
 
-  ## here we can run off syllabus.test, and both on osx or on linux
-  my $workdir="$superhome/ivo/bitsyllabus/syllabus.test/";
-  if (-e $workdir) {
-    print STDERR "running off the **TEST** subdir\n";
-  } else {
-    $workdir="$superhome/ivo/bitsyllabus/syllabus.space/";
-    (-e $workdir) or die "we have neither syllabus.test nor syllabus.space!\n";
-  }
+  (`grep syllabus.test /etc/hosts` =~ /\.syllabus\.test/mi) or die "please add *.syllabus.test to your /etc/hosts\n";
+  my $mode= ((@ARGV) && (defined($ARGV[0])) && ($ARGV[0] =~ /^p/i)) ? "production" : "development";
 
-  ## best: use DNSMASQ, add address=/test/127.0.0.1 into /usr/local/etc/dnsmasq.conf; and launchctl stop homebrew.mxcl.dnsmasq
-  (`grep syllabus.test /etc/hosts` =~ /\.syllabus\.test/) or die "please add *.syllabus.test to your /etc/hosts\n";
-
-  my $mode= "development";
-  if (@ARGV) { ($ARGV[0] =~ /^p/i) and $mode="production"; }
+  print STDERR "$0: running morbo for syllabus.test in $mode mode.\n";
 
   my $executable= (-x "/usr/local/bin/morbo") ? "/usr/local/bin/morbo" : "/usr/local/ActivePerl-5.24/site/bin/morbo";
   (-x $executable) or die "cannot find suitable morbo executable.\n";
-  print STDERR "invoking morbo in '$executable  -v -m $mode ./SylSpace -l http://syllabus.test:80' now.\n";
 
-  system("$executable -v -m $mode ./SylSpace -l http://syllabus.test:80");
+  echosystem("$executable -v -m $mode ./SylSpace -l http://syllabus.test:80");
+}
+
+sub echosystem {
+  print STDERR "\nEXECUTING SYSTEM: '$_[0]'\n";
+  system $_[0];
 }
