@@ -26,7 +26,7 @@ my @course=qw (mfe.welch mba.welch year.course.instructor.university intro.corpf
 
 use lib '../..';
 
-use SylSpace::Model::Files qw(answercollect cptemplate eqlisti eqwrite hwwrite filewrite filedelete eqsetdue hwsetdue filesetdue filelisti filelists filereads answerlists answerwrite);
+use SylSpace::Model::Files qw(answercollect cptemplate eqlisti eqwrite hwwrite filewritei filedelete eqsetdue hwsetdue filesetdue filelisti filelists filereads answerlists answerwrite);
 
 ################################################################################################################################
 
@@ -50,8 +50,8 @@ ok( eqwrite($course[0], $e2n, scalar slurp($e2n))>=0, 'writing $e2n' );
 ok( hwwrite($course[0], 'hw1.txt', "please do the first homework\n")>=0, 'writing hw1.txt');
 ok( hwwrite($course[0], 'hw2.txt', "please do the second homework.  it is longer.\n")>=0, 'writing hw2.txt');
 
-ok( filewrite($course[0], 'syllabus.txt', "<h2>please read this syllabus</h2>\n")>=0, 'writing syllabus.txt' );
-ok( filewrite($course[0], 'other.txt', "please do this syllabus\n")>=0, 'writing other.txt' );
+ok( filewritei($course[0], 'syllabus.txt', "<h2>please read this syllabus</h2>\n")>=0, 'writing syllabus.txt' );
+ok( filewritei($course[0], 'other.txt', "please do this syllabus\n")>=0, 'writing other.txt' );
 
 ####
 like( dies { hwsetdue($course[0], 'hw0.txt', time()+10000); }, qr/due/, 'cannot publish non-existing file hw0.txt' );
@@ -66,20 +66,17 @@ ok( filesetdue($course[0], 'other.txt', 0), 'harmless unpublished again' );
 
 my $npub= rlc( my $ilist= filelisti($course[0]));
 
-ok( $npub == 5, "instructor has $npub=5 files " );
+ok( $npub == 2, "instructor owns $npub files, which should be 2 (other.txt and syllabus.txt)" );
 
 my $publicstruct=filelists($course[0]);
 
 $npub= rlc($publicstruct);
-ok( $npub == 2, "student should see 2 published files (hw1, syllabus), actually saw $npub" );
+ok( $npub == 1, "student should see 1 published file (syllabus.txt), actually saw $npub" );
 
 (my $publicstring= Dumper( $publicstruct )) =~ s/\n/ /g;
+ok( $publicstring !~ m{other.txt}, "published still contains other.txt, even though it is not posted" );
+ok( $publicstring =~ m{syllabus\.txt}, "syllabus.txt is still posted.  good" );
 
-ok( $publicstring =~ m{hw1\.txt}, "published contains hw1.txt 1" );
-ok( $publicstring !~ m{other.txt}, "published still contains other.txt 1" );
-ok( $publicstring =~ m{syllabus\.txt}, "we had not published hw2.txt! 1" );
-
-ok( filereads( $course[0], 'hw1.txt'), "student can read hw1.txt 2" );
 ok( filereads( $course[0], 'syllabus.txt'), "student can read syllabus.txt 2" );
 like( dies { filereads( $course[0], 'other.txt') }, qr/sorry, /, "student cannnot read unpublished other.txt" );
 like( dies { filereads( $course[0], 'blahother.txt') }, qr/cannot read/, "student cannot read unexisting file" );

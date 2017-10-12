@@ -1,3 +1,8 @@
+
+
+	This should eventually allow GUI testing of Mojolicious
+
+
 #!/usr/bin/env perl
 use Test::Mojo;
 

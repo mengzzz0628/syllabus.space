@@ -88,8 +88,9 @@ my $uemencrypt= _encodeencrypt( $raw );
    </div>
 
 
-<h3> Donate and Confirm Identity  </h3>
+  <% if ($ENV{SYLSPACE_haveoauth}) { %>
 
+   <h3> Donate and Confirm Identity  </h3>
 
    <div class="row top-buffer text-center">
 
@@ -115,8 +116,14 @@ my $uemencrypt= _encodeencrypt( $raw );
 				</tr>
 			</table>
 		</form>
-	</div>
-     </div>
+	</div> <!-- col xs-12 -->
+	</div> <!-- row -->
+  <% } else { %>
+
+       <p> Paypal further authentication options omitted in local test mode without OAuth. </p>
+
+  <% } %>
+
    </div>
 </main>
 

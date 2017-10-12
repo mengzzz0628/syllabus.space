@@ -16,7 +16,7 @@ use SylSpace::Model::Model qw(:DEFAULT biosave usernew instructornewenroll usere
 
 use SylSpace::Model::Webcourse qw(_webcoursemake _webcourseremove );
 use SylSpace::Model::Grades qw(gradetaskadd gradesave);
-use SylSpace::Model::Files qw(filesetdue filewrite cptemplate);
+use SylSpace::Model::Files qw(filesetdue filewritei cptemplate);
 
 use Test2::Bundle::Extended;
 use Test2::Plugin::DieOnFail;
@@ -33,7 +33,7 @@ note '################ website creation';
 
 my @courselist=qw(corpfin.test syllabus.test);
 
-foreach (@courselist) {  ok( _webcoursemake($_), "created $_ site" ); ok( instructornewenroll($_, $iemail) ); }
+foreach (@courselist) {  ok( _webcoursemake($_), "created $_ site" ); ok( instructornewenroll($_, $iemail), "created $iemail as instructor for $_" ); }
 
 my @enrolledcourses= keys %{courselistenrolled($iemail)};
 ok( scalar @enrolledcourses == scalar @courselist, "check info on enrolled courses" );
@@ -88,8 +88,8 @@ ok( msgsave($courselist[0], { subject => 'Test Welcome', body => 'Welcome to the
 
 note '################ initial files';
 
-ok( filewrite($courselist[1], 'hw1.txt', "please do this first homework\n"), 'writing hw1.txt');
-ok( filewrite($courselist[1], 'syllabus.txt', "<h2>please read this simple txt syllabus</h2>\n"), 'writing syllabus.txt' );
+ok( filewritei($courselist[1], 'hw1.txt', "please do this first homework\n"), 'writing hw1.txt');
+ok( filewritei($courselist[1], 'syllabus.txt', "<h2>please read this simple txt syllabus</h2>\n"), 'writing syllabus.txt' );
 
 ok( cptemplate($courselist[0], 'corpfinintro'), "cannot copy corpfin template" );
 
@@ -106,7 +106,7 @@ foreach my $fnm (bsd_glob("../../../templates/equiz/corpfinintro/*.equiz")) {
 
 my $ssshtml="syllabus-sophisticated.html";
 my $sshtml= "../../../public/html/ifaq/$ssshtml"; ok( -e $sshtml, "have $ssshtml" );
-ok(  filewrite($courselist[0], $ssshtml, scalar slurp($sshtml)), 'writing $ssshtml' );
+ok(  filewritei($courselist[0], $ssshtml, scalar slurp($sshtml)), 'writing $ssshtml' );
 ok( filesetdue($courselist[0], $ssshtml, time()+$MONTH), "publish $ssshtml");
 
 ok( filesetdue($courselist[1], 'hw1.txt', time()+$MONTH), "publish hw1.txt open for 1 month");

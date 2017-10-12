@@ -67,7 +67,7 @@ __DATA__
 
 @@ AuthAuthenticator.html.ep
 
-%title 'authenticate email';
+%title 'register or authenticate';
 %layout 'auth';
 
 <% use SylSpace::Model::Controller qw(btnblock msghash2string); %>
@@ -77,12 +77,14 @@ __DATA__
 
 <p style="margin:1em"> To learn more about this site, please visit the <a href="/aboutus">about us</a> page.</p>
 
-  <%== msghash2string( [{ msgid => 0, priority => 5, time => 1495672668, subject => 'Test Play Site',
-			body => '<p>This is our syllabus.space (SylSpace) test site, with code on github. It is safe to authenticate and register yourself.  The site is run by Ivo Welch, UCLA.  For more information, please click on <b>About Us</b> below, and then read the linked FAQ.   <p>Registration allows you to try out the student perspective for our sample course&mdash;innovatively named <span style="color:blue;font-family:mono;">corpfin:intro</span>.  A typical quiz looks like <a href="/html/eqsample02a.html">this rendering</a>.  These equizzes are a great self-test resource for all introductory corporate finance students in their own right, regardless of where they are learning corporate finance. <p>If you are an instructor, you can also obtain access for your own tailored course site.  This allows you to post and change equizzes (<a href="/html/eqsample02a.html">sample source</a>), see what your students are answering, distribute homeworks and collect student answers, etc.  The web interface is far simpler and more pleasing than anything else out there.  Syllabus.space has practically zero learning curve.  If interested, please <a href="mailto:ivo.welch@gmail.com">email</a> to ask me for your own instructor site.  Include a preferred name (such as \'fin101a-2017.johndoe.syllabus.space\') and a gmail address (such as johndoe@gmail.com).<p>In summer 2017, the site and VM will be regularly destroyed and rebuilt, so please do not store anything valuable here.  If you stumble upon little or not-so-little bugs, please let me know. '}] ) %>
+  <%== msghash2string( [{ msgid => 0, priority => 5, time => 1495672668, subject => 'Hello!',
+			body => '<p>It is safe to register and/or authenticate.  The site is run by Ivo Welch, Prof at UCLA.  For more information, please click on <a href=\"/aboutus\">About Us</a>.   <p><b>Students</b>: Registration allows students to take sample tests, including a great set of corporate finance quizzes.  (A typical quiz looks like <a href="/html/eqsample02a.html">this rendering</a>.) <p><b>Instructors:</b> Instructors can also obtain an own tailored course site.  Course sites allow posting and changing equizzes, seeing what students have answered, distributing homeworks and collecting student answers.  The web interface is <em>far</em> simpler (no learning curve!) and more pleasing than anything else out there. See <a href="http://auth.syllabus.test/faq">screenshots</a>.  If interested, please <a href="mailto:ivo.welch@gmail.com">email to request</a> a tailored instructor site.  Include (1) a gmail address;  (2) a link to a university site for me to confirm your identity; (3) a course name (such as fin101a-2017); and (4) an instructor name abbreviation (such as johndoe).  Your private website will be <tt>http://fin101a-2017.johndoe.syllabus.space</tt>.<p>If you stumble upon little or not-so-little bugs, please let <a href="mailto:ivo.welch@gmail.com">me</a> know.'}] ) %>
 
 <hr />
 
 <nav>
+
+  <% if ($ENV{SYLSPACE_haveoauth}) { %>
 
   <p style="font-size:small;"><b>Direct Authentication</b> is the fastest and most reliable method to authenticate.  It works with your google or facebook id.</p>
 
@@ -118,11 +120,15 @@ __DATA__
       </div>
 
 
+  <% } else { %>
+
+   <p style="font-size:small">You did not have a local OAuth config file (usually a link to SylSpace-Secrets.conf), so you cannot use direct or email based registration or authentication.  For now, you can only use this Syllabus webapp reasonably on http://syllabus.test (i.e., localhost), which only allows "local cheating" authentication.</p>
+
+  <% } %>
+
      <% if ($ENV{'SYLSPACE_onlocalhost'}) { %>
-        <hr />
-        <hr />
-        <div class="row top-buffer text-center; border-style:solid;"> <!-- completely ignored afaik -->
-           <%== btnblock('/auth/testsetuser', '<i class="fa fa-users"></i> Hello, syllabus.test Sudo:<br />Choose Local Users', 'Listed Users -- Only on Localhost', 'btn-warning btn-md', 'w') %>
+        <div class="top-buffer text-center; border-style:solid;"> <!-- completely ignored afaik -->
+           <%== btnblock('/auth/testsetuser', '<i class="fa fa-users"></i> Choose Existing Listed User', '(works only on localhost, usually syllabus.test)', 'btn-warning btn-md', 'w') %>
         </div>
       <% } %>
 

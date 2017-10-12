@@ -8,27 +8,35 @@ plugin 'browser_detect';
 
 use Data::Dumper;
 
-## MOJO_REUSE = syllabus.test:3000:5
-if ($ENV{HYPNOTOAD_APP}) {
-  $ENV{MOJO_REUSE}= 'syllabus.space';
-}
+if ($ENV{HYPNOTOAD_APP}) {  $ENV{MOJO_REUSE}= 'syllabus.space'; }
 
 (defined($ENV{MOJO_REUSE})) or die "very weird running environment without MOJO_REUSE.  are you starting SylSpace w/o mojo or direct??\n: ".(Dumper \%ENV);
 ## $0 = MOJO_EXE = /Users/ivo/syllabus.space/syllabus.space/SylSpace
-(defined($ENV{MOJO_EXE})) or die "very weird running environment without MOJO_EXE";
+(defined($ENV{MOJO_EXE})) or die "very weird running environment without MOJO_EXE.";
 
 use FindBin;
 use Socket;
 
+(my $pgmname= $0) =~ s{.*/}{};  ## usually SylSpace
+
 $ENV{SYLSPACE_sitepath}= $FindBin::Bin;  ## /Users/ivo/syllabus.space/syllabus.space/
 
-($ENV{SYLSPACE_appname}= $0) =~ s{.*/}{};  ## SylSpace
-($ENV{SYLSPACE_sitename}= $ENV{MOJO_REUSE}) =~ s/:.*//g;  ## syllabus.test
-($ENV{SYLSPACE_sitename} eq 'localhost') and die "\n\nlocalhost is deprecated.  use syllabus.test instead.\n";
+($ENV{SYLSPACE_appname}= $0) =~ s{.*/}{};  ## SylSpace, from executable command
+($ENV{SYLSPACE_sitename}= $ENV{MOJO_REUSE}) =~ s/:.*//g;  ## syllabus.test, from Mojo
+
+($ENV{SYLSPACE_sitename} eq 'localhost') and die "\nyou cannot use localhost, because we need subdomins for testing.  please use syllabus.test instead.\n";
 $ENV{SYLSPACE_siteip}= inet_ntoa(inet_aton($ENV{SYLSPACE_sitename}));  ## 127.0.0.1
 $ENV{SYLSPACE_onlocalhost}= ($ENV{SYLSPACE_siteip} eq '127.0.0.1');
 
-(($ENV{SYLSPACE_onlocalhost}) && ($ENV{SYLSPACE_sitename} ne 'syllabus.test')) and die "please test only on syllabus.test";
+my $configfname= "$ENV{SYLSPACE_sitepath}/$pgmname-Secrets.conf";
+
+if ($ENV{SYLSPACE_onlocalhost}) {
+  ($ENV{SYLSPACE_sitename} eq 'syllabus.test') or die "please test only on syllabus.test";
+  my $etclines= `grep syllabus.test /etc/hosts`;
+  ($etclines =~ /corpfin.syllabus.test/m) or die "\n\nFor local testing, please add at the end of /etc/hosts the following: \n\n127.0.0.1 syllabus.test auth.syllabus.test corpfin.syllabus.test\n\n\n";
+} else {
+  (-e $configfname) or die "you need a $ENV{SYLSPACE_sitepath}/$pgmname.conf config file in non-local operation\n"
+}
 
 ################
 
@@ -36,16 +44,14 @@ $ENV{SYLSPACE_siteacolor}='AntiqueWhite'; $ENV{SYLSPACE_jumboacolor}='darkgreen'
 $ENV{SYLSPACE_siteicolor}=$ENV{SYLSPACE_sitescolor}='white';
 $ENV{SYLSPACE_jumboscolor}='darkblue'; $ENV{SYLSPACE_jumboicolor}='darkred';
 
+
 ################################################################################################################################
 ## unfortunately, you have to be connected to the correct diretory; I think Mojolyst does not work otherwise
 ################################################################################################################################
 
-{
-  (my $pgmname= $0) =~ s{.*/}{};  ## usually SylSpace
-  my $configfile="$ENV{SYLSPACE_sitepath}/$pgmname.conf";
-
-  (-e $configfile) or die "\nFATAL: no authentication secrets config file '$configfile'\n";
-  (-l $configfile) or die "\nFATAL: authentication secrets config file '$configfile' is in the github'ed  directory, not a link!\n";
+if (-e $configfname) {
+  (-e $configfname) or die "\nFATAL: no authentication secrets config file '$configfname'\n";
+  (-l $configfname) or die "\nFATAL: authentication secrets config file '$configfname' is in the github'ed  directory, not a link.  fix this security risk!\n";
   print STDERR "\n$0: good: authentication secrets are symlink to ".readlink("$ENV{SYLSPACE_sitepath}/$pgmname.conf")."\n";
 
   plugin 'Config';
@@ -87,6 +93,8 @@ $ENV{SYLSPACE_jumboscolor}='darkblue'; $ENV{SYLSPACE_jumboicolor}='darkred';
 			   on_finished => \&SylSpace::Controller::AuthAuthenticator::facebook
 			  );
   }
+
+  $ENV{SYLSPACE_haveoauth}= 1;
 }
 
 ################################################################################################################################
@@ -121,12 +129,15 @@ $ENV{SYLSPACE_jumboscolor}='darkblue'; $ENV{SYLSPACE_jumboicolor}='darkred';
 
 ################################################################################################################################
 use Perl6::Slurp;
-my @pwsecret=slurp('/var/sylspace/secrets.txt');
+
+my $vardir="/var/sylspace";
+
+my @pwsecret=slurp("$vardir/secrets.txt");
 app->secrets( \@pwsecret );  ## the first one encodes, the others are usable; maybe rotate by day
 app->config(hypnotoad => { listen => ['http://'.$ENV{'SYLSPACE_sitename'}.':80'] }); ## hypnotoad is serious and never on localhost
 
-(-e '/var/sylspace/users/instructor@gmail.com') or die "you need a few users in /var/sylspace/users\n";
-(-e '/var/sylspace/courses/intro.corpfin') or die "you need a few courses in /var/sylspace/courses\n";
+(-e "$vardir/users/instructor\@gmail.com") or die "you need a few users in $vardir/users/users\n";
+(-e "$vardir/courses/intro.corpfin") or die "you need a few courses in $vardir/courses\n";
 
 
 if ($ENV{'SYLSPACE_onlocalhost'}) {

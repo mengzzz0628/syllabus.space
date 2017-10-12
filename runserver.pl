@@ -14,6 +14,10 @@ sub dirgive { (-d $_[0]) ? $_[0] : undef; }
 
 my $superhome= (-d "/Users/ivo") ? "/Users" : "/home";
 
+my $whoami= `whoami`; chomp($whoami);
+($whoami eq 'root') or die "you must run this as root and not as $whoami, because even for testing, we occupy not localhost but syllabus.test:80\n";
+
+
 if ($hostname eq 'syllabus-space') {
   ($superhome eq '/home') or die "$0: please do not run real version on osx!\n";
   ($> == 0) or die "$0: you can run production only when you are root.\n";
@@ -45,7 +49,7 @@ if ($hostname eq 'syllabus-space') {
 
   my $executable= (-x "/usr/local/bin/morbo") ? "/usr/local/bin/morbo" : "/usr/local/ActivePerl-5.24/site/bin/morbo";
   (-x $executable) or die "cannot find suitable morbo executable.\n";
-  print STDERR "invoking morbo in $executable now.\n";
+  print STDERR "invoking morbo in '$executable  -v -m $mode ./SylSpace -l http://syllabus.test:80' now.\n";
 
   system("$executable -v -m $mode ./SylSpace -l http://syllabus.test:80");
 }

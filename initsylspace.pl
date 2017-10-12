@@ -114,7 +114,7 @@ if (!(-e "$var/secrets.txt")) {
   open(my $FO, ">", "$var/secrets.txt"); for (my $i=0; $i<30; ++$i) { print $FO mkrandomstring(32)."\n"; } close($FO);
 }
 
-say STDERR "now create a samplewebsite, e.g., (1) mksite.pl mfe.ucla instructor\@gmail.com or (2) run Model/Model.t or (3) run Model/MkTestSite.t";
+say STDERR "\nNow create a sample website.  First, cd Model/ .  Then\n\t(1) perl MkTestSite.t   --- creates the basics, corpfin/syllabus test\n\t(2) mksite.pl mfe.ucla instructor\@gmail.com   --- adds a new specific course site to existing site\n\t  // For more testing, you can also use perl Model.t ; perl Files.t instead.\n";
 
 sub mkrandomword {
   my $len= $_[0] || 32;
