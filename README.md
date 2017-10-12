@@ -2,7 +2,7 @@
 course management software on syllabus.space
 
 
-## Installation and Customization
+## Installation
 
 Due to the outdated three-year-old 5.18.2 version of perl still running on MacOS, we do not recommend it.  If you need to install syllabus.space on osx, first learn brew and install a newer perl first.
 
@@ -42,9 +42,24 @@ with your private authentication secrets, and link to it in your main SylSpace d
 The contents of the SylSpace-Secrets.conf file are illustrated in SylSpace-Secrets.template .  Edit and rename!
 
 
-## Starting
+## Automatic ReStart
 
 For automatic restart on crash and boot for use with the real production hypnotoad on syllabus.space, do
 
     # cp SylSpace.service /lib/systemd/system/
     # systemctl start SylSpace
+
+
+## Developing
+
+SylSpace is written in Mojolicious.
+
+The `SylSpace` top-level executable initializes a variety of global features and then starts the app loop.
+
+Each webpage ("controller") sits in its own `Controller/*.pm` file, which you can deduce by looking at the URL in the browser.
+
+Almost every controller uses functionality that is in the model, which is in `Model/*.pm`.  (The directory also contains some course initialization programs, such as `mkinstructor.pl` or `mksite.pl`.)
+
+The quiz evaluator is completely separate and laid out into `Model/eqbackend`.
+
+All default quizzes that course instructors can copy into their own home directories are in templates/equiz/ .
