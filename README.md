@@ -30,9 +30,14 @@ now point a firefox to http://syllabus.test (not Chrome!).  when done, just ^C o
 ### Real Operation
 
 For real operation on syllabus.space (or similar), you will also need to create a 
-	somewhere-else/SylSpace-Secrets.conf --- SylSpace's working email and your OAUTH facilities
+
+	<somewhere-else>/SylSpace-Secrets.conf --- SylSpace's working email and your OAUTH facilities
+
 with your private authentication secrets, and link to it in your main SylSpace directory.
-    # ln -s somewhere-else/SylSpace-Secrets.conf mysylspacedir/SylSpace-Secrets.conf
+
+    # ln -s <somewhere-else>/SylSpace-Secrets.conf mysylspacedir/SylSpace-Secrets.conf
+
+The contents of this .conf file are illustrated in SylSpace-Secrets.template .  Edit and rename!
 
 
 ## Starting
