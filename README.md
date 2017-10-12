@@ -21,15 +21,15 @@ Due to the outdated three-year-old 5.18.2 version of perl still running on MacOS
 *   perl MkTestSite.pl
 *   cd ..
 *   updatedb   # runserver.pl can now self-detect location
-*   perl runserver.pl   # smart enough to figure out whether you are running on syllabus.space itself.  use 'p' to force production mode
+*   perl runserver.pl   # smart enough to figure out whether it is running on syllabus.space domain (where it should use hypnotoad).  use 'p' to force production mode
 
 
-now point a firefox to http://syllabus.test (not Chrome!).  when done, just ^C out of runserver.pl
+now point a firefox to http://syllabus.test (not Chrome!).  when done, just ^C out of runserver.pl .  If you want to remove error messages, use 'p' for production mode.
 
 
 ### Real Operation
 
-For real operation on syllabus.space (or similar), you will also need to create a 
+For real production operation on syllabus.space (or similar), rather than local testing and development at syllabus.test, you will also need to create a file containing secrets:
 
 	<somewhere-else>/SylSpace-Secrets.conf --- SylSpace's working email and your OAUTH facilities
 
@@ -42,7 +42,7 @@ The contents of this .conf file are illustrated in SylSpace-Secrets.template .  
 
 ## Starting
 
-For use with hypnotoad on syllabus.space, with automatic restart, you can
+For automatic restart on crash and boot for use with the real production hypnotoad on syllabus.space, do
 
     # cp SylSpace.service /lib/systemd/system/
     # systemctl start SylSpace
