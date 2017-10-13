@@ -70,14 +70,21 @@ All default quizzes that course instructors can copy into their own home directo
 
 ### The Top Level
 
-FUTURE.md
-:	Plans
+**initsylspace.pl**
+:	the most important file.  initializes the `/var` hierarchy
 
-README.md
-:	This File
+cpanfile
+cpanlist
+:	has all required definitions.  Use as `cpanm --installdeps .` in this directory
 
-SylSpace*
+**SylSpace**
 :	The Main Executable
+
+runserver.pl*
+:	smartly starts the server, depending on the hostname, with hypnotoad or morbo
+
+
+The rest are also useful.
 
 SylSpace-Secrets.conf@
 :	A symlink to outside the hierarchy to keep secrets
@@ -92,27 +99,23 @@ SylSpace.t
 SylSpace.t2
 :	Beginning to learn how to write GUI tests.  Not working
 
-cpanfile
-cpanlist
-:	has all required definitions.  Use as `cpanm --installdeps .` in the directory
-
 hosts
 :	a variety of hostnames used in the startersite and messysite
 
-initsylspace.pl
-:	the most important file.  initializes the `/var` hierarchy
-
 nginx-config
 :	untested config file for nginx.  on my server, I deinstall all other webservers and just run hypnotoad
-
-runserver.pl*
-:	smartly starts the server, depending on the hostname, with hypnotoad or morbo
 
 start-hypnotoad.sh@
 :	link to runserver.pl
 
 stop-hypnotoad.sh*
 :	reminder how to stop hypnotoad
+
+FUTURE.md
+:	Plans
+
+README.md
+:	This File
 
 
 
@@ -211,22 +214,24 @@ fixupcamel.pl* was used to complain about misnamings inconsistenties.  mkurl.pl 
 
 ### ./lib/SylSpace/Model:  The Workhorse.
 
+* **mkstartersite.t** : usually first program invoked after initsylspace.pl
+
 * Controller.pm : all html drawing
+* Model.pm : the main model functions
 * Files.pm : storing and retrieving homeworks, equizzes, and files
 * Files.t
 * Grades.pm : storing and retrieving grades
 * Grades.t
-* Model.pm : the main model functions
 * Utils.pm : many common routines (e.g., globbing, file reading, etc.)
 * Utils.t
-* V4.pm : various scribblings for the next version
 * Webcourse.pm : creating and removing a new course, used in addsite.pl
 * addsite.pl  : CLI to add a new site with instructor
+* mkmessysite.t : for playing with functionality.  more extensive than mkstartersite.t
+
 * csettings-schema.yml  : what course information is required and what it must satisfy
-* eqbackend/
-* mkmessysite.t : for playing with functionality
-* **mkstartersite.t** : usually first program invoked after initsylspace.pl
 * usettings-schema.yml  : what biographical information is required and what it must satisfy
+
+* V4.pm : various scribblings for the next version
 
 
 ### ./lib/SylSpace/Model/eqbackend:
