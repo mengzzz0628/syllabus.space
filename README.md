@@ -63,9 +63,12 @@ The quiz evaluator is completely separate and laid out into `Model/eqbackend`.
 All default quizzes that course instructors can copy into their own home directories are in `templates/equiz/` .
 
 
+
+
+
 ## File Itinerary
 
-### Top Level
+### The Top Level
 
 FUTURE.md
 :	Plans
@@ -112,7 +115,8 @@ stop-hypnotoad.sh*
 :	reminder how to stop hypnotoad
 
 
-### ./lib/SylSpace/Controller:
+
+### ./lib/SylSpace/Controller: The URLs
 
 Each file corresponds to a URL.  Typically, a file such as `AuthGoclass` (note capitalization) is `/auth/goclass`.
 
@@ -201,50 +205,50 @@ Each file corresponds to a URL.  Typically, a file such as `AuthGoclass` (note c
 * Uploadsave.pm
 
 
-fixupcamel.pl*
-mkurl.pl.gz*
+fixupcamel.pl* was used to complain about misnamings inconsistenties.  mkurl.pl was used to generate a skeleton for a new url.
 
 
 
-### ./lib/SylSpace/Model:
+### ./lib/SylSpace/Model:  The Workhorse.
 
-The main workhorse functions.
-
-* Controller.pm
-* Files.pm
+* Controller.pm : all html drawing
+* Files.pm : storing and retrieving homeworks, equizzes, and files
 * Files.t
-* Grades.pm
+* Grades.pm : storing and retrieving grades
 * Grades.t
-* Model.pm
-* Utils.pm
+* Model.pm : the main model functions
+* Utils.pm : many common routines (e.g., globbing, file reading, etc.)
 * Utils.t
-* V4.pm --- various scribblings for the next version
-* Webcourse.pm
-* addsite.pl
-* csettings-schema.yml
+* V4.pm : various scribblings for the next version
+* Webcourse.pm : creating and removing a new course, used in addsite.pl
+* addsite.pl  : CLI to add a new site with instructor
+* csettings-schema.yml  : what course information is required and what it must satisfy
 * eqbackend/
-* mkmessysite.t
-* mkstartersite.t
-* usettings-schema.yml
+* mkmessysite.t : for playing with functionality
+* **mkstartersite.t** : usually first program invoked after initsylspace.pl
+* usettings-schema.yml  : what biographical information is required and what it must satisfy
 
 
 ### ./lib/SylSpace/Model/eqbackend:
 
-* 1simple.equiz
+* eqbackend.pl*  :  the main quiz evaluation program.
+  - solo = feed question from stdin
+  - syntax = check an equiz
+
 * EvalOneQuestion.pm
 * EvalStudentAnswers.pm
 * ParseTemplate.pm
 * RenderEquiz.pm
-* a.html
-* encrypt.pl.gz
-* eqbackend.pl*
-* equiz.js.gz
-* equizavatar.png.gz
+
+* 1simple.equiz : example quiz
 * tester.equiz
 * testsolo.equiz
 
 
-### ./public/css:
+
+### Static Files
+
+#### ./public/css:
 
 * dropzone.css
 * eqbackend-i.css
@@ -256,7 +260,7 @@ The main workhorse functions.
 * tablesorter.css
  
 
-### ./public/html:
+#### ./public/html:
 
 * android-icon-144x144.png
 * android-icon-192x192.png
@@ -297,32 +301,60 @@ The main workhorse functions.
 * takequiz.png
 * textarea.html
  
-### ./public/html/ifaq:
+#### ./public/html/ifaq:
 * syllabus-sophisticated.html
 * syllabus-sophisticated.png
 * syllabus.html
  
 
-### ./public/images:
+#### ./public/images:
 * bullseye.png
 * equiz-avatars.zip
 * mickey.png
-* 
-* ./public/js:
+ 
+#### ./public/js:
+
 * confirm.js
 * dropzone.js
 * eqbackend.js
 
 
 ### ./templates/layouts:
+
+* sylspace.html.ep : the key look of the website.  other ep files inherit it, and only change it a little
 * auth.html.ep
 * both.html.ep@
 * instructor.html.ep
 * student.html.ep
-* sylspace.html.ep
 
  
-### ./templates/equiz/corpfinintro:
+### ./templates/equiz : Quizzes
+
+
+#### ./templates/equiz/tutorials:
+
+* 1simple.equiz
+* 2medium.equiz
+* 3advanced.equiz
+* 4final-mba-2015.equiz
+
+
+#### ./templates/equiz/starters:
+
+* blackscholes.equiz
+* bs-sample-answer.png
+* bs-sample-render.png
+* finance.equiz
+* headerinfo.equiz
+* math.equiz
+* message.equiz
+* multchoice.equiz
+* plain.equiz
+* statistics.equiz
+* various.eqz
+
+
+#### ./templates/equiz/corpfinintro:
 
 * 02a-tvm.equiz
 * 02b-tvm.equiz
@@ -351,7 +383,7 @@ The main workhorse functions.
 * x@
 
 
-### ./templates/equiz/options:
+#### ./templates/equiz/options:
 
 * 232andrei01.equiz
 * 232andrei02.equiz
@@ -360,25 +392,3 @@ The main workhorse functions.
 * 232andrei05.equiz
 * 232andrei06.equiz
 
-
-### ./templates/equiz/starters:
-
-* blackscholes.equiz
-* bs-sample-answer.png
-* bs-sample-render.png
-* finance.equiz
-* headerinfo.equiz
-* math.equiz
-* message.equiz
-* multchoice.equiz
-* plain.equiz
-* statistics.equiz
-* various.eqz
-
-
-### ./templates/equiz/tutorials:
-
-* 1simple.equiz
-* 2medium.equiz
-* 3advanced.equiz
-* 4final-mba-2015.equiz
