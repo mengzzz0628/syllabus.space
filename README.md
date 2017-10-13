@@ -70,17 +70,17 @@ All default quizzes that course instructors can copy into their own home directo
 
 ### The Top Level
 
-**initsylspace.pl**
+* **initsylspace.pl**
 :	the most important file.  initializes the `/var` hierarchy
 
-cpanfile
-cpanlist
-:	has all required definitions.  Use as `cpanm --installdeps .` in this directory
+* cpanfile
+:	describes all required perl modules.  Use as `cpanm --installdeps .` in this directory.  (cpanlist just lists them.)
 
-**SylSpace**
+
+* **SylSpace**
 :	The Main Executable
 
-runserver.pl*
+* runserver.pl*
 :	smartly starts the server, depending on the hostname, with hypnotoad or morbo
 
 
