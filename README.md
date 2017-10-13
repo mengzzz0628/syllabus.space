@@ -114,89 +114,91 @@ stop-hypnotoad.sh*
 
 ### ./lib/SylSpace/Controller:
 
-Aboutus.pm
-AuthAuthenticator.pm
-AuthBioform.pm
-AuthBiosave.pm
-AuthGoclass.pm
-AuthIndex.pm
-AuthLocalverify.pm
-AuthMagic.pm
-AuthSendmail.pm
-AuthSettimeout.pm
-AuthTestsetuser.pm
-AuthUserdisroll.pm
-AuthUserenrollform.pm
-AuthUserenrollsave.pm
-Enter.pm
-Equizcenter.pm
-Equizgrade.pm
-Equizrate.pm
-Equizrender.pm
-Faq.pm
-Filecenter.pm
-Hwcenter.pm
-Index.pm
-InstructorCiobuttonsave.pm
-InstructorCioform.pm
-InstructorCiosave.pm
-InstructorCollectstudentanswers.pm
-InstructorCptemplate.pm
-InstructorDesign.pm
-InstructorDownload.pm
-InstructorEdit.pm
-InstructorEditsave.pm
-InstructorEquizcenter.pm
-InstructorEquizmore.pm
-InstructorFaq.pm
-InstructorFilecenter.pm
-InstructorFiledelete.pm
-InstructorFilemore.pm
-InstructorFilesetdue.pm
-InstructorGradecenter.pm
-InstructorGradedownload.pm
-InstructorGradeform.pm
-InstructorGradesave.pm
-InstructorGradesave1.pm
-InstructorGradetaskadd.pm
-InstructorHwcenter.pm
-InstructorHwmore.pm
-InstructorIndex.pm
-InstructorInstructor2student.pm
-InstructorInstructoradd.pm
-InstructorInstructordel.pm
-InstructorInstructorlist.pm
-InstructorMsgcenter.pm
-InstructorMsgdelete.pm
-InstructorMsgsave.pm
-InstructorRmtemplates.pm
-InstructorSilentdownload.pm
-InstructorSitebackup.pm
-InstructorStudentdetailedlist.pm
-InstructorUserenroll.pm
-InstructorView.pm
-Login.pm
-Logout.pm
-Msgcenter.pm
-Msgmarkasread.pm
-PaypalHandler.pm
-Showseclog.pm
-Showtweets.pm
-StudentEquizcenter.pm
-StudentFaq.pm
-StudentFilecenter.pm
-StudentFileview.pm
-StudentGradecenter.pm
-StudentHwcenter.pm
-StudentIndex.pm
-StudentMsgcenter.pm
-StudentOwnfileview.pm
-StudentQuickinfo.pm
-StudentStudent2instructor.pm
-Testquestion.pm
-Testquestion.pm.save
-Uploadform.pm
-Uploadsave.pm
+Each file corresponds to a URL.  Typically, a file such as `AuthGoclass` (note capitalization) is `/auth/goclass`.
+
+* Aboutus.pm
+* AuthAuthenticator.pm
+* AuthBioform.pm
+* AuthBiosave.pm
+* AuthGoclass.pm
+* AuthIndex.pm
+* AuthLocalverify.pm
+* AuthMagic.pm
+* AuthSendmail.pm
+* AuthSettimeout.pm
+* AuthTestsetuser.pm
+* AuthUserdisroll.pm
+* AuthUserenrollform.pm
+* AuthUserenrollsave.pm
+* Enter.pm
+* Equizcenter.pm
+* Equizgrade.pm
+* Equizrate.pm
+* Equizrender.pm
+* Faq.pm
+* Filecenter.pm
+* Hwcenter.pm
+* Index.pm
+* InstructorCiobuttonsave.pm
+* InstructorCioform.pm
+* InstructorCiosave.pm
+* InstructorCollectstudentanswers.pm
+* InstructorCptemplate.pm
+* InstructorDesign.pm
+* InstructorDownload.pm
+* InstructorEdit.pm
+* InstructorEditsave.pm
+* InstructorEquizcenter.pm
+* InstructorEquizmore.pm
+* InstructorFaq.pm
+* InstructorFilecenter.pm
+* InstructorFiledelete.pm
+* InstructorFilemore.pm
+* InstructorFilesetdue.pm
+* InstructorGradecenter.pm
+* InstructorGradedownload.pm
+* InstructorGradeform.pm
+* InstructorGradesave.pm
+* InstructorGradesave1.pm
+* InstructorGradetaskadd.pm
+* InstructorHwcenter.pm
+* InstructorHwmore.pm
+* InstructorIndex.pm
+* InstructorInstructor2student.pm
+* InstructorInstructoradd.pm
+* InstructorInstructordel.pm
+* InstructorInstructorlist.pm
+* InstructorMsgcenter.pm
+* InstructorMsgdelete.pm
+* InstructorMsgsave.pm
+* InstructorRmtemplates.pm
+* InstructorSilentdownload.pm
+* InstructorSitebackup.pm
+* InstructorStudentdetailedlist.pm
+* InstructorUserenroll.pm
+* InstructorView.pm
+* Login.pm
+* Logout.pm
+* Msgcenter.pm
+* Msgmarkasread.pm
+* PaypalHandler.pm
+* Showseclog.pm
+* Showtweets.pm
+* StudentEquizcenter.pm
+* StudentFaq.pm
+* StudentFilecenter.pm
+* StudentFileview.pm
+* StudentGradecenter.pm
+* StudentHwcenter.pm
+* StudentIndex.pm
+* StudentMsgcenter.pm
+* StudentOwnfileview.pm
+* StudentQuickinfo.pm
+* StudentStudent2instructor.pm
+* Testquestion.pm
+* Testquestion.pm.save
+* Uploadform.pm
+* Uploadsave.pm
 
 
 fixupcamel.pl*
@@ -205,165 +207,178 @@ mkurl.pl.gz*
 
 
 ### ./lib/SylSpace/Model:
-Controller.pm
-Files.pm
-Files.t
-Grades.pm
-Grades.t
-Model.pm
-Utils.pm
-Utils.t
-V4.pm
-Webcourse.pm
-addsite.pl
-csettings-schema.yml
-eqbackend/
-mkmessysite.t
-mkstartersite.t
-usettings-schema.yml
+
+The main workhorse functions.
+
+* Controller.pm
+* Files.pm
+* Files.t
+* Grades.pm
+* Grades.t
+* Model.pm
+* Utils.pm
+* Utils.t
+* V4.pm --- various scribblings for the next version
+* Webcourse.pm
+* addsite.pl
+* csettings-schema.yml
+* eqbackend/
+* mkmessysite.t
+* mkstartersite.t
+* usettings-schema.yml
 
 
 ### ./lib/SylSpace/Model/eqbackend:
-1simple.equiz
-EvalOneQuestion.pm
-EvalStudentAnswers.pm
-ParseTemplate.pm
-RenderEquiz.pm
-a.html
-encrypt.pl.gz
-eqbackend.pl*
-equiz.js.gz
-equizavatar.png.gz
-tester.equiz
-testsolo.equiz
+
+* 1simple.equiz
+* EvalOneQuestion.pm
+* EvalStudentAnswers.pm
+* ParseTemplate.pm
+* RenderEquiz.pm
+* a.html
+* encrypt.pl.gz
+* eqbackend.pl*
+* equiz.js.gz
+* equizavatar.png.gz
+* tester.equiz
+* testsolo.equiz
 
 
 ### ./public/css:
-dropzone.css
-eqbackend-i.css
-eqbackend.css
-equiz.css
-fontshadow.css
-input.css
-sylspace.css
-tablesorter.css
+
+* dropzone.css
+* eqbackend-i.css
+* eqbackend.css
+* equiz.css
+* fontshadow.css
+* input.css
+* sylspace.css
+* tablesorter.css
+ 
 
 ### ./public/html:
-android-icon-144x144.png
-android-icon-192x192.png
-android-icon-36x36.png
-android-icon-48x48.png
-android-icon-72x72.png
-android-icon-96x96.png
-apple-icon-114x114.png
-apple-icon-120x120.png
-apple-icon-144x144.png
-apple-icon-152x152.png
-apple-icon-180x180.png
-apple-icon-57x57.png
-apple-icon-60x60.png
-apple-icon-72x72.png
-apple-icon-76x76.png
-apple-icon-precomposed.png
-apple-icon.png
-browserconfig.xml
-eqsample02a.html
-eqsample02a.txt
-faq.html
-favicon-16x16.png
-favicon-32x32.png
-favicon-96x96.png
-favicon-uni.zip
-favicon.ico
-favicon.png
-favicons.html
-ifaq/
-instructor-syllabus.png
-manifest.json
-ms-icon-144x144.png
-ms-icon-150x150.png
-ms-icon-310x310.png
-ms-icon-70x70.png
-student-syllabus.png
-takequiz.png
-textarea.html
 
-./public/html/ifaq:
-syllabus-sophisticated.html
-syllabus-sophisticated.png
-syllabus.html
+* android-icon-144x144.png
+* android-icon-192x192.png
+* android-icon-36x36.png
+* android-icon-48x48.png
+* android-icon-72x72.png
+* android-icon-96x96.png
+* apple-icon-114x114.png
+* apple-icon-120x120.png
+* apple-icon-144x144.png
+* apple-icon-152x152.png
+* apple-icon-180x180.png
+* apple-icon-57x57.png
+* apple-icon-60x60.png
+* apple-icon-72x72.png
+* apple-icon-76x76.png
+* apple-icon-precomposed.png
+* apple-icon.png
+* browserconfig.xml
+* eqsample02a.html
+* eqsample02a.txt
+* faq.html
+* favicon-16x16.png
+* favicon-32x32.png
+* favicon-96x96.png
+* favicon-uni.zip
+* favicon.ico
+* favicon.png
+* favicons.html
+* ifaq/
+* instructor-syllabus.png
+* manifest.json
+* ms-icon-144x144.png
+* ms-icon-150x150.png
+* ms-icon-310x310.png
+* ms-icon-70x70.png
+* student-syllabus.png
+* takequiz.png
+* textarea.html
+ 
+### ./public/html/ifaq:
+* syllabus-sophisticated.html
+* syllabus-sophisticated.png
+* syllabus.html
+ 
 
-./public/images:
-bullseye.png
-equiz-avatars.zip
-mickey.png
-
-./public/js:
-confirm.js
-dropzone.js
-eqbackend.js
+### ./public/images:
+* bullseye.png
+* equiz-avatars.zip
+* mickey.png
+* 
+* ./public/js:
+* confirm.js
+* dropzone.js
+* eqbackend.js
 
 
 ### ./templates/layouts:
-auth.html.ep
-both.html.ep@
-instructor.html.ep
-student.html.ep
-sylspace.html.ep
+* auth.html.ep
+* both.html.ep@
+* instructor.html.ep
+* student.html.ep
+* sylspace.html.ep
 
+ 
 ### ./templates/equiz/corpfinintro:
 
-02a-tvm.equiz
-02b-tvm.equiz
-03-perpann.equiz
-04a-capbudgrules.equiz
-04b-capbudgrules.equiz
-05a-yieldcurve.equiz
-05b-yieldcurve.equiz
-06a-uncertainty.equiz
-06b-uncertainty.equiz
-07-invintro.equiz
-08-invest.equiz
-09-benchmarking.equiz
-10-capm.equiz
-11-imperfect.equiz
-12-effmkts.equiz
-13-npvapplications.equiz
-14-valuation.equiz
-15-comparables.equiz
-16-capstruct-intro.equiz
-17-capstruct-more.equiz
-eqformat.pl
-final-mba-2015.equiuiz
-guidelines.txt
-unclean/
-x@
+* 02a-tvm.equiz
+* 02b-tvm.equiz
+* 03-perpann.equiz
+* 04a-capbudgrules.equiz
+* 04b-capbudgrules.equiz
+* 05a-yieldcurve.equiz
+* 05b-yieldcurve.equiz
+* 06a-uncertainty.equiz
+* 06b-uncertainty.equiz
+* 07-invintro.equiz
+* 08-invest.equiz
+* 09-benchmarking.equiz
+* 10-capm.equiz
+* 11-imperfect.equiz
+* 12-effmkts.equiz
+* 13-npvapplications.equiz
+* 14-valuation.equiz
+* 15-comparables.equiz
+* 16-capstruct-intro.equiz
+* 17-capstruct-more.equiz
+* eqformat.pl
+* final-mba-2015.equiuiz
+* guidelines.txt
+* unclean/
+* x@
 
 
 ### ./templates/equiz/options:
-232andrei01.equiz
-232andrei02.equiz
-232andrei03.equiz
-232andrei04.equiz
-232andrei05.equiz
-232andrei06.equiz
+
+* 232andrei01.equiz
+* 232andrei02.equiz
+* 232andrei03.equiz
+* 232andrei04.equiz
+* 232andrei05.equiz
+* 232andrei06.equiz
+
 
 ### ./templates/equiz/starters:
-blackscholes.equiz
-bs-sample-answer.png
-bs-sample-render.png
-finance.equiz
-headerinfo.equiz
-math.equiz
-message.equiz
-multchoice.equiz
-plain.equiz
-statistics.equiz
-various.eqz
+
+* blackscholes.equiz
+* bs-sample-answer.png
+* bs-sample-render.png
+* finance.equiz
+* headerinfo.equiz
+* math.equiz
+* message.equiz
+* multchoice.equiz
+* plain.equiz
+* statistics.equiz
+* various.eqz
+
 
 ### ./templates/equiz/tutorials:
-1simple.equiz
-2medium.equiz
-3advanced.equiz
-4final-mba-2015.equiz
 
+* 1simple.equiz
+* 2medium.equiz
+* 3advanced.equiz
+* 4final-mba-2015.equiz
