@@ -29,7 +29,7 @@ now point your firefox browser to `http://syllabus.test`.  (do not use Chrome!).
 
 ### Real Operation
 
-For real production operation on syllabus.space (or similar), rather than local testing and development at syllabus.test, you will also need to create a file containing secrets:
+For real production operation on syllabus.space (or similar), rather than local testing and development at syllabus.test, you also should create a file containing secrets so that the Google, Facebook, and Paypal Authentications work.
 
 	<somewhere-else>/SylSpace-Secrets.conf --- SylSpace's working email and your OAUTH facilities
 
@@ -244,7 +244,9 @@ fixupcamel.pl* was used to complain about misnamings inconsistenties.  mkurl.pl 
 * ParseTemplate.pm
 * RenderEquiz.pm
 
-* 1simple.equiz : example quiz
+this directory contains some example equizzes here for testing
+
+* 1simple.equiz
 * tester.equiz
 * testsolo.equiz
 
