@@ -10,16 +10,6 @@ use feature 'signatures';
 no warnings qw(experimental::signatures);
 
 ################################################################
-## not used, but we want to make sure that these modules are installed.
-use common::sense;
-use File::Copy;
-use Perl6::Slurp;
-use Archive::Zip;
-use FindBin;
-use Mojolicious::Plugin::RenderFile;
-use Data::Dumper;
-
-################################################################
 
 use lib '../..';
 
@@ -37,3 +27,10 @@ instructornewenroll($subdomain, $iemail);
 
 print "successfully created website $subdomain with instructor $iemail\n";
 
+if (`hostname` !~ /syllabus-space/m) {
+  print "
+
+IMPORTANT : because you did not execute this on a production site, you probably
+need to add $subdomain to map to 127.0.0.1 into /etc/hosts
+";
+}

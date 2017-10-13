@@ -18,15 +18,13 @@ Due to the outdated three-year-old 5.18.2 version of perl still running on MacOS
 *   echo "127.0.0.1 syllabus.test corpfin.syllabus.test auth.syllabus.test" >> /etc/hosts
 *   perl initsylspace.pl -f
 *   cd Model
-*   perl MkTestSite.pl
+*   perl mkstartersite.pl
 *   cd ..
 *   updatedb   # runserver.pl can now self-detect location
-*   perl runserver.pl   # smart enough to figure out whether it is running on syllabus.space domain (where it should use hypnotoad).
+*   perl runserver.pl    # smart enough to figure out whether it is running on syllabus.space domain (where it should use hypnotoad).
 
 
 now point your firefox browser to `http://syllabus.test`.  (do not use Chrome!).  when you are done, ^C out of runserver.pl .
-
-runserver.pl also has a mode that lets it operate similar to hypnotoad, primarily removing informative error messages.  Give runserver.pl a 'p' argument to force this production mode.
 
 
 ### Real Operation
@@ -39,12 +37,12 @@ with your private authentication secrets, and link to it in your main SylSpace d
 
     # ln -s <somewhere-else>/SylSpace-Secrets.conf mysylspacedir/SylSpace-Secrets.conf
 
-The contents of the SylSpace-Secrets.conf file are illustrated in SylSpace-Secrets.template .  Edit and rename!
+The contents of the SylSpace-Secrets.conf file are illustrated in SylSpace-Secrets.template .  Edit and rename!  Thereafter, you should see google login buttons.
 
 
-## Automatic ReStart
+## Automatic (Re-) Start
 
-For automatic restart on crash and boot for use with the real production hypnotoad on syllabus.space, do
+For automatic start on boot and restart on crash in the real production hypnotoad on syllabus.space, do
 
     # cp SylSpace.service /lib/systemd/system/
     # systemctl start SylSpace
@@ -62,4 +60,310 @@ Almost every controller uses functionality that is in the model, which is in `Mo
 
 The quiz evaluator is completely separate and laid out into `Model/eqbackend`.
 
-All default quizzes that course instructors can copy into their own home directories are in templates/equiz/ .
+All default quizzes that course instructors can copy into their own home directories are in `templates/equiz/` .
+
+
+## File Itinerary
+
+### Top Level
+
+FUTURE.md
+:	Plans
+
+README.md
+:	This File
+
+SylSpace*
+:	The Main Executable
+
+SylSpace-Secrets.conf@
+:	A symlink to outside the hierarchy to keep secrets
+
+SylSpace-Secrets.template
+:	Illustrating how the secret file should look like
+
+SylSpace.service
+:	The systemd service file, to be copied into /lib/systemd/system/ for automatic (re-)start
+
+SylSpace.t
+SylSpace.t2
+:	Beginning to learn how to write GUI tests.  Not working
+
+cpanfile
+cpanlist
+:	has all required definitions.  Use as `cpanm --installdeps .` in the directory
+
+hosts
+:	a variety of hostnames used in the startersite and messysite
+
+initsylspace.pl
+:	the most important file.  initializes the `/var` hierarchy
+
+nginx-config
+:	untested config file for nginx.  on my server, I deinstall all other webservers and just run hypnotoad
+
+runserver.pl*
+:	smartly starts the server, depending on the hostname, with hypnotoad or morbo
+
+start-hypnotoad.sh@
+:	link to runserver.pl
+
+stop-hypnotoad.sh*
+:	reminder how to stop hypnotoad
+
+
+### ./lib/SylSpace/Controller:
+
+Aboutus.pm
+AuthAuthenticator.pm
+AuthBioform.pm
+AuthBiosave.pm
+AuthGoclass.pm
+AuthIndex.pm
+AuthLocalverify.pm
+AuthMagic.pm
+AuthSendmail.pm
+AuthSettimeout.pm
+AuthTestsetuser.pm
+AuthUserdisroll.pm
+AuthUserenrollform.pm
+AuthUserenrollsave.pm
+Enter.pm
+Equizcenter.pm
+Equizgrade.pm
+Equizrate.pm
+Equizrender.pm
+Faq.pm
+Filecenter.pm
+Hwcenter.pm
+Index.pm
+InstructorCiobuttonsave.pm
+InstructorCioform.pm
+InstructorCiosave.pm
+InstructorCollectstudentanswers.pm
+InstructorCptemplate.pm
+InstructorDesign.pm
+InstructorDownload.pm
+InstructorEdit.pm
+InstructorEditsave.pm
+InstructorEquizcenter.pm
+InstructorEquizmore.pm
+InstructorFaq.pm
+InstructorFilecenter.pm
+InstructorFiledelete.pm
+InstructorFilemore.pm
+InstructorFilesetdue.pm
+InstructorGradecenter.pm
+InstructorGradedownload.pm
+InstructorGradeform.pm
+InstructorGradesave.pm
+InstructorGradesave1.pm
+InstructorGradetaskadd.pm
+InstructorHwcenter.pm
+InstructorHwmore.pm
+InstructorIndex.pm
+InstructorInstructor2student.pm
+InstructorInstructoradd.pm
+InstructorInstructordel.pm
+InstructorInstructorlist.pm
+InstructorMsgcenter.pm
+InstructorMsgdelete.pm
+InstructorMsgsave.pm
+InstructorRmtemplates.pm
+InstructorSilentdownload.pm
+InstructorSitebackup.pm
+InstructorStudentdetailedlist.pm
+InstructorUserenroll.pm
+InstructorView.pm
+Login.pm
+Logout.pm
+Msgcenter.pm
+Msgmarkasread.pm
+PaypalHandler.pm
+Showseclog.pm
+Showtweets.pm
+StudentEquizcenter.pm
+StudentFaq.pm
+StudentFilecenter.pm
+StudentFileview.pm
+StudentGradecenter.pm
+StudentHwcenter.pm
+StudentIndex.pm
+StudentMsgcenter.pm
+StudentOwnfileview.pm
+StudentQuickinfo.pm
+StudentStudent2instructor.pm
+Testquestion.pm
+Testquestion.pm.save
+Uploadform.pm
+Uploadsave.pm
+
+
+fixupcamel.pl*
+mkurl.pl.gz*
+
+
+
+### ./lib/SylSpace/Model:
+Controller.pm
+Files.pm
+Files.t
+Grades.pm
+Grades.t
+Model.pm
+Utils.pm
+Utils.t
+V4.pm
+Webcourse.pm
+addsite.pl
+csettings-schema.yml
+eqbackend/
+mkmessysite.t
+mkstartersite.t
+usettings-schema.yml
+
+
+### ./lib/SylSpace/Model/eqbackend:
+1simple.equiz
+EvalOneQuestion.pm
+EvalStudentAnswers.pm
+ParseTemplate.pm
+RenderEquiz.pm
+a.html
+encrypt.pl.gz
+eqbackend.pl*
+equiz.js.gz
+equizavatar.png.gz
+tester.equiz
+testsolo.equiz
+
+
+### ./public/css:
+dropzone.css
+eqbackend-i.css
+eqbackend.css
+equiz.css
+fontshadow.css
+input.css
+sylspace.css
+tablesorter.css
+
+### ./public/html:
+android-icon-144x144.png
+android-icon-192x192.png
+android-icon-36x36.png
+android-icon-48x48.png
+android-icon-72x72.png
+android-icon-96x96.png
+apple-icon-114x114.png
+apple-icon-120x120.png
+apple-icon-144x144.png
+apple-icon-152x152.png
+apple-icon-180x180.png
+apple-icon-57x57.png
+apple-icon-60x60.png
+apple-icon-72x72.png
+apple-icon-76x76.png
+apple-icon-precomposed.png
+apple-icon.png
+browserconfig.xml
+eqsample02a.html
+eqsample02a.txt
+faq.html
+favicon-16x16.png
+favicon-32x32.png
+favicon-96x96.png
+favicon-uni.zip
+favicon.ico
+favicon.png
+favicons.html
+ifaq/
+instructor-syllabus.png
+manifest.json
+ms-icon-144x144.png
+ms-icon-150x150.png
+ms-icon-310x310.png
+ms-icon-70x70.png
+student-syllabus.png
+takequiz.png
+textarea.html
+
+./public/html/ifaq:
+syllabus-sophisticated.html
+syllabus-sophisticated.png
+syllabus.html
+
+./public/images:
+bullseye.png
+equiz-avatars.zip
+mickey.png
+
+./public/js:
+confirm.js
+dropzone.js
+eqbackend.js
+
+
+### ./templates/layouts:
+auth.html.ep
+both.html.ep@
+instructor.html.ep
+student.html.ep
+sylspace.html.ep
+
+### ./templates/equiz/corpfinintro:
+
+02a-tvm.equiz
+02b-tvm.equiz
+03-perpann.equiz
+04a-capbudgrules.equiz
+04b-capbudgrules.equiz
+05a-yieldcurve.equiz
+05b-yieldcurve.equiz
+06a-uncertainty.equiz
+06b-uncertainty.equiz
+07-invintro.equiz
+08-invest.equiz
+09-benchmarking.equiz
+10-capm.equiz
+11-imperfect.equiz
+12-effmkts.equiz
+13-npvapplications.equiz
+14-valuation.equiz
+15-comparables.equiz
+16-capstruct-intro.equiz
+17-capstruct-more.equiz
+eqformat.pl
+final-mba-2015.equiuiz
+guidelines.txt
+unclean/
+x@
+
+
+### ./templates/equiz/options:
+232andrei01.equiz
+232andrei02.equiz
+232andrei03.equiz
+232andrei04.equiz
+232andrei05.equiz
+232andrei06.equiz
+
+### ./templates/equiz/starters:
+blackscholes.equiz
+bs-sample-answer.png
+bs-sample-render.png
+finance.equiz
+headerinfo.equiz
+math.equiz
+message.equiz
+multchoice.equiz
+plain.equiz
+statistics.equiz
+various.eqz
+
+### ./templates/equiz/tutorials:
+1simple.equiz
+2medium.equiz
+3advanced.equiz
+4final-mba-2015.equiz
+
