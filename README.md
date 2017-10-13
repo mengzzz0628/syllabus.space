@@ -86,36 +86,35 @@ All default quizzes that course instructors can copy into their own home directo
 
 The rest are also useful.
 
-SylSpace-Secrets.conf@
+* SylSpace-Secrets.conf@
 :	A symlink to outside the hierarchy to keep secrets
 
-SylSpace-Secrets.template
+* SylSpace-Secrets.template
 :	Illustrating how the secret file should look like
 
-SylSpace.service
+* SylSpace.service
 :	The systemd service file, to be copied into /lib/systemd/system/ for automatic (re-)start
 
-SylSpace.t
-SylSpace.t2
+* SylSpace.t*
 :	Beginning to learn how to write GUI tests.  Not working
 
-hosts
+* hosts
 :	a variety of hostnames used in the startersite and messysite
 
-nginx-config
+* nginx-config
 :	untested config file for nginx.  on my server, I deinstall all other webservers and just run hypnotoad
 
-start-hypnotoad.sh@
+* start-hypnotoad.sh@
 :	link to runserver.pl
 
-stop-hypnotoad.sh*
+* stop-hypnotoad.sh*
 :	reminder how to stop hypnotoad
 
-FUTURE.md
-:	Plans
+* FUTURE.md
+:	plans
 
-README.md
-:	This File
+* README.md
+:	this file
 
 
 
